@@ -1,0 +1,18 @@
+{
+  "UploadModules": [
+    {
+      "Module": "UserCreation",
+      "UploadPath": "D:\\Ex\\CoreOne\\CoreOne.UI\\wwwroot\\Uploads\\Profiles",
+      "AllowedExtensions": [ ".jpg", ".png", ".pdf", ".jpeg", ".svg", ".docx" ],
+      "MaxSizeInMB": 5,
+      "CompressionLevel": 50
+    },
+    {
+      "Module": "emp",
+      "UploadPath": "D:/FileStorage/UserCreation",
+      "AllowedExtensions": [ ".jpg", ".png", ".pdf" ],
+      "MaxSizeInMB": 5,
+      "CompressionLevel": 50
+    }
+  ]
+}

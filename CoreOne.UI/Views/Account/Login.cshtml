@@ -1,0 +1,189 @@
+﻿ @model CoreOne.COMMON.Models.LoginViewModel
+
+@{
+    Layout = "_LoginLayout";
+}
+@* 
+    <input />
+    <input />
+    <button type="submit">Login</button>
+
+ *@
+
+
+<div class="auth-fluid">
+    <!--Auth fluid left content -->
+    <div class="auth-fluid-form-box">
+        <div class="align-items-center d-flex h-100">
+            <div class="p-3">
+
+                <!-- Logo -->
+                <div class="auth-brand text-center text-lg-start">
+                    <div class="auth-logo">
+                        <a href="index.html" class="logo logo-dark text-center">
+                            <span class="logo-lg">
+                                <img src="~/assets/images/logo-dark.png" alt="" height="22">
+                            </span>
+                        </a>
+
+                        <a href="index.html" class="logo logo-light text-center">
+                            <span class="logo-lg">
+                                <img src="~/assets/images/logo-light.png" alt="" height="22">
+                            </span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- title-->
+                <h4 class="mt-0">Sign In</h4>
+                <p class="text-muted mb-4">Enter your username and password to access account.</p>
+
+                <!-- form -->
+                <form asp-action="Login" method="post" id="loginForm">
+                    <div class="mb-3">
+                        <label for="emailaddress" class="form-label">Username</label>
+                        <input class="form-control" asp-for="UserName" placeholder="Enter your username" required>
+                        <span asp-validation-for="UserName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="input-group input-group-merge">
+                            <input asp-for="Password" type="password" class="form-control" placeholder="Enter your password" required>
+                            <div class="input-group-text" data-password="false">
+                                <span class="password-eye"></span>
+                            </div>
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="checkbox-signin">
+                            <label class="form-check-label" for="checkbox-signin">Remember me</label>
+                        </div>
+                    </div>
+
+
+                    @* Transparent Toast Container (top-right) *@
+                    @{
+                        var message = TempData["message"];
+
+                    }
+
+                    @if (message!= null)
+                    {
+                        var messagetype = TempData["messagetype"];
+                        string messageType ="";
+                        if (messagetype is not null)
+                        {
+                            messageType = messagetype.ToString(); 
+                        }
+                        if (string.Equals(messageType, "error", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+                                <div class="toast show border border-danger rounded shadow-sm" style="background-color: rgba(255, 0, 0, 0.1);" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="d-flex">
+                                        <div class="toast-body text-danger d-flex align-items-center">
+                                            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                                            @message
+                                        </div>
+                                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else if (string.Equals(messageType, "success", StringComparison.OrdinalIgnoreCase))
+                        {
+                            <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0" style="z-index: 1080; padding: 7rem 1rem 1rem 1rem;">
+                                <div class="toast show border border-success rounded shadow-sm"
+                                     style="background-color: rgba(40, 167, 69, 0.15);"
+                                     role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="d-flex">
+                                        <div class="toast-body text-success d-flex align-items-center">
+                                            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                                            @message
+                                        </div>
+                                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            // Fallback: Warning when messageType is null or unrecognized
+                            <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 mt-5 me-3" style="z-index: 1080;">
+                                <div class="toast show border border-warning rounded shadow-sm"
+                                     style="background-color: rgba(255, 193, 7, 0.15);"
+                                     role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="d-flex">
+                                        <div class="toast-body text-warning d-flex align-items-center">
+                                            <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                                            @message
+                                        </div>
+                                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    
+
+
+
+                    <div class="text-center d-grid">
+                        <button class="btn btn-primary" type="submit">Log In</button>
+                    </div>
+                </form>
+
+                @section Scripts {
+                    <partial name="_ValidationScriptsPartial" />
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+                            toastElList.forEach(function (toastEl) {
+                                var toast = new bootstrap.Toast(toastEl, {
+                                    delay: 3000  // 4 seconds
+                                });
+                                toast.show();
+
+                                // Optional: clear TempData when toast is closed
+                                toastEl.addEventListener('hidden.bs.toast', function () {
+                                    fetch('@Url.Action("ClearTempData", "Account")', { method: 'POST' });
+                                });
+                            });
+                        });
+                    </script>
+                }
+
+
+
+                <!-- end form-->
+                <!-- Footer-->
+                <footer class="footer footer-alt">
+                    <p class="text-muted"><a href="auth-register-2.html" class="text-muted ms-1"><b>Forgot your password?</b></a></p>
+                </footer>
+
+            </div> <!-- end .card-body -->
+        </div> <!-- end .align-items-center.d-flex.h-100-->
+    </div>
+    <!-- end auth-fluid-form-box-->
+    <!-- Auth fluid right content -->
+    <div class="auth-fluid-right text-center">
+        <div class="auth-user-testimonial">
+            <h2 class="mb-3 text-white">Document Management</h2>
+            <p class="lead">
+                <i class="mdi mdi-file-document-outline"></i>
+                Manage, organize, and access your documents securely and efficiently.
+                <br>Upload, approve, and track files with ease using our system.
+            </p>
+            <h5 class="text-white">
+                - CoreOne Portal
+            </h5>
+        </div>
+    </div>
+
+    <!-- end Auth fluid right content -->
+</div>

@@ -1,0 +1,317 @@
+﻿@model CoreOne.COMMON.Models.UserCreation
+
+@{
+    ViewData["Title"] = "User Creation";
+    var users = ViewBag.Users as List<CoreOne.COMMON.Models.UserCreation> ?? new();
+    int totalRecords = ViewBag.TotalRecords ?? 0;
+    int pageNumber = ViewBag.PageNumber ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    string sortColumn = ViewBag.SortColumn ?? "";
+    string sortDir = ViewBag.SortDir ?? "ASC";
+    string search = ViewBag.Search ?? "";
+    string searchCol = ViewBag.SearchCol ?? "";
+}
+
+    <div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-flex justify-content-between align-items-center">
+                <h4 class="page-title fw-bold text-gradient">User Management</h4>
+                <button class="btn btn-primary rounded-pill shadow-sm" id="btnAddUser"
+                        data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="mdi mdi-plus-circle"></i> Add User
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+    <!-- Search, Filter, and Page Size -->
+    <div class="row mb-3 mt-2 align-items-center">
+        <div class="col-md-2 m-2">
+            <select id="searchCol" class="form-select rounded-pill">
+                <option value="UserName" selected> Name</option>
+                <option value="Email">Email</option>
+                <option value="PhoneNumber">Phone</option>
+                    <option value="GenderName">Gender</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input id="search" type="text" class="form-control rounded-pill" placeholder="Enter keyword..." value="@search" />
+        </div>
+        <div class="col-md-2">
+            <select id="activeStatus" class="form-select rounded-pill">
+                <option value="">All Status</option>
+                <option value="1">Active</option>
+                <option value="2">Blocked</option>
+                <option value="0">Deactivated</option>
+            </select>
+        </div>
+    
+        <!-- Page Size Dropdown (like Role) -->
+        <div class="col-md-2">
+          
+                <button id="btnSearch" class="btn btn-success rounded-pill ms-2">
+                    <i class="mdi mdi-magnify"></i> Search
+                </button>
+         
+            
+        </div>
+
+            <div class="col-md-3 text-end" style="margin-left: 2.5rem;">
+                <select id="pageSize" class="form-select rounded-pill w-50 d-inline-block">
+                    @{
+                        int[] pageSizes = new int[] { 1, 10, 20, 50, 100 };
+                        foreach (var size in pageSizes)
+                        {
+                            <option value="@size" selected="@(size == pageSize)">@size</option>
+                        }
+                    }
+                </select>
+            </div>
+    </div>
+ 
+    </div>
+   
+
+
+    <!-- User Table -->
+    <div class="card glass-card p-3 shadow-lg">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle text-center mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th onclick="sortTable('UserName')" class="sortable">
+                            Name @Html.Raw(sortColumn == "UserName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                        </th>
+                        <th onclick="sortTable('Email')" class="sortable">
+                            Email @Html.Raw(sortColumn == "Email" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                        </th>
+                        <th>Phone</th>
+                        <th onclick="sortTable('RoleName')" class="sortable">
+                            Role @Html.Raw(sortColumn == "RoleName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                        </th>
+                        <th onclick="sortTable('GenderName')" class="sortable">
+                            Gender @Html.Raw(sortColumn == "GenderName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                        </th>
+                        <th>Status</th>
+                       
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (users.Any())
+                    {
+                        foreach (var user in users)
+                        {
+                            <tr>
+                                <td>@user.UserName</td>
+                                <td>@user.Email</td>
+                                <td>@user.PhoneNumber</td>
+                                <td>@user.RoleName</td>
+                                <td>@user.GenderName</td>
+                                <td>
+                                    @{
+                                        var status = user.ActiveFlag switch
+                                        {
+                                            1 => "Active",
+                                            2 => "Blocked",
+                                            0 => "Deactivated",
+                                            _ => "Unknown"
+                                        };
+                                        var color = user.ActiveFlag == 1 ? "text-success" :
+                                        user.ActiveFlag == 2 ? "text-danger" :
+                                        "text-secondary";
+                                    }
+                                    <span class="@color fw-semibold">@status</span>
+                                </td>
+                             
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary me-1" onclick="editUser(@user.UserID)">
+                                        <i class="mdi mdi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteUser(@user.UserID)">
+                                        <i class="mdi mdi-delete"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-muted text-center py-4">No users found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-3">
+            <div class="text-muted">
+                Showing page <b>@pageNumber</b> of <b>@Math.Ceiling((double)totalRecords / pageSize)</b>
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    @{
+                        int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+                        for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == pageNumber ? "active" : "")">
+                                <a class="page-link" href="javascript:void(0)" onclick="changePage(@i)">@i</a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <!-- wider modal -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userModalLabel">Add User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" asp-for="UserID" />
+
+                <div class="row">
+                    <!-- Left: Form -->
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="UserName" class="form-label">Name</label>
+                            <input type="text" asp-for="UserName" class="form-control" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="MailTypeID" class="form-label">Mail Type</label>
+                            @Html.DropDownList("MailTypeID", ViewBag.MailTypeList as List<SelectListItem>,
+                            new { @class = "form-select" })
+                            <span asp-validation-for="MailTypeID" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label for="Email" class="form-label">Email</label>
+                            <input type="email" asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="PhoneNumber" class="form-label">Phone Number</label>
+                            <input type="text" asp-for="PhoneNumber" class="form-control" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="RoleID" class="form-label">Role</label>
+
+                            @Html.DropDownList("RoleID", ViewBag.RoleList as List<SelectListItem>,
+                                 new { @class = "form-select" })
+                            <span asp-validation-for="RoleID" class="text-danger"></span>
+                           
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="GenderID" class="form-label">Gender</label>
+                            @Html.DropDownList("GenderID", ViewBag.GenderList as List<SelectListItem>,
+                                                        new { @class = "form-select" })
+                            <span asp-validation-for="GenderID" class="text-danger"></span>
+                        </div>
+
+                     
+                    </div>
+
+                    <!-- Right: Image Upload -->
+                    <div class="col-md-4 text-center">
+                        <button class="btn btn-primary" onclick="openFileUpload('UserCreation')">Upload Profile</button>
+                        <span asp-validation-for="PhotoPath" class="text-danger"></span>
+
+                    
+
+
+
+                        <!-- If user already has a stored file -->
+                      
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="btnSaveUser"  class="btn btn-success">Save</button>
+           
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script src="~/js/usercreation.js"></script>
+
+@section Scripts {
+   
+    <script>
+        (function () {
+            // Current server-side values
+            const current = {
+                pageNumber: parseInt('@pageNumber'),
+                pageSize: parseInt('@pageSize'),
+                search: '@(search ?? "")',
+                searchCol: '@(searchCol ?? "")',
+                sortColumn: '@(sortColumn ?? "")',
+                sortDir: '@(sortDir ?? "ASC")',
+                status: '@(ViewBag.Status ?? "")'
+            };
+
+            function buildUrl(params) {
+                const qs = new URLSearchParams();
+                qs.set('pageNumber', params.pageNumber ?? current.pageNumber);
+                qs.set('pageSize', params.pageSize ?? current.pageSize);
+                if ((params.search ?? current.search) !== '') qs.set('search', params.search ?? current.search);
+                qs.set('searchCol', params.searchCol ?? current.searchCol);
+                qs.set('sortColumn', params.sortColumn ?? current.sortColumn);
+                qs.set('sortDir', params.sortDir ?? current.sortDir);
+                if ((params.status ?? current.status) !== '') qs.set('status', params.status ?? current.status);
+                return `/UserCreationUI/Index?` + qs.toString();
+            }
+
+            function navigateTo(params) {
+                window.location.href = buildUrl(params);
+            }
+
+            // Page change
+            window.changePage = function (page) {
+                navigateTo({ pageNumber: page });
+            };
+
+            // Sorting
+            window.sortTable = function (column) {
+                let newDir = current.sortDir === 'ASC' ? 'DESC' : 'ASC';
+                if (current.sortColumn !== column) newDir = 'ASC';
+                navigateTo({ pageNumber: 1, sortColumn: column, sortDir: newDir });
+            };
+
+            // Search button
+            $('#btnSearch').click(function () {
+                const search = $('#search').val();
+                const searchCol = $('#searchCol').val();
+                const status = $('#activeStatus').val();
+                navigateTo({ pageNumber: 1, search: search, searchCol: searchCol, status: status });
+            });
+
+            // Page Size change
+            $('#pageSize').on('change', function () {
+                navigateTo({ pageNumber: 1, pageSize: parseInt($(this).val(), 10) });
+            });
+        })();
+
+        // Edit/Delete functions
+
+    </script>
+
+}
+

@@ -1,0 +1,490 @@
+﻿@using CoreOne.COMMON.Models
+
+@{
+    ViewData["Title"] = "Role Permission";
+
+    int pageNumber = ViewBag.PageNumber ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    int totalRecords = ViewBag.TotalRecords ?? 0;
+    int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+    string search = ViewBag.Search ?? "";
+    string sortColumn = ViewBag.SortColumn ?? "RoleName";
+    string sortDir = ViewBag.SortDir ?? "ASC";
+    string searchCol = ViewBag.SearchCol ?? "RoleName";
+
+    var rolePermissions = ViewBag.RolePermissions as List<RolePermissionModel> ?? new List<RolePermissionModel>();
+
+    // Pagination window server-side: show up to 5 pages
+    int maxWindow = 5;
+    int startPage = 1;
+    int endPage = totalPages;
+
+    if (totalPages > maxWindow)
+    {
+        int half = maxWindow / 2; // 2
+        startPage = pageNumber - half;
+        endPage = pageNumber + half;
+
+        if (startPage < 1)
+        {
+            startPage = 1;
+            endPage = maxWindow;
+        }
+        else if (endPage > totalPages)
+        {
+            endPage = totalPages;
+            startPage = totalPages - maxWindow + 1;
+        }
+    }
+    else
+    {
+        startPage = 1;
+        endPage = totalPages;
+    }
+}
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript: void(0);">Authorization</a></li>
+                       
+                        <li class="breadcrumb-item active">Role Permission</li>
+                    </ol>
+                </div>
+                <h4 class="page-title">Role Permission</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row justify-content-between">
+                <div class="col-auto">
+                    <button type="button" class="btn btn-blue waves-effect waves-light float-end"
+                            onclick="window.location.href='/RolePermission/Index'">
+                        <i class="mdi mdi-refresh-circle"></i> Refresh
+                    </button>
+
+                </div>
+                <div class="col-auto">
+                    <has-permission module-id="6" action-id="1">
+                   
+                        <button type="button" class="btn btn-success waves-effect waves-light float-end" onclick="openAddPermissionModal()">
+                            <i class="mdi mdi-plus-circle"></i> Create Permission
+                        </button>
+                    </has-permission>
+                  
+
+                </div><!-- end col-->
+            </div> <!-- end row -->
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+
+            <div class="row mb-3">
+                <!-- Search Box (live) -->
+                <div class="col-md-4">
+                    <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." />
+                </div>
+
+
+                <div class="col-sm-3">
+                    <select class="form-select my-1 my-lg-0" id="searchField">
+                        @{
+                            string[] searchableFields = new string[] { "RoleName" };//table column name
+                            string[] searchableNames = new string[] { "Role Name" }; //user show name
+                            for (int i = 0; i < searchableFields.Length; i++)
+                            {
+                                var field = searchableFields[i];
+                                <option value="@field" selected="@(field == searchCol)">@searchableNames[i]</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+
+
+                <div class="col-sm-5">
+                    <div class="d-flex justify-content-end">
+                        <select class="form-select my-1 my-lg-0 w-50" id="pageSize">
+                            @{
+                                int[] pageSizes = new int[] { 1, 10, 20, 50, 100 };
+                                foreach (var size in pageSizes)
+                                {
+                                    <option value="@size" selected="@(size == pageSize)">@size</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+
+                <!-- Info (top) -->
+
+            </div>
+
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th style="color:#343a40">Sl No</th>
+
+                        <th class="text-center">
+                            <a href="javascript:void(0)" onclick="sortTable('RoleName')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:#343a40;">
+                                <span>Role Name</span>
+                                <span>
+                                    @if (sortColumn == "RoleName")
+                                    {
+                                        if (sortDir == "ASC")
+                                        {
+                                            <i class="bi bi-arrow-up"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-arrow-down"></i>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-arrow-down-up text-muted"></i>
+                                    }
+                                </span>
+                            </a>
+                        </th>
+
+                      
+
+                   
+
+                        
+
+                        <th class ="text-center" style="color:#343a40">Action</th>
+                    </tr>
+                </thead>
+
+
+                <tbody>
+                    @{
+                        int count = ((pageNumber - 1) * pageSize) + 1;
+                    }
+                    @foreach (var r in rolePermissions)
+                    {
+                        <tr>
+                            <td>@count</td>
+                            <td class="text-body fw-semibold">@r.RoleName</td>
+                            
+
+
+                           
+                            <td class="text-center d-flex justify-content-center gap-2">
+                                <has-permission module-id="6" action-id="8">
+                                <!-- Manage -->
+                                <button class="btn btn-primary btn-sm rounded-pill px-3"
+                                        onclick="openPermissionModal(@r.RoleID, '@r.RoleName')">
+                                    <i class="bi bi-gear-fill me-1"></i> Manage
+                                </button>
+                                  </has-permission>
+                                <has-permission module-id="6" action-id="4">
+                                <!-- View -->
+                                <button class="btn btn-warning text-white btn-sm rounded-pill px-3"
+                                        onclick="ViewPermissionModal(@r.RoleID, '@r.RoleName')">
+                                    <i class="bi bi-eye-fill me-1"></i> View
+                                </button>
+                                  </has-permission>
+                                <has-permission module-id="6" action-id="9">
+                                <!-- Deactivate -->
+                                <button class="btn btn-danger btn-sm rounded-pill px-3"
+                                        onclick="deactivatePermission(@r.RoleID)">
+                                    <i class="bi bi-x-circle-fill me-1"></i> Deactivate
+                                </button>
+                                  </has-permission>
+                            </td>
+
+
+
+                           
+                        </tr>
+                        count++;
+                    }
+                    @if (!rolePermissions.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">No records found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <!-- Bottom info -->
+            <div class="d-flex justify-content-between align-items-center mt-2">
+                <div>
+                    <small class="text-muted">
+                        Showing page <strong>@pageNumber</strong> of <strong>@totalPages</strong> — <strong>@totalRecords</strong> records
+                    </small>
+                </div>
+
+                <!-- Pagination window (max 5 pages) -->
+                <nav aria-label="Role pagination">
+                    <ul class="pagination pagination-rounded mb-0">
+                        <!-- Prev -->
+                        <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
+                            <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber - 1)">« Prev</a>
+                        </li>
+
+                        <!-- If startPage > 1 show first page and ellipsis -->
+                        @if (startPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0)" data-page="1">1</a>
+                            </li>
+                            @if (startPage > 2)
+                            {
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                            }
+                        }
+
+                        <!-- Window pages -->
+                        @for (int i = startPage; i <= endPage; i++)
+                        {
+                            <li class="page-item @(i == pageNumber ? "active" : "")">
+                                <a class="page-link" href="javascript:void(0)" data-page="@i">@i</a>
+                            </li>
+                        }
+
+                        <!-- If endPage < totalPages show ellipsis and last page -->
+                        @if (endPage < totalPages)
+                        {
+                            if (endPage < totalPages - 1)
+                            {
+                                <li class="page-item disabled"><span class="page-link">…</span></li>
+                            }
+                            <li class="page-item">
+                                <a class="page-link" href="javascript:void(0)" data-page="@totalPages">@totalPages</a>
+                            </li>
+                        }
+
+                        <!-- Next -->
+                        <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                            <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber + 1)">Next »</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+<!-- =================== Modal =================== -->
+<div class="modal fade" id="permissionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <!-- Header -->
+            <div class="modal-header text-white"
+                 style="background: linear-gradient(135deg, #4facfe, #4facfe);">
+                <h5 class="modal-title fw-bol   d d-flex align-items-center">
+                    <i class="bi bi-ui-checks-grid me-2"></i> Manage Role Permissions
+                </h5>
+                <button type="button"
+                        class="btn btn-light rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                        onclick="window.location.href='/RolePermission/Index'"
+                        style="width: 38px; height: 38px; border: none;">
+                    <i class="bi bi-x-lg text-dark fw-bold"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body bg-light">
+
+                <!-- Role dropdown -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Select Role</label>
+                        <select id="roleDropdown"
+                                class="form-select shadow-sm border rounded-3 px-3 py-2"
+                                onchange="onRoleChange()"
+                                style="transition: all 0.2s ease;">
+                            <option value="">-- Choose Role --</option>
+                            @if (ViewBag.Roles != null)
+                            {
+                                List<RolePermissionModel> roles = ViewBag.Roles as List<RolePermissionModel>;
+                                @foreach (var role in roles)
+                                {
+                                    <option value="@role.RoleID">@role.RoleName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Global Select All -->
+                <div class="alert alert-light border rounded-3 shadow-sm d-flex align-items-center justify-content-between px-3 py-2">
+                    <span class="fw-bold text-dark">
+                        <i class="bi bi-check2-circle text-success"></i> Select All Permissions
+                    </span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="selectAllGlobal">
+                    </div>
+                </div>
+
+                <!-- Permissions container -->
+                <div id="permissionsContainer" class="accordion mt-3">
+                    <p class="text-muted">Choose a role to load permissions...</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-0 bg-light d-flex justify-content-end gap-2">
+                <!-- Save Button -->
+                <button type="button"
+                        class="btn text-white fw-semibold d-flex align-items-center gap-2"
+                        style="background: linear-gradient(135deg, #42e695, #3bb2b8); border-radius: 10px; padding: 0.6rem 1.4rem; transition: all 0.3s;"
+                        id="SaveRolePermissions"
+                        onclick="savePermissions()">
+                    <i class="bi bi-save-fill"></i> Save
+                </button>
+
+                <!-- Close Button -->
+                <button type="button"
+                        class="btn btn-warning border fw-semibold d-flex align-items-center gap-2"
+                        style="border-radius: 10px; padding: 0.6rem 1.4rem; transition: all 0.3s;"
+                        onclick="window.location.href='/RolePermission/Index'">
+                    <i class="bi bi-x-circle"></i> Close
+                </button>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+
+
+<script src="~/js/rolepermission.js"></script>
+@section Scripts {
+    <script>
+        (function () {
+            // Utility to build Index URL with query params
+            function buildUrl(params) {
+                const base = '@Url.Action("Index", "RolePermission")';
+                const qs = new URLSearchParams();
+                qs.set('pageNumber', params.pageNumber ?? 1);
+                qs.set('pageSize', params.pageSize ?? current.pageSize);
+                if ((params.search ?? current.search) !== '') qs.set('search', params.search ?? current.search);
+                qs.set('searchCol', params.searchCol ?? current.searchCol);
+                qs.set('sortColumn', params.sortColumn ?? current.sortColumn);
+                qs.set('sortDir', params.sortDir ?? current.sortDir);
+                return base + '?' + qs.toString();
+            }
+
+            // Current server-side values
+            const current = {
+                pageNumber: parseInt('@pageNumber'),
+                pageSize: parseInt('@pageSize'),
+                search: '@(search ?? "")',
+                searchCol: '@(searchCol ?? "")',
+                sortColumn: '@(sortColumn ?? "")',
+                sortDir: '@(sortDir ?? "")'
+            };
+
+            // Debounce
+            function debounce(fn, delay) {
+                let t;
+                return function (...args) {
+                    clearTimeout(t);
+                    t = setTimeout(() => fn.apply(this, args), delay);
+                };
+            }
+
+            function navigateTo(opts) {
+                const params = {
+                    pageNumber: opts.pageNumber ?? 1,
+                    pageSize: opts.pageSize ?? current.pageSize,
+                    search: opts.search ?? current.search,
+                    searchCol: opts.searchCol ?? current.searchCol,
+                    sortColumn: opts.sortColumn ?? current.sortColumn,
+                    sortDir: opts.sortDir ?? current.sortDir
+                };
+                window.location.href = buildUrl(params);
+            }
+
+            // Elements
+            const searchInput = document.getElementById('searchBox');
+            const searchField = document.getElementById('searchField');
+            const pageSizeSelect = document.getElementById('pageSize');
+            const paginationLinks = document.querySelectorAll('.pagination a.page-link');
+
+            // Live search
+            const onSearch = debounce(function (e) {
+                const val = e.target.value.trim();
+                navigateTo({
+                    pageNumber: 1,
+                    search: val,
+                    searchCol: searchField.value
+                });
+            }, 450);
+
+            if (searchInput) searchInput.addEventListener('input', onSearch);
+
+            // search column change -> page 1
+            if (searchField) searchField.addEventListener('change', function (e) {
+                navigateTo({
+                    pageNumber: 1,
+                    search: searchInput.value.trim(),
+                    searchCol: e.target.value
+                });
+            });
+
+            // pageSize change -> page 1
+            if (pageSizeSelect) pageSizeSelect.addEventListener('change', function (e) {
+                navigateTo({
+                    pageNumber: 1,
+                    pageSize: parseInt(e.target.value, 10),
+                    search: searchInput.value.trim()
+                });
+            });
+
+            // pagination clicks
+            document.querySelectorAll('.pagination a.page-link').forEach(function (el) {
+                el.addEventListener('click', function (ev) {
+                    ev.preventDefault();
+                    const page = parseInt(el.getAttribute('data-page'), 10) || 1;
+                    // clamp page
+                    const target = Math.max(1, page);
+                    navigateTo({
+                        pageNumber: target,
+                        pageSize: parseInt(pageSizeSelect.value, 10),
+                        search: searchInput.value.trim()
+                    });
+                });
+            });
+
+            // Sorting: toggles direction; clicking a different column resets to ASC
+            window.sortTable = function (column) {
+                let newDir = current.sortDir === 'ASC' ? 'DESC' : 'ASC';
+                if (current.sortColumn !== column) newDir = 'ASC';
+                navigateTo({
+                    pageNumber: 1,
+                    sortColumn: column,
+                    sortDir: newDir,
+                    search: searchInput.value.trim()
+                });
+            };
+        })();
+
+
+
+
+    </script>
+}

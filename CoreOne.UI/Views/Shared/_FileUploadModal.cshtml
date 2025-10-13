@@ -1,0 +1,168 @@
+﻿<!-- Common File Upload Modal -->
+<style>
+    /* Modal container */
+    #fileUploadModal .modal-content,
+    #fileViewModal .modal-content {
+        border: 2px solid #007bff; /* blue border, change color as needed */
+        border-radius: 10px; /* optional rounded corners */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+
+    /* Modal dialog */
+    #fileUploadModal .modal-dialog,
+    #fileViewModal .modal-dialog {
+        max-width: 800px; /* limit width */
+        margin: 1.75rem auto; /* vertical spacing + center */
+    }
+
+    /* Modal body - center content */
+    #fileUploadModal .modal-body,
+    #fileViewModal .modal-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* center horizontally */
+        justify-content: center;
+    }
+
+    /* Preview section */
+    #previewSection {
+        width: 100%;
+        max-width: 700px;
+        overflow: hidden;
+       
+        box-sizing: border-box;
+        background-color: #f8f8f8;
+        text-align: center;
+    }
+
+    /* Iframe styling */
+    #filePreviewFrame,
+    #viewFileFrame {
+        width: 100%;
+        height: 500px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        display: block;
+    }
+
+    /* Download button */
+    #downloadBtn,
+    #downloadFileBtn {
+        margin-top: 10px;
+    }
+
+
+
+
+
+
+    #viewFilePreviewSection {
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        padding: 10px;
+        background-color: #f9fafb;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .file-preview-frame {
+        width: 100%;
+        height: 65vh;
+        border: none;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    #viewFilePlaceholder {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        height: 65vh;
+        color: #6c757d;
+        font-style: italic;
+        border-radius: 10px;
+        background-color: #ffffff;
+        border: 1px dashed #ccc;
+    }
+
+    #viewFileLoading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+        font-weight: 500;
+        color: #555;
+    }
+
+
+
+</style>
+<div class="modal fade" id="fileUploadModal" tabindex="-1" style="z-index: 2050 !important;">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">Upload File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="uploadForm" enctype="multipart/form-data">
+                    <input type="hidden" id="uploadModule" />
+                    <input type="hidden" id="currentTempId" />
+                    <div class="mb-3">
+                        <input type="file" id="uploadFileInput" class="form-control" />
+                        <div class="invalid-feedback" id="uploadError"></div>
+                        <div class="valid-feedback">File looks good!</div>
+                    </div>
+                </form>
+
+                <div id="previewSection" style="display:none; text-align:center;">
+                    <iframe id="filePreviewFrame" width="100%" height="600px" style="border:none;"></iframe>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" id="uploadBtn" class="btn btn-success">Upload</button>
+                <button type="button" id="zoomInBtn" class="btn btn-outline-secondary">+</button>
+                <button type="button" id="zoomOutBtn" class="btn btn-outline-secondary">-</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Edit/View File Modal -->
+<div class="modal fade" id="viewFileModal" tabindex="-1" aria-labelledby="viewFileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border border-primary shadow-lg">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title" id="viewFileModalLabel">File Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body">
+                <div id="viewFileLoading">Loading preview...</div>
+
+                <div id="viewFilePreviewSection">
+                    <iframe id="viewFileFrame" class="file-preview-frame"></iframe>
+                    <div id="viewFilePlaceholder"></div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <a id="downloadFileBtn" class="btn btn-success" target="_blank">Download</a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@*  modify it for every module-- in edit append this html
+    before this run prepareSavedFilePreview('filepath') js function
+<button type="button" class="btn btn-sm btn-info" onclick="openFileViewModalshow()">
+    <i class="bi bi-eye"></i>
+</button> *@
+
+<script src="~/js/file-upload.js"></script>

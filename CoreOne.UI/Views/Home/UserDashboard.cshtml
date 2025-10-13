@@ -1,0 +1,103 @@
+﻿
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@* Transparent Toast Container (top-right) *@
+@{
+    var message = TempData["message"];
+
+}
+
+@if (message != null)
+{
+    var messagetype = TempData["messagetype"];
+    string messageType = "";
+    if (messagetype is not null)
+    {
+        messageType = messagetype.ToString();
+    }
+    if (string.Equals(messageType, "error", StringComparison.OrdinalIgnoreCase))
+    {
+        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+            <div class="toast show border border-danger rounded shadow-sm" style="background-color: rgba(255, 0, 0, 0.1);" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body text-danger d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                        @message
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+    else if (string.Equals(messageType, "success", StringComparison.OrdinalIgnoreCase))
+    {
+        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0" style="z-index: 1080; padding: 7rem 1rem 1rem 1rem;">
+            <div class="toast show border border-success rounded shadow-sm"
+                 style="background-color: rgba(40, 167, 69, 0.15);"
+                 role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body text-success d-flex align-items-center">
+                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                        @message
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        // Fallback: Warning when messageType is null or unrecognized
+        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 mt-5 me-3" style="z-index: 1080;">
+            <div class="toast show border border-warning rounded shadow-sm"
+                 style="background-color: rgba(255, 193, 7, 0.15);"
+                 role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body text-warning d-flex align-items-center">
+                        <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                        @message
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+            toastElList.forEach(function (toastEl) {
+                var toast = new bootstrap.Toast(toastEl, {
+                    delay: 2000  //  seconds
+                });
+                toast.show();
+
+                // Optional: clear TempData when toast is closed
+                toastEl.addEventListener('hidden.bs.toast', function () {
+                    fetch('@Url.Action("ClearTempData", "Account")', { method: 'POST' });
+                });
+            });
+        });
+    </script>
+}
