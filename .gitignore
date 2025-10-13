@@ -1,5 +1,7 @@
 # Visual Studio folder
 .vs/
+bin/
+obj/
 
 # Build results
 [Dd]ebug/
