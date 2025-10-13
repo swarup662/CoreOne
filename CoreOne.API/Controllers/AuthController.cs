@@ -13,6 +13,7 @@ namespace CoreOne.API.Controllers
     {
         private readonly IAuthRepository _authRepository;
 
+
         public AuthController(IAuthRepository authRepository)
         {
             _authRepository = authRepository;
