@@ -1,77 +1,116 @@
 ﻿<!-- Common File Upload Modal -->
 <style>
-    /* Modal container */
+    :root {
+        --primary-color: #007bff;
+        --secondary-color: #6c757d;
+        --bg-light: #f9fafb;
+        --border-radius: 14px;
+        --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.08);
+    }
+
+    /* ======= Common Modal Base ======= */
     #fileUploadModal .modal-content,
     #fileViewModal .modal-content {
-        border: 2px solid #007bff; /* blue border, change color as needed */
-        border-radius: 10px; /* optional rounded corners */
-        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-soft);
+        background: #fff;
+        transition: all 0.3s ease-in-out;
     }
 
-    /* Modal dialog */
     #fileUploadModal .modal-dialog,
     #fileViewModal .modal-dialog {
-        max-width: 800px; /* limit width */
-        margin: 1.75rem auto; /* vertical spacing + center */
+        max-width: 850px;
+        margin: 2rem auto;
     }
 
-    /* Modal body - center content */
+    /* ======= Header ======= */
+    .modal-header {
+        background: var(--bg-light);
+        border-bottom: 1px solid #e3e6ea;
+        border-top-left-radius: var(--border-radius);
+        border-top-right-radius: var(--border-radius);
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-title {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .btn-close {
+        background: transparent;
+        opacity: 0.6;
+        transition: 0.2s;
+    }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
+    /* ======= Body ======= */
     #fileUploadModal .modal-body,
     #fileViewModal .modal-body {
-        display: flex;
-        flex-direction: column;
-        align-items: center; /* center horizontally */
-        justify-content: center;
+        background: #fff;
+        padding: 1.5rem 2rem;
     }
 
-    /* Preview section */
+    /* Upload Input */
+    #uploadFileInput {
+        border: 1px solid #dcdfe4;
+        border-radius: 10px;
+        padding: 10px;
+        transition: border-color 0.3s ease;
+    }
+
+        #uploadFileInput:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+        }
+
+    #uploadError {
+        color: #dc3545;
+        font-size: 0.9rem;
+    }
+
+    /* Preview Section */
     #previewSection {
-        width: 100%;
-        max-width: 700px;
-        overflow: hidden;
-       
-        box-sizing: border-box;
-        background-color: #f8f8f8;
+        display: none;
+        background-color: #f8fafc;
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        margin-top: 1rem;
+        padding: 0.5rem;
         text-align: center;
+        box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.05);
     }
 
-    /* Iframe styling */
     #filePreviewFrame,
     #viewFileFrame {
         width: 100%;
         height: 500px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-        display: block;
-    }
-
-    /* Download button */
-    #downloadBtn,
-    #downloadFileBtn {
-        margin-top: 10px;
-    }
-
-
-
-
-
-
-    #viewFilePreviewSection {
-        border: 2px solid #dee2e6;
-        border-radius: 10px;
-        padding: 10px;
-        background-color: #f9fafb;
-        margin-top: 10px;
-        transition: all 0.3s ease;
-    }
-
-    .file-preview-frame {
-        width: 100%;
-        height: 65vh;
         border: none;
         border-radius: 10px;
         background-color: #fff;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    /* ======= View Modal Extra ======= */
+    #viewFilePreviewSection {
+        border: 1px solid #e1e5ea;
+        border-radius: 12px;
+        background-color: var(--bg-light);
+        padding: 12px;
+        box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.03);
+        margin-top: 8px;
+    }
+
+    #viewFileLoading {
+        display: none;
+        text-align: center;
+        padding: 20px;
+        color: #555;
+        font-weight: 500;
     }
 
     #viewFilePlaceholder {
@@ -79,24 +118,56 @@
         justify-content: center;
         align-items: center;
         height: 65vh;
-        color: #6c757d;
+        color: #888;
         font-style: italic;
-        border-radius: 10px;
-        background-color: #ffffff;
+        background-color: #fff;
         border: 1px dashed #ccc;
+        border-radius: 10px;
     }
 
-    #viewFileLoading {
-        display: none;
-        text-align: center;
-        padding: 20px;
-        font-weight: 500;
-        color: #555;
+    /* ======= Footer Buttons ======= */
+    .modal-footer {
+        background: #f8f9fa;
+        border-top: 1px solid #e3e6ea;
+        border-bottom-left-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+        padding: 1rem 1.5rem;
     }
 
+        .modal-footer .btn {
+            border-radius: 8px;
+            padding: 8px 18px;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
 
+        .modal-footer .btn-success {
+            background: var(--primary-color);
+            border: none;
+        }
 
+            .modal-footer .btn-success:hover {
+                background: #0069d9;
+            }
+
+        .modal-footer .btn-outline-secondary:hover {
+            background: #e9ecef;
+        }
+
+    /* Subtle zoom animation */
+    .modal.fade .modal-dialog {
+        transform: scale(0.95);
+        opacity: 0;
+        transition: all 0.25s ease-out;
+    }
+
+    .modal.show .modal-dialog {
+        transform: scale(1);
+        opacity: 1;
+    }
 </style>
+
+<!-- Upload Modal -->
 <div class="modal fade" id="fileUploadModal" tabindex="-1" style="z-index: 2050 !important;">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
@@ -109,15 +180,29 @@
                 <form id="uploadForm" enctype="multipart/form-data">
                     <input type="hidden" id="uploadModule" />
                     <input type="hidden" id="currentTempId" />
-                    <div class="mb-3">
-                        <input type="file" id="uploadFileInput" class="form-control" />
+                    <!-- Replace only this block inside the upload modal -->
+                    <div class="mb-3 text-center">
+                        <label for="uploadFileInput" class="form-label fw-semibold mb-2 text-muted">
+                            Select a File to Upload
+                        </label>
+
+                        <!-- Custom Upload Box -->
+                        <div class="upload-box" id="uploadBox">
+                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
+                            <p class="upload-text">Drag & Drop your file here<br><span>or click to browse</span></p>
+                            <input type="file" id="uploadFileInput" class="form-control visually-hidden" />
+                        </div>
+
+                        <div id="fileNameDisplay" class="text-secondary small mt-2"></div>
+
                         <div class="invalid-feedback" id="uploadError"></div>
                         <div class="valid-feedback">File looks good!</div>
                     </div>
+
                 </form>
 
-                <div id="previewSection" style="display:none; text-align:center;">
-                    <iframe id="filePreviewFrame" width="100%" height="600px" style="border:none;"></iframe>
+                <div id="previewSection">
+                    <iframe id="filePreviewFrame"></iframe>
                 </div>
             </div>
 
@@ -131,14 +216,13 @@
     </div>
 </div>
 
-
-<!-- Edit/View File Modal -->
-<div class="modal fade" id="viewFileModal" tabindex="-1" aria-labelledby="viewFileModalLabel" aria-hidden="true">
+<!-- View Modal -->
+<div class="modal fade" id="viewFileModal" tabindex="-1" aria-labelledby="viewFileModalLabel" aria-hidden="true" style="z-index: 2049 !important;">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content border border-primary shadow-lg">
+        <div class="modal-content">
             <div class="modal-header bg-light">
                 <h5 class="modal-title" id="viewFileModalLabel">File Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
@@ -152,17 +236,12 @@
 
             <div class="modal-footer">
                 <a id="downloadFileBtn" class="btn btn-success" target="_blank">Download</a>
+                <button type="button" id="zoomInBtnView" class="btn btn-outline-secondary">+</button>
+                <button type="button" id="zoomOutBtnView" class="btn btn-outline-secondary">-</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
-
-
-@*  modify it for every module-- in edit append this html
-    before this run prepareSavedFilePreview('filepath') js function
-<button type="button" class="btn btn-sm btn-info" onclick="openFileViewModalshow()">
-    <i class="bi bi-eye"></i>
-</button> *@
 
 <script src="~/js/file-upload.js"></script>

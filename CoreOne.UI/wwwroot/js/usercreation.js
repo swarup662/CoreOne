@@ -1,21 +1,20 @@
-﻿$("#btnSaveUser").click(async function () {
-    // Build payload
-    var payload = {
-        UserID: $("#UserID").val() || 0,
-        UserName: $("#UserName").val().trim(),
-        Email: $("#Email").val().trim(),
-        PhoneNumber: $("#PhoneNumber").val().trim(),
-        RoleID: $("#RoleID").val(),
-        GenderID: $("#GenderID").val(),
-        MailTypeID: $("#MailTypeID").val()
-    };
-    const result = await saveFile();
-    var IsfileUploaded =false;
-    if (result.success) {
-        IsfileUploaded = true
-    } 
+﻿
+$(document).ready(function () {
+    $('#showFile').hide()
+
+});
+
+function closeUserCreationPage() {
+    window.location.href = '/UserCreationUI/Index';
+}
+
+
+$("#btnSaveUser").click(async function () {
+  
+
+
     // Clear validation classes & messages
-    $("#UserName, #Email, #PhoneNumber, #RoleID, #GenderID, #MailTypeID,#PhotoPath ", )
+    $("#UserName, #Email, #PhoneNumber, #RoleID, #GenderID, #MailTypeID", )
         .removeClass("is-invalid is-valid");
     $(".text-danger").text('');
 
@@ -26,14 +25,66 @@
     const isRoleValid = await validateField("RoleID");
     const isGenderValid = await validateField("GenderID");
     const isMailTypeValid = await validateField("MailTypeID");
-
+    var relativePath = null;
+    var filename = null
     // Stop if any validation fails
     if (!isUserNameValid || !isEmailValid || !isPhoneValid ||
-        !isRoleValid || !isGenderValid || !isMailTypeValid || IsfileUploaded) {
+        !isRoleValid || !isGenderValid || !isMailTypeValid ) {
      
         return; // 🔥 Stop here — don’t run the save AJAX
     }
 
+
+    //-----------file uploadation code-------------------//
+    const userId = $("#UserID").val(); // get the value
+
+    if (userId && !isNaN(userId) && Number(userId) > 0 && tempBlobCommonId ==null) {
+       // console.log("✅ Valid UserID);
+    } else {
+        console.log("❌ Invalid UserID ");
+
+        const result = await saveFile();
+        var IsfileUploaded = false;
+        let $fileinput = $("#" + "PhotoPath");
+        let $fileerrorSpan = $fileinput.next(".text-danger");
+        $fileinput.removeClass("is-invalid is-valid");
+        $fileerrorSpan.text('');
+
+        if (result.success) {
+            IsfileUploaded = true
+            $fileinput.addClass("is-valid");
+            $("#PhotoPath").text("");
+            relativePath = result.relativePath;
+            filename = result.fileName;
+        }
+        else {
+
+            $fileinput.addClass("is-invalid");
+
+            $("#PhotoPath").text("Please upload a photo");
+
+
+        }
+        // Stop if any validation fails
+        if (!IsfileUploaded) {
+
+            return; // 🔥 Stop here — don’t run the save AJAX
+        }
+        //-------------------------------------------------------//
+    }
+
+    //Build Payload
+    var payload = {
+        UserID: $("#UserID").val() || 0,
+        UserName: $("#UserName").val().trim(),
+        Email: $("#Email").val().trim(),
+        PhoneNumber: $("#PhoneNumber").val().trim(),
+        RoleID: $("#RoleID").val(),
+        GenderID: $("#GenderID").val(),
+        MailTypeID: $("#MailTypeID").val(),
+        PhotoPath: relativePath,
+        PhotoName: filename
+    };
     // --- All validations passed, proceed to save ---
     $.ajax({
         url: '/UserCreationUI/SaveUser',
@@ -124,7 +175,7 @@ $("#UserName, #Email, #PhoneNumber, #RoleID, #GenderID, #MailTypeID")
 
 function editUser(id) {
     // Update modal header and aria-labelledby for edit
-    $('#userModalLabel').text('Edit User');
+    $('#addUserModalLabel').text('Edit User');
     $('#addUserModal').attr('aria-labelledby', 'userModalLabel');
 
     $.ajax({
@@ -141,7 +192,22 @@ function editUser(id) {
             $('#GenderID').val(user.genderID);
             $('#MailTypeID').val(user.mailTypeID);
 
-            $('#addUserModal').modal('show');
+            //-----------file uploadation code-------------------//
+
+
+            $('#showFile').show();
+            if (user.photoPath === "" || user.photoPath === null || user.photoPath === undefined) {
+                $('#showFile').hide();
+
+            }
+            else {
+                loadProfilePhoto(user.photoPath);
+                prepareSavedFilePreview(user.photoPath);
+            }
+
+            //------------------------------------------------------//
+           
+        $('#addUserModal').modal('show');
         },
         error: function () {
             alert('Could not load user details!');
@@ -162,5 +228,37 @@ function deleteUser(id) {
                 else alert("Failed to delete user");
             }
         });
+    }
+}
+
+
+document.getElementById("uploadFileInput").addEventListener("change", async function () {
+    if ($("#showFile").length > 0) {
+        $("#showFile").hide();
+    }
+
+});
+
+async function loadProfilePhoto(filePath) {
+    const img = document.getElementById("profilePreview");
+    const defaultSrc = "/images/default-user.png";
+
+    // Handle invalid, null, or empty path
+    if (!filePath || filePath.trim() === "" || filePath === "null" || filePath === "undefined") {
+        img.src = defaultSrc;
+        return;
+    }
+
+    try {
+        const resp = await fetch(`/api/FileUpload/viewSaved?filePath=${encodeURIComponent(filePath)}`);
+        if (!resp.ok) throw new Error("Photo not found");
+
+        const blob = await resp.blob();
+        const blobUrl = URL.createObjectURL(blob);
+
+        img.src = blobUrl;
+    } catch (err) {
+        console.error("Error loading profile photo:", err);
+        img.src = defaultSrc;
     }
 }

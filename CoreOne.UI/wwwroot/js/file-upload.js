@@ -3,6 +3,7 @@ let zoomLevel = 1;
 
 // Open modal
 function openFileUpload(moduleName) {
+
     const modal = new bootstrap.Modal(document.getElementById("fileUploadModal"));
     document.getElementById("uploadModule").value = moduleName;
 
@@ -59,6 +60,69 @@ document.getElementById("uploadFileInput").addEventListener("change", async func
 
     showValidationSuccess();
 });
+
+
+// ===== Custom upload UI behavior =====
+const uploadBox = document.getElementById("uploadBox");
+const uploadInput = document.getElementById("uploadFileInput");
+const fileNameDisplay = document.getElementById("fileNameDisplay");
+const fileUploadModal = document.getElementById("fileUploadModal");
+
+// Clicking box opens file selector
+uploadBox.addEventListener("click", () => uploadInput.click());
+
+// Show selected filename
+uploadInput.addEventListener("change", () => {
+    if (uploadInput.files && uploadInput.files.length > 0) {
+        const fileName = uploadInput.files[0].name;
+        fileNameDisplay.textContent = `Selected: ${fileName}`;
+    } else {
+        fileNameDisplay.textContent = "";
+    }
+});
+
+// Drag & Drop highlight
+["dragenter", "dragover"].forEach(evt => {
+    uploadBox.addEventListener(evt, e => {
+        e.preventDefault();
+        uploadBox.classList.add("dragover");
+    });
+});
+
+["dragleave", "drop"].forEach(evt => {
+    uploadBox.addEventListener(evt, e => {
+        e.preventDefault();
+        uploadBox.classList.remove("dragover");
+    });
+});
+
+// Handle dropped file
+uploadBox.addEventListener("drop", e => {
+    e.preventDefault();
+    if (e.dataTransfer.files.length > 0) {
+        uploadInput.files = e.dataTransfer.files;
+        const fileName = uploadInput.files[0].name;
+        fileNameDisplay.textContent = `Selected: ${fileName}`;
+    }
+});
+
+// ===== Clear on modal close =====
+fileUploadModal.addEventListener("hidden.bs.modal", () => {
+    uploadInput.value = "";
+    fileNameDisplay.textContent = "";
+});
+
+// ===== Clear after successful upload (optional, safe hook) =====
+// Call this inside your existing AJAX success or upload complete logic
+function clearUploadFileDisplay() {
+    uploadInput.value = "";
+    fileNameDisplay.textContent = "";
+}
+
+
+
+
+
 
 
 // Temp upload
@@ -278,6 +342,17 @@ async function prepareSavedFilePreview(filePath) {
         // Show section and hide loader
         if (loadingIndicator) loadingIndicator.style.display = "none";
         previewSection.style.display = "block";
+        document.getElementById("zoomInBtnView").addEventListener("click", () => {
+            zoomLevel += 0.1;
+            document.getElementById("viewFileFrame").style.transform = `scale(${zoomLevel})`;
+        });
+
+        document.getElementById("zoomOutBtnView").addEventListener("click", () => {
+            if (zoomLevel > 0.2) zoomLevel -= 0.1;
+            document.getElementById("viewFileFrame").style.transform = `scale(${zoomLevel})`;
+        });
+
+
 
         // Modal display handled elsewhere (eye icon click)
     } catch (err) {
@@ -299,7 +374,7 @@ document.querySelectorAll(".eye-icon").forEach(icon => {
 
 
 function openFileViewModalshow() {
-    const modal = new bootstrap.Modal(document.getElementById("fileViewModal"));
+    const modal = new bootstrap.Modal(document.getElementById("viewFileModal"));
     modal.show();
 }
 

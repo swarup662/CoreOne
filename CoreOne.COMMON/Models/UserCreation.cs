@@ -15,8 +15,7 @@ namespace CoreOne.COMMON.Models
         [StringLength(100, ErrorMessage = "User name cannot exceed 100 characters.")]
         public string UserName { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Password is required.")]
-        [StringLength(255, ErrorMessage = "Password cannot exceed 255 characters.")]
+  
         public string PasswordHash { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Email is required.")]
@@ -41,7 +40,7 @@ namespace CoreOne.COMMON.Models
         public string? GenderName { get; set; }
 
         // Optional image upload fields
-        [Required(ErrorMessage = "Please upload a file.")]
+        //[Required(ErrorMessage = "Please upload a file.")]
         public string? PhotoPath { get; set; }
         public string? PhotoName { get; set; }
 

@@ -12,6 +12,21 @@
     string searchCol = ViewBag.SearchCol ?? "";
 }
 
+<style>
+    #addUserModal .modal-content {
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    #addUserModal .modal-header {
+        background: linear-gradient(135deg, #007bff, #0056d2);
+    }
+
+    #addUserModal img.object-fit-cover {
+        object-fit: cover;
+    }
+
+</style>
     <div class="container-fluid">
     <div class="row">
         <div class="col-12">
@@ -168,86 +183,97 @@
     </div>
 </div>
 
-<div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <!-- wider modal -->
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="userModalLabel">Add User</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="addUserModalLabel">
+                    <i class="bi bi-person-plus me-2"></i>Add New User
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
-            <div class="modal-body">
+            <!-- Body -->
+            <div class="modal-body px-4 py-3">
                 <input type="hidden" asp-for="UserID" />
 
-                <div class="row">
-                    <!-- Left: Form -->
+                <div class="row g-4">
+                    <!-- Left Section (Form Fields) -->
                     <div class="col-md-8">
                         <div class="mb-3">
-                            <label for="UserName" class="form-label">Name</label>
-                            <input type="text" asp-for="UserName" class="form-control" />
-                            <span asp-validation-for="UserName" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label for="MailTypeID" class="form-label">Mail Type</label>
-                            @Html.DropDownList("MailTypeID", ViewBag.MailTypeList as List<SelectListItem>,
-                            new { @class = "form-select" })
-                            <span asp-validation-for="MailTypeID" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label for="Email" class="form-label">Email</label>
-                            <input type="email" asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <label for="UserName" class="form-label fw-semibold">Full Name</label>
+                            <input type="text" asp-for="UserName" class="form-control form-control-lg" placeholder="Enter full name" />
+                            <span asp-validation-for="UserName" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label for="PhoneNumber" class="form-label">Phone Number</label>
-                            <input type="text" asp-for="PhoneNumber" class="form-control" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            <label for="MailTypeID" class="form-label fw-semibold">Mail Type</label>
+                            @Html.DropDownList("MailTypeID", ViewBag.MailTypeList as List<SelectListItem>, new { @class = "form-select form-select-lg" })
+                            <span asp-validation-for="MailTypeID" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label for="RoleID" class="form-label">Role</label>
-
-                            @Html.DropDownList("RoleID", ViewBag.RoleList as List<SelectListItem>,
-                                 new { @class = "form-select" })
-                            <span asp-validation-for="RoleID" class="text-danger"></span>
-                           
+                            <label for="Email" class="form-label fw-semibold">Email Address</label>
+                            <input type="email" asp-for="Email" class="form-control form-control-lg" placeholder="example@domain.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label for="GenderID" class="form-label">Gender</label>
-                            @Html.DropDownList("GenderID", ViewBag.GenderList as List<SelectListItem>,
-                                                        new { @class = "form-select" })
-                            <span asp-validation-for="GenderID" class="text-danger"></span>
+                            <label for="PhoneNumber" class="form-label fw-semibold">Phone Number</label>
+                            <input type="text" asp-for="PhoneNumber" class="form-control form-control-lg" placeholder="Enter phone number" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                         </div>
 
-                     
+                        <div class="mb-3">
+                            <label for="RoleID" class="form-label fw-semibold">User Role</label>
+                            @Html.DropDownList("RoleID", ViewBag.RoleList as List<SelectListItem>, new { @class = "form-select form-select-lg" })
+                            <span asp-validation-for="RoleID" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="GenderID" class="form-label fw-semibold">Gender</label>
+                            @Html.DropDownList("GenderID", ViewBag.GenderList as List<SelectListItem>, new { @class = "form-select form-select-lg" })
+                            <span asp-validation-for="GenderID" class="text-danger small"></span>
+                        </div>
                     </div>
 
-                    <!-- Right: Image Upload -->
-                    <div class="col-md-4 text-center">
-                        <button class="btn btn-primary" onclick="openFileUpload('UserCreation')">Upload Profile</button>
-                        <span asp-validation-for="PhotoPath" class="text-danger"></span>
+                    <!-- Right Section (Image Upload) -->
+                    <div class="col-md-4 text-center border-start">
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                            <div class="border rounded-circle overflow-hidden mb-3" style="width: 120px; height: 120px;">
+                                <img id="profilePreview" src="/images/default-user.png" alt="Profile" class="img-fluid w-100 h-100 object-fit-cover" />
+                            </div>
 
-                    
+                            <button class="btn btn-outline-primary btn-sm mb-2 px-4" onclick="openFileUpload('UserCreation')">
+                                <i class="bi bi-upload me-1"></i>Upload Profile
+                            </button>
 
+                            <span id="PhotoPath" class="text-danger small mb-2"></span>
 
-
-                        <!-- If user already has a stored file -->
-                      
+                            <button type="button" class="btn btn-outline-info btn-sm" id="showFile" style="display:none" onclick="openFileViewModalshow()">
+                                <i class="bi bi-eye me-1"></i>View
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" id="btnSaveUser"  class="btn btn-success">Save</button>
-           
+            <!-- Footer -->
+            <div class="modal-footer d-flex justify-content-between px-4">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="window.location.href='/UserCreationUI/Index'">
+                    <i class="bi bi-x-circle me-1" ></i>Cancel
+                </button>
+                <button type="button" id="btnSaveUser" class="btn btn-success px-4">
+                    <i class="bi bi-check-circle me-1"></i>Save User
+                </button>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <script src="~/js/usercreation.js"></script>

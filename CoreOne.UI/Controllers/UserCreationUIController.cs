@@ -190,6 +190,17 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveUser([FromBody] UserCreation model)
         {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(ms => ms.Value.Errors.Any())
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => kv.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                return Json(new { errors });
+            }
             if (!TryValidateModel(model))
             {
                 // Collect validation errors into a dictionary

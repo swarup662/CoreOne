@@ -44,7 +44,7 @@ namespace CoreOne.API.Controllers
                     PhoneNumber = row["PhoneNumber"]?.ToString(),
                     RoleID = row["RoleID"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["RoleID"]),
                     RoleName = row["RoleName"]?.ToString(),  // ✅ Added RoleName
-                    GenderID = row["GenderID"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["RoleID"]),
+                    GenderID = row["GenderID"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["GenderID"]),
                     GenderName = row["GenderName"]?.ToString(),  // ✅ Added RoleName
                     MailTypeID = row["MailTypeID"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["MailTypeID"]),
                     PhotoPath = row["PhotoPath"]?.ToString(),
