@@ -252,7 +252,7 @@
 
             <form id="menuModuleForm">
                 <div class="modal-body">
-                    <input asp-for="MenuModuleID" type="text" id="hdnMenuModuleID" />
+                    <input asp-for="MenuModuleID" type="hidden" id="hdnMenuModuleID" />
                     <!-- MENU SECTION -->
                     <div class="p-3 mb-3 rounded border bg-light">
                         <div class="row">
@@ -260,10 +260,13 @@
                                 <div class="mb-3">
                                     <label class="form-label">Menu Name</label>
                                     <input type="text" id="MenuName" class="form-control" placeholder="Enter Menu Name" />
+                                    <span id="MenuName-error" class="text-danger"></span>
+
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Sequence</label>
                                     <input type="number" id="MenuSeq" class="form-control" placeholder="Enter Menu Sequence" />
+                                    <span id="MenuSeq-error" class="text-danger"></span>
                                 </div>
                             </div>
 
@@ -271,6 +274,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Menu Icon</label>
                                     <input type="text" id="MenuSymbol" class="form-control" placeholder="Select Icon" readonly />
+                                    <span id="MenuSymbol-error" class="text-danger"></span>
                                 </div>
 
                                 <div class="icon-scroll-container">
@@ -307,7 +311,7 @@
                         <table class="table table-bordered table-striped mt-3" id="moduleTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th>ID</th> <!
+                                    <th>ID</th>
                                     <th>Name</th>
                                     <th>URL</th>
                                     <th>Sequence</th>
@@ -404,6 +408,7 @@
                 .then(data => {
                     if (!data) throw new Error("No data returned");
 
+                    // Populate menu fields
                     $("#hdnMenuModuleID").val(data.menuID);
                     $("#MenuName").val(data.menuName);
                     $("#MenuSeq").val(data.menuSeq);
@@ -412,15 +417,26 @@
                     const tbody = $("#moduleTable tbody").empty();
 
                     if (data.modules && data.modules.length > 0) {
-                        data.modules.forEach(m => {
-                            tbody.append(`
-                                <tr data-module-id="${m.moduleID}">
-                                    <td class="moduleName">${m.name}</td>
-                                    <td class="moduleUrl">${m.url}</td>
-                                    <td class="moduleSeq">${m.sequence}</td>
-                                    <td><button type="button" class="btn btn-danger btn-sm removeModule">Remove</button></td>
-                                </tr>
-                            `);
+                        // Sort modules by sequence ascending
+                        const sortedModules = data.modules.sort((a, b) => a.sequence - b.sequence);
+
+                        sortedModules.forEach(m => {
+                            // Check for duplicates in the existing table
+                            const seqExists = $("#moduleTable tbody tr").filter(function () {
+                                return parseInt($(this).find(".moduleSeq").text()) === m.sequence;
+                            }).length > 0;
+
+                            if (!seqExists) {
+                                tbody.append(`
+                                    <tr data-module-id="${m.moduleID}">
+                                        <td class="moduleId" style="display:none">${m.moduleID}</td>
+                                        <td class="moduleName">${m.name}</td>
+                                        <td class="moduleUrl">${m.url}</td>
+                                        <td class="moduleSeq">${m.sequence}</td>
+                                        <td><button type="button" class="btn btn-danger btn-sm removeModule">Remove</button></td>
+                                    </tr>
+                                `);
+                            }
                         });
                     }
 
@@ -429,55 +445,205 @@
                 .catch(err => alert(err));
         }
 
-        // Add module to table
+
+              // Add module to table
         $("#addModuleBtn").click(function () {
-            const name = $("#ModuleName").val();
-            const url = $("#ModuleUrl").val();
-            const seq = $("#ModuleSeq").val();
-            if (!name || !url) return alert("Module name & URL required");
+            const name = $("#ModuleName").val().trim();
+            const url = $("#ModuleUrl").val().trim();
+            const seq = $("#ModuleSeq").val().trim();
 
-            $("#moduleTable tbody").append(`
-                <tr data-module-id="">
-                    <td class="moduleName">${name}</td>
-                    <td class="moduleUrl">${url}</td>
-                    <td class="moduleSeq">${seq}</td>
-                    <td><button type="button" class="btn btn-danger btn-sm removeModule">Remove</button></td>
-                </tr>
-            `);
+            // Validate empty fields
+            if (!name || !url || !seq) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Please enter Module Name, URL, and Sequence.'
+                });
+                return;
+            }
 
+            // Check for duplicate sequence
+            let seqExists = false;
+            $("#moduleTable tbody tr").each(function () {
+                const existingSeq = $(this).find(".moduleSeq").text();
+                if (parseInt(existingSeq) === parseInt(seq)) {
+                    seqExists = true;
+                    return false; // break loop
+                }
+            });
+
+            if (seqExists) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validation Error',
+                    text: 'Sequence number already exists. Please use a unique sequence.'
+                });
+                return;
+            }
+
+            // Create new row
+            const row = `<tr data-module-id="">
+                <td class="moduleId" style="display:none"></td>
+                <td class="moduleName">${name}</td>
+                <td class="moduleUrl">${url}</td>
+                <td class="moduleSeq">${seq}</td>
+                <td><button type="button" class="btn btn-danger btn-sm removeModule">Remove</button></td>
+            </tr>`;
+
+            // Insert row in ascending sequence order
+            let inserted = false;
+            $("#moduleTable tbody tr").each(function () {
+                const currentSeq = parseInt($(this).find(".moduleSeq").text());
+                if (parseInt(seq) < currentSeq) {
+                    $(this).before(row);
+                    inserted = true;
+                    return false;
+                }
+            });
+
+            if (!inserted) {
+                $("#moduleTable tbody").append(row);
+            }
+
+            // Clear input fields
             $("#ModuleName, #ModuleUrl, #ModuleSeq").val('');
         });
 
-        // Remove module row
+        // Remove module
         $(document).on("click", ".removeModule", function () {
             $(this).closest("tr").remove();
         });
 
-        // Save Menu + Modules in ONE call
+
+
+
+
+
+
+
+                 // Map input IDs to model property names
+        const fieldMap = {
+            "MenuName": "Name",
+            "MenuSeq": "Sequence",
+            "MenuSymbol": "MenuSymbol"
+        };
+
+
+                // When user clicks an icon
+        $("#iconList .icon-item").click(function () {
+            // Get the icon name or identifier (for example, use class)
+            const iconClass = $(this).find("i").attr("class"); // e.g., "fe-home"
+
+            // Set the input value
+            $("#MenuSymbol").val(iconClass);
+
+            // Trigger validation for MenuSymbol
+            const menuId = $("#hdnMenuModuleID").val() || null;
+            validateMenuField("MenuSymbol", menuId);
+        });
+
+        // Validate Menu fields with server AND client empty check
+        function validateMenuField(fieldId, menuId = null) {
+            let $input = $("#" + fieldId);
+            let $errorSpan = $("#" + fieldId + "-error");
+            let value = $input.val().trim();
+
+            // Clear previous state
+            $input.removeClass("is-invalid is-valid");
+            $errorSpan.text('');
+
+            // Client-side empty check
+            if (!value) {
+                $input.addClass("is-invalid");
+                $errorSpan.text("This field is required.");
+                return $.Deferred().resolve().promise(); // Stop AJAX, already invalid
+            }
+
+            // Server-side validation
+            let payload = {};
+            payload[fieldId] = value;
+            if (menuId) payload["MenuModuleID"] = menuId;
+
+            return $.ajax({
+                url: '/MenuModule/ValidateMenuField',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (resp) {
+                    const modelField = fieldMap[fieldId];
+                    if (resp.errors && resp.errors[modelField]) {
+                        $input.addClass("is-invalid");
+                        $errorSpan.text(resp.errors[modelField][0]);
+                    } else {
+                        $input.addClass("is-valid");
+                    }
+                }
+            });
+        }
+
+        // Real-time validation
+        $("#MenuName, #MenuSeq, #MenuSymbol").on("input change", function () {
+            const menuId = $("#hdnMenuModuleID").val() || null;
+            validateMenuField(this.id, menuId);
+        });
+
+               // Save Menu + Modules
         $("#btnSavemenu").click(async function () {
             const menuId = $("#hdnMenuModuleID").val();
 
+            // Validate menu fields first
+                  // Validate menu fields first
+        await validateMenuField("MenuName", menuId);
+        await validateMenuField("MenuSeq", menuId);
+        await validateMenuField("MenuSymbol", menuId);
+
+        // Prevent save if validation fails
+        if ($("#MenuName").hasClass("is-invalid") ||
+            $("#MenuSeq").hasClass("is-invalid") ||
+            $("#MenuSymbol").hasClass("is-invalid")) {
+
+            
+            return; // stop execution
+        }
+
+        // Check if at least one module exists
+        const moduleCount = $("#moduleTable tbody tr").length;
+        if (moduleCount === 0) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Validation Error',
+                text: 'Please add at least one module before saving.'
+            });
+            return; // stop execution
+        }
+
+        // Continue to build payload and save...
+
+
+            // Build payload
             const menuWithModules = {
                 MenuModuleID: menuId ? parseInt(menuId) : null,
-                Name: $("#MenuName").val(),
-                MenuSymbol: $("#MenuSymbol").val(),
+                Name: $("#MenuName").val().trim(),
+                MenuSymbol: $("#MenuSymbol").val().trim(),
                 Sequence: parseInt($("#MenuSeq").val()),
                 RecType: menuId ? 'U' : 'I',
                 Modules: []
             };
 
+            // Collect modules
             $("#moduleTable tbody tr").each(function () {
                 const row = $(this);
                 const moduleId = row.data("module-id");
 
                 menuWithModules.Modules.push({
                     ModuleID: moduleId ? parseInt(moduleId) : null,
-                    Name: row.find(".moduleName").text(),
-                    Url: row.find(".moduleUrl").text(),
+                    Name: row.find(".moduleName").text().trim(),
+                    Url: row.find(".moduleUrl").text().trim(),
                     Sequence: parseInt(row.find(".moduleSeq").text())
                 });
             });
 
+            // Send save request
             try {
                 const resp = await fetch("/MenuModule/SaveMenuWithModules", {
                     method: "POST",
@@ -491,16 +657,26 @@
                 }
 
                 const result = await resp.json();
-                alert("Menu & Modules saved successfully!");
-                $("#moduleSetupModal").modal("hide");
-                location.reload();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Menu & Modules saved successfully.',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    $("#moduleSetupModal").modal("hide");
+                    location.reload();
+                });
 
             } catch (err) {
                 console.error(err);
-                alert("Error saving menu/modules: " + err.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Error saving menu/modules: ' + err.message
+                });
             }
         });
-
 
 
 

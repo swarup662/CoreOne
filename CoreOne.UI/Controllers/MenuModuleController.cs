@@ -91,6 +91,41 @@ namespace CoreOne.UI.Controllers
             return Json(new { success = true, menuId = (int)result.menuId });
         }
 
+        [HttpPost]
+        public IActionResult ValidateMenuField([FromBody] Dictionary<string, string> fieldData)
+        {
+            // Create a dummy model just for validation
+            var model = new MenuWithModulesSave();
+
+            // Bind the single field into model
+            foreach (var field in fieldData)
+            {
+                if (field.Key == "MenuName")
+                    model.Name = field.Value;
+                if (field.Key == "MenuSeq" && int.TryParse(field.Value, out int seq))
+                    model.Sequence = seq;
+                if (field.Key == "MenuSymbol")
+                    model.MenuSymbol = field.Value;
+            }
+
+            // Validate only that property
+            TryValidateModel(model);
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(ms => ms.Value.Errors.Any())
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => kv.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                return Json(new { errors });
+            }
+
+            return Json(new { success = true });
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetMenuForEdit(int id)
         {
