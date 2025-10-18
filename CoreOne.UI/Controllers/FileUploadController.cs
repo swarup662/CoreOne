@@ -58,6 +58,7 @@ public class FileUploadController : ControllerBase
         return Ok(new { message = "Temp upload successful", tempId, contentType });
     }
 
+
     // --- View temp file for preview/download ---
     [HttpGet("viewTemp")]
     public IActionResult ViewTemp([FromQuery] string tempId, [FromQuery] bool inline = true)
@@ -172,9 +173,8 @@ public class FileUploadController : ControllerBase
             return BadRequest("File path required");
 
         // Determine full path
-        string fullPath = filePath.StartsWith("wwwroot")
-            ? Path.Combine(AppContext.BaseDirectory, filePath.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString()))
-            : filePath;
+        string fullPath = GetFullPath(filePath);
+            
 
         if (!System.IO.File.Exists(fullPath))
             return NotFound("File not found");
@@ -203,5 +203,21 @@ public class FileUploadController : ControllerBase
         var fileBytes = System.IO.File.ReadAllBytes(fullPath);
         return File(fileBytes, contentType);
     }
+    private string GetFullPath(string filePath)
+    {
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentNullException(nameof(filePath));
+
+        filePath = filePath.TrimStart('/', '\\');
+
+        if (filePath.StartsWith("wwwroot", StringComparison.OrdinalIgnoreCase))
+        {
+            string inside = filePath.Substring("wwwroot".Length).TrimStart('/', '\\');
+            return Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", inside));
+        }
+
+        return Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), filePath));
+    }
+
 
 }
