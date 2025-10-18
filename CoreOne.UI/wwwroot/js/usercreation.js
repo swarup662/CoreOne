@@ -262,3 +262,65 @@ async function loadProfilePhoto(filePath) {
         img.src = defaultSrc;
     }
 }
+
+
+
+
+
+function openExtraPermissionModal(userId,roleId) {
+    isAddMode = false;
+    currentRoleId = roleId;
+
+    $("#roleDropdown").val(roleId);
+    $("#permissionsContainer").html("<p class='text-muted'>Loading...</p>");
+    $("#permissionModal").modal("show");
+    $("#selectAllGlobal").prop("checked", false);
+
+    fetchPermissions(userId, roleId);
+}
+
+function fetchPermissions(userId, roleId, ) {
+    $("#permissionsContainer").html("<p class='text-muted'>Loading...</p>");
+
+    $.ajax({
+        url: "/UserCreationUI/GetRoleAndExtraPermissions",
+        type: "GET",
+        data: { userId: userId ,roleId: roleId },
+        success: function (html) {
+            $("#permissionsContainer").html(html);
+
+            // Wire up events after injecting HTML
+            $(".select-all").on("change", function () {
+                let module = $(this).data("module");
+                let isChecked = $(this).is(":checked");
+                $(`.perm-checkbox[data-module='${module}']`).prop("checked", isChecked);
+                updateGlobalSelectAll();
+            });
+
+            $(".perm-checkbox").on("change", function () {
+                let module = $(this).data("module");
+                let allChecked = $(`.perm-checkbox[data-module='${module}']`).length ===
+                    $(`.perm-checkbox[data-module='${module}']:checked`).length;
+                $(`.select-all[data-module='${module}']`).prop("checked", allChecked);
+                updateGlobalSelectAll();
+            });
+
+            updateGlobalSelectAll();
+        },
+        error: function () {
+            $("#permissionsContainer").html("<p class='text-danger'>⚠️ Failed to load permissions.</p>");
+        }
+    });
+}
+
+function updateGlobalSelectAll() {
+    let allChecked = $(".perm-checkbox").length > 0 &&
+        $(".perm-checkbox:checked").length === $(".perm-checkbox").length;
+    $("#selectAllGlobal").prop("checked", allChecked);
+}
+
+
+async function extraPermission(UserID, RoleID) {
+    openExtraPermissionModal(UserID,RoleID)
+
+}
