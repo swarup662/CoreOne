@@ -3,7 +3,7 @@
 @using CoreOne.COMMON.Models
 @{
     ViewData["Title"] = "Menu Module Master";
-
+    Layout = "~/Views/Shared/_Layout.cshtml";
     int pageNumber = ViewBag.PageNumber ?? 1;
     int pageSize = ViewBag.PageSize ?? 10;
     int totalRecords = ViewBag.TotalRecords ?? 0;
@@ -61,6 +61,8 @@
 
  
 </style>
+
+
 
 <div class="container-fluid">
 
@@ -243,142 +245,220 @@
 
 
 <div class="modal fade" id="moduleSetupModal" tabindex="-1" aria-labelledby="moduleModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-3">
+            <div class="modal-header bg-primary text-white border-0 rounded-top py-2">
                 <h5 class="modal-title" id="moduleModalLabel">Create Menu & Modules</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
             <form id="menuModuleForm">
-                <div class="modal-body">
+                <div class="modal-body p-3 bg-light">
                     <input asp-for="MenuModuleID" type="hidden" id="hdnMenuModuleID" />
-                    <!-- MENU SECTION -->
-                    <div class="p-3 mb-3 rounded border bg-light">
-                        <div class="row">
-                            <div class="col-xl-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Menu Name</label>
-                                    <input type="text" id="MenuName" class="form-control" placeholder="Enter Menu Name" />
-                                    <span id="MenuName-error" class="text-danger"></span>
 
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Sequence</label>
-                                    <input type="number" id="MenuSeq" class="form-control" placeholder="Enter Menu Sequence" />
-                                    <span id="MenuSeq-error" class="text-danger"></span>
-                                </div>
-                            </div>
+                    <!-- Accordion -->
+                    <div class="accordion" id="menuModuleAccordion">
 
-                            <div class="col-xl-6">
-                                <div class="mb-3">
-                                    <label class="form-label">Menu Icon</label>
-                                    <input type="text" id="MenuSymbol" class="form-control" placeholder="Select Icon" readonly />
-                                    <span id="MenuSymbol-error" class="text-danger"></span>
-                                </div>
+                        <!-- MENU SECTION -->
+                        
+                            <div class="accordion-item mb-2">
+                            <h2 class="accordion-header" id="menuHeading">
+                                <button class="accordion-button fw-bold py-2" style="border-radius: 6px;"
+                                        type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#menuCollapse"
+                                        aria-expanded="true"
+                                        aria-controls="menuCollapse">
+                                    Menu Details
+                                </button>
+                            </h2>
 
-                                <div class="icon-scroll-container">
-                                    <div class="icons-list-demo d-flex flex-nowrap" id="iconList">
-                                        <div class="icon-item mx-1"><i class="fe-home"></i></div>
-                                        <div class="icon-item mx-1"><i class="fe-settings"></i></div>
-                                        <div class="icon-item mx-1"><i class="fe-user"></i></div>
+
+
+                            <div id="menuCollapse" class="accordion-collapse collapse show" aria-labelledby="menuHeading">
+                                <div class="accordion-body p-3 bg-white rounded-3 shadow-sm border">
+                                    <div class="row g-2">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold small">Menu Name</label>
+                                            <input type="text" id="MenuName" class="form-control form-control-sm" placeholder="Enter Menu Name" />
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold small">Sequence</label>
+                                            <input type="number" id="MenuSeq" class="form-control form-control-sm" placeholder="Seq" />
+                                        </div>
+                                        <div class="col-md-12">
+                                            <label class="form-label fw-semibold small">Menu Icon</label>
+                                            <input type="text" id="MenuSymbol" class="form-control form-control-sm mb-1" placeholder="Select Icon" readonly />
+                                            <div class="icon-scroll-container">
+                                                <div class="icons-list-demo d-flex flex-nowrap" id="iconList">
+                                                    <div class="icon-item mx-1" title="Home"><i class="fe-home" style="margin-left:11px"></i></div>
+                                                    <div class="icon-item mx-1" title="Settings"><i class="fe-settings" style="margin-left:11px"></i></div>
+                                                    <div class="icon-item mx-1" title="User"><i class="fe-user" style="margin-left:11px"></i></div>
+                                                    <div class="icon-item mx-1" title="Bell"><i class="fe-bell" style="margin-left:11px"></i></div>
+                                                    <div class="icon-item mx-1" title="Star"><i class="fe-star" style="margin-left:11px"></i></div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- MODULE SECTION -->
-                    <div class="p-3 mb-3 rounded border bg-light">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label class="form-label">Module Name</label>
-                                <input type="text" id="ModuleName" class="form-control" placeholder="Enter Module Name" />
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Module URL</label>
-                                <input type="text" id="ModuleUrl" class="form-control" placeholder="Enter Module URL" />
-                            </div>
-                            <div class="col-md-2">
-                                <label class="form-label">Sequence</label>
-                                <input type="number" id="ModuleSeq" class="form-control" placeholder="Seq" />
-                            </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button type="button" class="btn btn-primary w-100" id="addModuleBtn">Add</button>
+                        <!-- MODULE SECTION -->
+                        <div class="accordion-item mb-2">
+                            <h2 class="accordion-header" id="moduleHeading">
+                                <button class="accordion-button collapsed fw-bold py-2" style="border-radius: 6px;" type="button" data-bs-toggle="collapse" data-bs-target="#moduleCollapse" aria-expanded="false" aria-controls="moduleCollapse">
+                                    Module Details
+                                </button>
+                            </h2>
+                            <div id="moduleCollapse" class="accordion-collapse collapse" aria-labelledby="moduleHeading">
+                                <div class="accordion-body p-3 bg-white rounded-3 shadow-sm border">
+                                    <div class="row g-2 align-items-end">
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold small">Module Name</label>
+                                            <input type="text" id="ModuleName" class="form-control form-control-sm" placeholder="Enter Module Name" />
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold small">Module URL</label>
+                                            <input type="text" id="ModuleUrl" class="form-control form-control-sm" placeholder="Enter Module URL" />
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label fw-semibold small">Seq</label>
+                                            <input type="number" id="ModuleSeq" class="form-control form-control-sm" placeholder="Seq" />
+                                        </div>
+                                        <div class="col-md-2">
+                                            <button type="button" class="btn btn-primary w-100 btn-sm" id="addModuleBtn">Add</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="table-responsive mt-2">
+                                        <table class="table table-hover table-bordered align-middle mb-0 table-sm" id="moduleTable">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th style="display:none">ModuleId</th>
+                                                    <th>Seq</th>
+                                                    <th>Name</th>
+                                                    <th>URL</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <table class="table table-bordered table-striped mt-3" id="moduleTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th style="display:none">ModuleId</th>
-                                    <th>Sequence</th>
-                                    <th>Name</th>
-                                    <th>URL</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
                     </div>
 
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="btnSavemenu" class="btn btn-success">Save</button>
+                <div class="modal-footer border-0 pt-1">
+                    <button type="button" onclick="window.location.href='/MenuModule/Index'" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btnSavemenu" class="btn btn-success btn-sm">Save</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- ✅ Styles -->
 <style>
+    /* Accordion items spacing */
+    .accordion-item {
+        border: none;
+        margin-bottom: 0.5rem; /* space between accordion items */
+    }
+
+    /* Accordion headers: fully rounded, gradient, shadows */
+    .accordion-button {
+        font-size: 0.95rem;
+        border-radius: 10px; /* fully rounded */
+        background: linear-gradient(145deg, #c3dbff, #dde9f9);
+        color: #0d6efd;
+        font-weight: 600;
+
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.06), -2px -2px 6px rgba(255,255,255,0.7);
+        border: none;
+    }
+
+        /* Hover effect: light gradient + subtle lift */
+        .accordion-button:hover {
+            background: background: linear-gradient(145deg, #c3dbff, #dde9f9);
+            transform: translateY(-1px);
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.08), -3px -3px 8px rgba(255,255,255,0.7);
+        }
+
+        /* Expanded header: blue gradient + white text */
+        .accordion-button:not(.collapsed) {
+            background: linear-gradient(145deg, #1d68d5, #00af6e);
+            color: #fff;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+        }
+
+    /* Accordion body: rounded bottom corners, shadow */
+    .accordion-body {
+        background-color: #fff;
+        border-radius: 0 0 10px 10px; /* only bottom corners rounded */
+        padding: 0.75rem !important;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.03);
+        border-top: none;
+    }
+
+    /* Inputs: compact and modern */
+    .form-control.form-control-sm {
+        border-radius: 6px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    /* Icon scroll container */
     .icon-scroll-container {
         overflow-x: auto;
         white-space: nowrap;
-        padding: 8px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        background: #fff;
+        padding: 6px;
+        border-radius: 8px;
+        background-color: #f5f7fa;
+        box-shadow: inset 0 0 3px rgba(0,0,0,0.05);
+        margin-top: 4px;
     }
 
+    /* Icon items: circle, hover scale, shadow */
     .icon-item {
         flex: 0 0 auto;
-        width: 36px;
-        height: 36px;
+        width: 40px;
+        height: 40px;
         display: flex;
         align-items: center;
         justify-content: center;
         font-size: 18px;
-        border-radius: 6px;
-        background-color: #f9fafb;
+        border-radius: 50%;
+        background-color: #fff;
         cursor: pointer;
-        transition: 0.2s ease-in-out;
+        transition: all 0.2s ease;
+        line-height: 1;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        margin-right: 4px;
     }
 
         .icon-item:hover {
-            background-color: #e9f3ff;
-            transform: scale(1.1);
+            background-color: #e6f0ff;
+            transform: scale(1.15);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.12);
         }
 
         .icon-item.selected {
             border: 2px solid #0d6efd;
-            background-color: #e6f0ff;
+            background-color: #d0e4ff;
+            transform: scale(1.15);
         }
 
-    .icon-scroll-container::-webkit-scrollbar {
-        height: 6px;
-    }
-
-    .icon-scroll-container::-webkit-scrollbar-thumb {
-        background-color: #b0c4de;
-        border-radius: 10px;
+    /* Tables: compact */
+    .table-sm th, .table-sm td {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.85rem;
     }
 </style>
-
-
 
 
 
@@ -439,9 +519,10 @@
                                         <td class="moduleUrl">
                                             <input type="text" class="form-control form-control-sm" value="${m.url}" />
                                         </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger btn-sm removeModule">Remove</button>
-                                        </td>
+                                         <td class="d-flex gap-1 justify-content-start">
+       
+            <a href="javascript:void(0);" class="btn btn-sm btn-primary setupModule" title="Setup"><i class="fe-settings"></i></a>
+        </td>
                                     </tr>
                                 `);
                             }
@@ -490,9 +571,14 @@
                     <td class="moduleSeq"><input type="number" class="form-control form-control-sm" value="${seq}" /></td>
                     <td class="moduleName"><input type="text" class="form-control form-control-sm" value="${name}" /></td>
                     <td class="moduleUrl"><input type="text" class="form-control form-control-sm" value="${url}" /></td>
-                    <td>
-                        <button type="button" class="btn btn-danger btn-sm removeModule">Remove</button>
-                    </td>
+              <td class="d-flex gap-1 justify-content-start">
+            <a href="javascript:void(0);" class="btn btn-sm btn-danger removeModule" title="Remove">
+                <i class="fe-trash"></i>
+            </a>
+            <a href="javascript:void(0);" class="btn btn-sm btn-primary setupModule" title="Setup">
+                <i class="fe-settings"></i>
+            </a>
+        </td>
                 </tr>`;
 
             // Insert row in ascending sequence order
