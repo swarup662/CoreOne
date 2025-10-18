@@ -311,10 +311,10 @@
                         <table class="table table-bordered table-striped mt-3" id="moduleTable">
                             <thead class="table-light">
                                 <tr>
-                                    <th>ID</th>
+                                    <th style="display:none">ModuleId</th>
+                                    <th>Sequence</th>
                                     <th>Name</th>
                                     <th>URL</th>
-                                    <th>Sequence</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -421,19 +421,27 @@
                         const sortedModules = data.modules.sort((a, b) => a.sequence - b.sequence);
 
                         sortedModules.forEach(m => {
-                            // Check for duplicates in the existing table
+                            // Check for duplicate sequence in table
                             const seqExists = $("#moduleTable tbody tr").filter(function () {
-                                return parseInt($(this).find(".moduleSeq").text()) === m.sequence;
+                                return parseInt($(this).find(".moduleSeq input").val()) === m.sequence;
                             }).length > 0;
 
                             if (!seqExists) {
                                 tbody.append(`
                                     <tr data-module-id="${m.moduleID}">
                                         <td class="moduleId" style="display:none">${m.moduleID}</td>
-                                        <td class="moduleName">${m.name}</td>
-                                        <td class="moduleUrl">${m.url}</td>
-                                        <td class="moduleSeq">${m.sequence}</td>
-                                        <td><button type="button" class="btn btn-danger btn-sm removeModule">Remove</button></td>
+                                        <td class="moduleSeq">
+                                            <input type="number" class="form-control form-control-sm" value="${m.sequence}" />
+                                        </td>
+                                        <td class="moduleName">
+                                            <input type="text" class="form-control form-control-sm" value="${m.name}" />
+                                        </td>
+                                        <td class="moduleUrl">
+                                            <input type="text" class="form-control form-control-sm" value="${m.url}" />
+                                        </td>
+                                        <td>
+                                            <button type="button" class="btn btn-danger btn-sm removeModule">Remove</button>
+                                        </td>
                                     </tr>
                                 `);
                             }
@@ -445,8 +453,7 @@
                 .catch(err => alert(err));
         }
 
-
-              // Add module to table
+        // Add module to table
         $("#addModuleBtn").click(function () {
             const name = $("#ModuleName").val().trim();
             const url = $("#ModuleUrl").val().trim();
@@ -463,14 +470,9 @@
             }
 
             // Check for duplicate sequence
-            let seqExists = false;
-            $("#moduleTable tbody tr").each(function () {
-                const existingSeq = $(this).find(".moduleSeq").text();
-                if (parseInt(existingSeq) === parseInt(seq)) {
-                    seqExists = true;
-                    return false; // break loop
-                }
-            });
+            const seqExists = $("#moduleTable tbody tr").filter(function () {
+                return parseInt($(this).find(".moduleSeq input").val()) === parseInt(seq);
+            }).length > 0;
 
             if (seqExists) {
                 Swal.fire({
@@ -481,19 +483,22 @@
                 return;
             }
 
-            // Create new row
-            const row = `<tr data-module-id="">
-                <td class="moduleId" style="display:none"></td>
-                <td class="moduleName">${name}</td>
-                <td class="moduleUrl">${url}</td>
-                <td class="moduleSeq">${seq}</td>
-                <td><button type="button" class="btn btn-danger btn-sm removeModule">Remove</button></td>
-            </tr>`;
+            // Create new row with input fields
+            const row = `
+                <tr data-module-id="">
+                    <td class="moduleId" style="display:none"></td>
+                    <td class="moduleSeq"><input type="number" class="form-control form-control-sm" value="${seq}" /></td>
+                    <td class="moduleName"><input type="text" class="form-control form-control-sm" value="${name}" /></td>
+                    <td class="moduleUrl"><input type="text" class="form-control form-control-sm" value="${url}" /></td>
+                    <td>
+                        <button type="button" class="btn btn-danger btn-sm removeModule">Remove</button>
+                    </td>
+                </tr>`;
 
             // Insert row in ascending sequence order
             let inserted = false;
             $("#moduleTable tbody tr").each(function () {
-                const currentSeq = parseInt($(this).find(".moduleSeq").text());
+                const currentSeq = parseInt($(this).find(".moduleSeq input").val());
                 if (parseInt(seq) < currentSeq) {
                     $(this).before(row);
                     inserted = true;
@@ -509,13 +514,10 @@
             $("#ModuleName, #ModuleUrl, #ModuleSeq").val('');
         });
 
-        // Remove module
+        // Remove module button
         $(document).on("click", ".removeModule", function () {
             $(this).closest("tr").remove();
         });
-
-
-
 
 
 
@@ -630,18 +632,19 @@
                 Modules: []
             };
 
-            // Collect modules
-            $("#moduleTable tbody tr").each(function () {
-                const row = $(this);
-                const moduleId = row.data("module-id");
+                  // Collect modules (read from input fields)
+        $("#moduleTable tbody tr").each(function () {
+            const row = $(this);
+            const moduleId = row.data("module-id");
 
-                menuWithModules.Modules.push({
-                    ModuleID: moduleId ? parseInt(moduleId) : null,
-                    Name: row.find(".moduleName").text().trim(),
-                    Url: row.find(".moduleUrl").text().trim(),
-                    Sequence: parseInt(row.find(".moduleSeq").text())
-                });
+            menuWithModules.Modules.push({
+                ModuleID: moduleId ? parseInt(moduleId) : null,
+                Name: row.find(".moduleName input").val().trim(),
+                Url: row.find(".moduleUrl input").val().trim(),
+                Sequence: parseInt(row.find(".moduleSeq input").val())
             });
+        });
+
 
             // Send save request
             try {
