@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CoreOne.COMMON\CoreOne.COMMON.csproj" />
+    <ProjectReference Include="..\CoreOne.DOMAIN\CoreOne.DOMAIN.csproj" />
   </ItemGroup>
 
 </Project>

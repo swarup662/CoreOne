@@ -1,28 +1,28 @@
 ﻿using System.Data;
-using CoreOne.API.Helpers;
+using CoreOne.API.Infrastructure.Data;
 using CoreOne.API.Interfaces;
-using CoreOne.COMMON.Models;
+using CoreOne.DOMAIN.Models;
 
 namespace CoreOne.API.Repositories
 {
     public class RolePermissionRepository : IRolePermissionRepository
     {
-        private readonly DBHelper _dbHelper;
+        private readonly DBContext _dbHelper;
 
-        public RolePermissionRepository(DBHelper dbHelper)
+        public RolePermissionRepository(DBContext dbHelper)
         {
             _dbHelper = dbHelper;
         }
 
         // 1. Roles dropdown
-        public async Task<IEnumerable<RolePermissionModel>> GetRolesAsync()
+        public async Task<IEnumerable<RolePermission>> GetRolesAsync()
         {
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetRolesForDropdown"); // SELECT * FROM Roles
-            var list = new List<RolePermissionModel>();
+            var list = new List<RolePermission>();
 
             foreach (DataRow row in dt.Rows)
             {
-                list.Add(new RolePermissionModel
+                list.Add(new RolePermission
                 {
                     RoleID = Convert.ToInt32(row["RoleID"]),
                     RoleName = row["RoleName"].ToString()
@@ -55,15 +55,15 @@ namespace CoreOne.API.Repositories
 
 
         // 3. Permissions by role id
-        public async Task<IEnumerable<RolePermissionModel>> GetByRoleIdAsync(int roleId)
+        public async Task<IEnumerable<RolePermission>> GetByRoleIdAsync(int roleId)
         {
             var parameters = new Dictionary<string, object> { { "@RoleID", roleId } };
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetRolePermissionsByRoleID", parameters);
 
-            var list = new List<RolePermissionModel>();
+            var list = new List<RolePermission>();
             foreach (DataRow row in dt.Rows)
             {
-                list.Add(new RolePermissionModel
+                list.Add(new RolePermission
                 {
                     RoleID = roleId,
                     MenuModuleID = Convert.ToInt32(row["MenuModuleID"]),
@@ -79,7 +79,7 @@ namespace CoreOne.API.Repositories
             return await Task.FromResult(list);
         }
 
-        public async Task<int> SaveAsync(IEnumerable<RolePermissionModel> rolePermissions, int roleId, int userId)
+        public async Task<int> SaveAsync(IEnumerable<RolePermission> rolePermissions, int roleId, int userId)
         {
             var dt = new DataTable();
             dt.Columns.Add("RoleID", typeof(int));

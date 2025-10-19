@@ -1,5 +1,6 @@
 ﻿using CoreOne.API.Helpers;
-using CoreOne.COMMON.Models;
+using CoreOne.API.Infrastructure.Data;
+using CoreOne.DOMAIN.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,9 +10,9 @@ namespace CoreOne.API.Repositories
 {
     public class UserRepository : IUserRepository
     {
-        private readonly DBHelper _dbHelper;
+        private readonly DBContext _dbHelper;
 
-        public UserRepository(DBHelper dbHelper)
+        public UserRepository(DBContext dbHelper)
         {
             _dbHelper = dbHelper;
         }
@@ -37,7 +38,7 @@ namespace CoreOne.API.Repositories
             return _dbHelper.ExecuteSP_ReturnInt("sp_SaveUser", parameters);
         }
 
-        public int AssignPermissions(List<UserPermissionModel> permissions)
+        public int AssignPermissions(List<UserPermission> permissions)
         {
             int result = 0;
             foreach (var p in permissions)

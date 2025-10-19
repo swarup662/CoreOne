@@ -1,4 +1,4 @@
-﻿using CoreOne.COMMON.Models;
+﻿using CoreOne.DOMAIN.Models;
 using CoreOne.UI.Controllers;
 using CoreOne.UI.Helper;
 using CoreOne.UI.Middleware;
@@ -10,11 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<SettingsService>();
-builder.Services.AddScoped<MenuController>();
-builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
+builder.Services.AddScoped<MenuLayoutController>();
+builder.Services.Configure<ApiSettingsHelper>(builder.Configuration.GetSection("ApiSettings"));
 // Add this line to make ApiSettings directly injectable
 builder.Services.AddSingleton(resolver =>
-    resolver.GetRequiredService<IOptions<ApiSettings>>().Value);
+    resolver.GetRequiredService<IOptions<ApiSettingsHelper>>().Value);
 
 builder.Services.Configure<FileUploadSettings>(options =>
 {
@@ -27,8 +27,8 @@ builder.Services.Configure<FileUploadSettings>(options =>
 builder.Services.AddHttpContextAccessor(); // ✅ Needed for token access
 builder.Services.AddHttpClient();
 
-builder.Services.AddScoped<PermissionService>();
-builder.Services.AddScoped<PermissionHtmlProcessor>();
+builder.Services.AddScoped<PermissionHelper>();
+builder.Services.AddScoped<ActionPermissionHtmlProcessorUiHelper>();
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();
 

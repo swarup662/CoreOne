@@ -2,14 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
-using CoreOne.COMMON.Models;
+using CoreOne.DOMAIN.Models;
 namespace CoreOne.UI.Controllers
 {
     public class AccountController : Controller
     {
         private readonly string BaseUrlAuth;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ApiSettings _apiSettings;
+        private readonly ApiSettingsHelper _apiSettings;
 
         public AccountController(IConfiguration config, IHttpClientFactory httpClientFactory, SettingsService settingsService)
         {
@@ -31,7 +31,7 @@ namespace CoreOne.UI.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var client = _httpClientFactory.CreateClient();
-            var url = _apiSettings.BaseUrlAuth + "/Login";
+            var url = _apiSettings.BaseUrlAuthentication + "/Login";
             var json = JsonConvert.SerializeObject(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -84,7 +84,7 @@ namespace CoreOne.UI.Controllers
                 try
                 {
                     var client = _httpClientFactory.CreateClient();
-                    var url = _apiSettings.BaseUrlAuth + "/Logout";
+                    var url = _apiSettings.BaseUrlAuthentication + "/Logout";
 
                     var json = JsonConvert.SerializeObject(user.UserID);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");

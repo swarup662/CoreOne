@@ -1,4 +1,4 @@
-﻿@using CoreOne.COMMON.Models
+﻿@using CoreOne.DOMAIN.Models
 
 @{
     ViewData["Title"] = "Role Permission";
@@ -13,7 +13,7 @@
     string sortDir = ViewBag.SortDir ?? "ASC";
     string searchCol = ViewBag.SearchCol ?? "RoleName";
 
-    var rolePermissions = ViewBag.RolePermissions as List<RolePermissionModel> ?? new List<RolePermissionModel>();
+    var rolePermissions = ViewBag.RolePermissions as List<RolePermission> ?? new List<RolePermission>();
 
     // Pagination window server-side: show up to 5 pages
     int maxWindow = 5;
@@ -317,7 +317,7 @@
                             <option value="">-- Choose Role --</option>
                             @if (ViewBag.Roles != null)
                             {
-                                List<RolePermissionModel> roles = ViewBag.Roles as List<RolePermissionModel>;
+                                List<RolePermission> roles = ViewBag.Roles as List<RolePermission>;
                                 @foreach (var role in roles)
                                 {
                                     <option value="@role.RoleID">@role.RoleName</option>

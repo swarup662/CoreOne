@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
-using CoreOne.COMMON.Models;
+using CoreOne.DOMAIN.Models;
 using CoreOne.UI.Helper;
 using System.Data;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace CoreOne.UI.Controllers
     public class RolePermissionController : Controller
     {
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ApiSettings _apiSettings;
+        private readonly ApiSettingsHelper _apiSettings;
 
         public RolePermissionController(IHttpClientFactory httpClientFactory, SettingsService settingsService)
         {
@@ -25,7 +25,7 @@ namespace CoreOne.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string search = null, string sortColumn = "", string sortDir = null)
         {
-            var model = new RoleGridRequest
+            var model = new RolePermissionGridRequest
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
@@ -42,16 +42,16 @@ namespace CoreOne.UI.Controllers
             var resp = await client.PostAsync(url, content);
             if (!resp.IsSuccessStatusCode)
             {
-                List<RolePermissionModel> erroles = new List<RolePermissionModel>();
+                List<RolePermission> erroles = new List<RolePermission>();
                 return View(erroles);
                 ViewBag.Roles = null; // 👈 kept as is
             }
             else
             {
                 var response = await resp.Content.ReadAsStringAsync();
-                var apiResult = JsonConvert.DeserializeObject<RoleGridPagedResponse>(response);
+                var apiResult = JsonConvert.DeserializeObject<RolePermissionGridPagedResponse>(response);
 
-                var roles = apiResult?.Items ?? new List<RolePermissionModel>();
+                var roles = apiResult?.Items ?? new List<RolePermission>();
                 ViewBag.RolePermissions = roles;
                var ddlresponse = await client.GetAsync($"{_apiSettings.BaseUrlRolePermission}/roles");
                 if (!ddlresponse.IsSuccessStatusCode)
@@ -61,7 +61,7 @@ namespace CoreOne.UI.Controllers
                 else
                 {
                     var ddljson = await ddlresponse.Content.ReadAsStringAsync();
-                    var ddlroles = JsonConvert.DeserializeObject<IEnumerable<RolePermissionModel>>(ddljson);
+                    var ddlroles = JsonConvert.DeserializeObject<IEnumerable<RolePermission>>(ddljson);
                     ViewBag.Roles = ddlroles;
                 }
 
@@ -88,7 +88,7 @@ namespace CoreOne.UI.Controllers
             var client = _httpClientFactory.CreateClient();
             var response = await client.GetAsync($"{_apiSettings.BaseUrlRolePermission}/GetRolePermissionByRoleId/{roleId}");
             var json = await response.Content.ReadAsStringAsync();
-            var permissions = JsonConvert.DeserializeObject<IEnumerable<RolePermissionModel>>(json);
+            var permissions = JsonConvert.DeserializeObject<IEnumerable<RolePermission>>(json);
 
             if (permissions == null || !permissions.Any())
             {
@@ -164,7 +164,7 @@ namespace CoreOne.UI.Controllers
         // Save / Update permissions
         // =========================
         [HttpPost]
-        public async Task<IActionResult> SavePermissions(int roleId,  [FromBody] List<RolePermissionModel> permissions)
+        public async Task<IActionResult> SavePermissions(int roleId,  [FromBody] List<RolePermission> permissions)
         {
             var client = _httpClientFactory.CreateClient();
             var content = new StringContent(JsonConvert.SerializeObject(permissions), Encoding.UTF8, "application/json");

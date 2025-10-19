@@ -7,7 +7,7 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using CoreOne.COMMON.Models; // ensure ActionDto available or create local DTO
+using CoreOne.DOMAIN.Models; // ensure ActionDto available or create local DTO
 using System.Linq;
 using System.Text;
 using CoreOne.UI.Helper;
@@ -16,7 +16,7 @@ using CoreOne.UI.Helper;
 public class PermissionTagHelper : TagHelper
 {
     private readonly IHttpClientFactory _httpClientFactory;
-    private readonly ApiSettings _apiSettings;
+    private readonly ApiSettingsHelper _apiSettings;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public PermissionTagHelper(IHttpClientFactory httpClientFactory, SettingsService settingsService, IHttpContextAccessor httpContextAccessor)

@@ -1,5 +1,5 @@
 ﻿using Azure.Core;
-using CoreOne.API.Helpers;
+using CoreOne.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json; // ← Use this instead of System.Text.Json
 using System.Net;
@@ -9,9 +9,9 @@ namespace CoreOne.API.Middleware
     public class ErrorLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly DBHelper _dbHelper;
+        private readonly DBContext _dbHelper;
 
-        public ErrorLoggingMiddleware(RequestDelegate next, DBHelper dbHelper)
+        public ErrorLoggingMiddleware(RequestDelegate next, DBContext dbHelper)
         {
             _next = next;
             _dbHelper = dbHelper;

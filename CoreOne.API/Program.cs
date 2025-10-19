@@ -1,29 +1,29 @@
-using CoreOne.API.Helpers;
 using CoreOne.API.Middleware;
-using CoreOne.API.Services;
 using CoreOne.API.Repositories;
 using CoreOne.API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using CoreOne.API.Interface;
+using CoreOne.API.Infrastructure.Data;
+using CoreOne.API.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // --- Add services ---
-builder.Services.AddSingleton<DBHelper>();
+builder.Services.AddSingleton<DBContext>();
 builder.Services.AddSingleton<TokenService>();
 builder.Services.AddControllers();
 
 
 // --- Register services ---
-builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
-builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+builder.Services.AddScoped<IRoleCreationRepository, RoleCreationRepository>();
 builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 builder.Services.AddScoped<IUserCreationRepository, UserCreationRepository>();
-builder.Services.AddScoped<IMenuModuleRepository, MenuModuleRepository>();
+builder.Services.AddScoped<IModuleSetupRepository, ModuleSetupRepository>();
 builder.Services.AddScoped<PermissionController>();
 
 // --- API Versioning ---

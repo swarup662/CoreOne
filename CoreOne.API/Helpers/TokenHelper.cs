@@ -1,5 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using CoreOne.COMMON.Models;
+using CoreOne.DOMAIN.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace CoreOne.UI.Helper

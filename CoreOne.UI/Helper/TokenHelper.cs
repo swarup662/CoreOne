@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using CoreOne.COMMON.Models;
+using CoreOne.DOMAIN.Models;
 using Microsoft.AspNetCore.Http;
 
 namespace CoreOne.UI.Helper

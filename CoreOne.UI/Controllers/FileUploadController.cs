@@ -10,7 +10,7 @@ using System.Drawing.Imaging;
 using iText.Kernel.Pdf;          // PdfWriter, PdfDocument, WriterProperties
 using iText.Kernel.Pdf.Canvas;   // optional, for canvas operations
 using iText.Kernel.Pdf.Canvas.Parser;
-using CoreOne.COMMON.Models; // optional
+using CoreOne.DOMAIN.Models; // optional
 
 [ApiController]
 [Route("api/[controller]")]
@@ -53,7 +53,7 @@ public class FileUploadController : ControllerBase
             _ => "application/octet-stream"
         };
 
-        var tempId = TempFileStorage.AddFile(bytes, file.FileName, contentType, module);
+        var tempId = TempFileStorageHelper.AddFile(bytes, file.FileName, contentType, module);
 
         return Ok(new { message = "Temp upload successful", tempId, contentType });
     }
@@ -63,7 +63,7 @@ public class FileUploadController : ControllerBase
     [HttpGet("viewTemp")]
     public IActionResult ViewTemp([FromQuery] string tempId, [FromQuery] bool inline = true)
     {
-        if (!TempFileStorage.TryGetFile(tempId, out var content, out var fileName, out var contentType, out var _))
+        if (!TempFileStorageHelper.TryGetFile(tempId, out var content, out var fileName, out var contentType, out var _))
             return NotFound("Temp file not found");
 
         if (inline && (contentType.StartsWith("image/") || contentType == "application/pdf"))
@@ -81,7 +81,7 @@ public class FileUploadController : ControllerBase
     [HttpPost("save")]
     public IActionResult SaveFile([FromForm] string tempId)
     {
-        if (!TempFileStorage.TryGetFile(tempId, out var content, out var fileName, out var contentType, out var module))
+        if (!TempFileStorageHelper.TryGetFile(tempId, out var content, out var fileName, out var contentType, out var module))
             return BadRequest(new { error = "File not found" });
 
         var config = _settings.UploadModules.FirstOrDefault(x => x.Module.Equals(module, StringComparison.OrdinalIgnoreCase));
@@ -150,7 +150,7 @@ public class FileUploadController : ControllerBase
 
         // Save final bytes
         System.IO.File.WriteAllBytes(savePath, finalBytes);
-        TempFileStorage.RemoveFile(tempId);
+        TempFileStorageHelper.RemoveFile(tempId);
 
         // Determine relative path
         string wwwrootPath = Path.Combine(AppContext.BaseDirectory, "wwwroot");

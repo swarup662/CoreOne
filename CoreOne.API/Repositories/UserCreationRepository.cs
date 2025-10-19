@@ -1,6 +1,6 @@
-﻿using CoreOne.API.Helpers;
+﻿using CoreOne.API.Infrastructure.Data;
 using CoreOne.API.Interfaces;
-using CoreOne.COMMON.Models;
+using CoreOne.DOMAIN.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -9,9 +9,9 @@ namespace CoreOne.API.Repositories
 {
     public class UserCreationRepository : IUserCreationRepository
     {
-        private readonly DBHelper _dbHelper;
+        private readonly DBContext _dbHelper;
 
-        public UserCreationRepository(DBHelper dbHelper)
+        public UserCreationRepository(DBContext dbHelper)
         {
             _dbHelper = dbHelper;
         }

@@ -1,4 +1,4 @@
-﻿using CoreOne.API.Helpers;
+﻿using CoreOne.API.Infrastructure.Data;
 using Microsoft.AspNetCore.Http;
 
 namespace CoreOne.API.Middleware
@@ -6,9 +6,9 @@ namespace CoreOne.API.Middleware
     public class ActivityLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly DBHelper _dbHelper;
+        private readonly DBContext _dbHelper;
 
-        public ActivityLoggingMiddleware(RequestDelegate next, DBHelper dbHelper)
+        public ActivityLoggingMiddleware(RequestDelegate next, DBContext dbHelper)
         {
             _next = next;
             _dbHelper = dbHelper;

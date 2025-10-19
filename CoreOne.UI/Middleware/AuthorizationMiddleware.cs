@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Text;
-using CoreOne.COMMON.Models;
+using CoreOne.DOMAIN.Models;
 using CoreOne.UI.Helper;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -12,7 +12,7 @@ namespace CoreOne.UI.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ApiSettings _apiSettings;
+        private readonly ApiSettingsHelper _apiSettings;
 
         public AuthorizationMiddleware(RequestDelegate next, IHttpClientFactory httpClientFactory, SettingsService settingsService)
         {
@@ -77,7 +77,7 @@ namespace CoreOne.UI.Middleware
             try
             {
                 var client = _httpClientFactory.CreateClient();
-                var url = $"{_apiSettings.BaseUrlAuth}/Logout";
+                var url = $"{_apiSettings.BaseUrlAuthentication}/Logout";
 
                 var json = JsonConvert.SerializeObject(new { UserId = userId });
                 var content = new StringContent(json, Encoding.UTF8, "application/json");

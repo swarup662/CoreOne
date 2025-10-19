@@ -1,4 +1,4 @@
-﻿using CoreOne.COMMON.Models;
+﻿using CoreOne.DOMAIN.Models;
 using CoreOne.UI.Helper;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -11,7 +11,7 @@ namespace CoreOne.UI.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ApiSettings _apiSettings;
+        private readonly ApiSettingsHelper _apiSettings;
         private readonly string BaseUrlAuth;
         public UiErrorLoggingMiddleware(RequestDelegate next, IHttpClientFactory httpClientFactory, IConfiguration config)
         {

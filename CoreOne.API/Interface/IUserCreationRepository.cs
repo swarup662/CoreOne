@@ -1,4 +1,4 @@
-﻿using CoreOne.COMMON.Models;
+﻿using CoreOne.DOMAIN.Models;
 using System.Data;
 
 namespace CoreOne.API.Interfaces

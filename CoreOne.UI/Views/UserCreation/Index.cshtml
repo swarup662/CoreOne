@@ -1,0 +1,447 @@
+﻿@using CoreOne.DOMAIN.Models
+@using Newtonsoft.Json
+@model CoreOne.DOMAIN.Models.UserCreation
+
+@{
+    ViewData["Title"] = "User Creation";
+    var users = ViewBag.Users as List<UserCreation> ?? new();
+    int totalRecords = ViewBag.TotalRecords ?? 0;
+    int pageNumber = ViewBag.PageNumber ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    string sortColumn = ViewBag.SortColumn ?? "";
+    string sortDir = ViewBag.SortDir ?? "ASC";
+    string search = ViewBag.Search ?? "";
+    string searchCol = ViewBag.SearchCol ?? "";
+}
+
+<style>
+    #addUserModal .modal-content {
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    #addUserModal .modal-header {
+        background: linear-gradient(135deg, #007bff, #0056d2);
+    }
+
+    #addUserModal img.object-fit-cover {
+        object-fit: cover;
+    }
+
+</style>
+
+<script>
+    async function loadUserPhotoByFilePath(filePath, elementId) {
+        // Use the same logic as loadProfilePhoto
+        const img = document.getElementById(elementId);
+        const defaultSrc = "/images/default-user.png";
+
+        if (!img) return;
+
+        // Handle invalid, null, or empty path
+        if (!filePath || filePath.trim() === "" || filePath === "null" || filePath === "undefined") {
+            img.src = defaultSrc;
+            return;
+        }
+
+        try {
+            // Use your existing API exactly as in loadProfilePhoto
+            const resp = await fetch(`/api/FileUpload/viewSaved?filePath=${encodeURIComponent(filePath)}`);
+            if (!resp.ok) throw new Error("Photo not found");
+
+            const blob = await resp.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+            img.src = blobUrl;
+        } catch (err) {
+            console.error("Error loading user photo:", err);
+            img.src = defaultSrc;
+        }
+    }
+</script>
+
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="page-title-box d-flex justify-content-between align-items-center">
+                <h4 class="page-title fw-bold text-gradient">User Management</h4>
+                <button class="btn btn-primary rounded-pill shadow-sm" id="btnAddUser"
+                        data-bs-toggle="modal" data-bs-target="#addUserModal">
+                    <i class="mdi mdi-plus-circle"></i> Add User
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="card glass-card p-3 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-dark">
+                    <tr>
+                        <th class="text-center" style="width: 5%;">#</th>
+                        <th class="text-center" style="width: 10%;">Profile</th>
+                        <th class="text-start sortable" onclick="sortTable('UserName')">
+                            Name @Html.Raw(sortColumn == "UserName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                        </th>
+                        <th class="text-start sortable" onclick="sortTable('Email')">
+                            Email @Html.Raw(sortColumn == "Email" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                        </th>
+                        <th class="text-start">Phone</th>
+                        <th class="text-start sortable" onclick="sortTable('RoleName')">
+                            Role @Html.Raw(sortColumn == "RoleName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                        </th>
+                        <th class="text-start sortable" onclick="sortTable('GenderName')">
+                            Gender @Html.Raw(sortColumn == "GenderName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                        </th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int count = ((pageNumber - 1) * pageSize) + 1;
+                    }
+                    @if (users.Any())
+                    {
+                        foreach (var user in users)
+                        {
+                            <tr class="align-middle">
+                                <td class="text-center">@count</td>
+                                <td class="text-center">
+                                    <img id="userPhoto_@user.UserID"
+                                         src="/images/default-user.png"
+                                         alt="Profile"
+                                         class="rounded-circle"
+                                         style="width:50px; height:50px; object-fit:cover; border:1px solid #ddd;">
+                                </td>
+                                <td class="text-start fw-semibold">@user.UserName</td>
+                                <td class="text-start">@user.Email</td>
+                                <td class="text-start">@user.PhoneNumber</td>
+                                <td class="text-start">@user.RoleName</td>
+                                <td class="text-start">@user.GenderName</td>
+                                <td class="text-center">
+                                    @{
+                                        var status = user.ActiveFlag switch
+                                        {
+                                            1 => "Active",
+                                            2 => "Blocked",
+                                            0 => "Deactivated",
+                                            _ => "Unknown"
+                                        };
+                                        var badgeClass = user.ActiveFlag == 1 ? "bg-success" :
+                                        user.ActiveFlag == 2 ? "bg-danger" :
+                                        "bg-secondary";
+                                    }
+                                    <span class="badge @badgeClass fw-semibold">@status</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                        <!-- Edit -->
+                                        <button class="btn btn-sm btn-outline-primary shadow-sm"
+                                                onclick="editUser(@user.UserID)"
+                                                title="Edit User">
+                                            <i class="mdi mdi-pencil-outline"></i>
+                                        </button>
+
+                                        <!-- Delete -->
+                                        <button class="btn btn-sm btn-outline-danger shadow-sm"
+                                                onclick="deleteUser(@user.UserID)"
+                                                title="Delete User">
+                                            <i class="mdi mdi-delete-outline"></i>
+                                        </button>
+
+                                        <!-- Extra Permission -->
+                                        <button class="btn btn-sm btn-outline-info shadow-sm"
+                                                onclick="extraPermission(@user.UserID, @user.RoleID)"
+                                                title="Extra Permission">
+                                            <i class="mdi mdi-shield-account-outline"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <script>
+                                // Load user photo
+                                loadUserPhotoByFilePath(@Html.Raw(JsonConvert.SerializeObject(user.PhotoPath)), 'userPhoto_@user.UserID');
+                            </script>
+
+                            count++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center text-muted py-4">No users found</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+            <div class="text-muted small">
+                Showing page <b>@pageNumber</b> of <b>@Math.Ceiling((double)totalRecords / pageSize)</b>
+            </div>
+            <nav>
+                <ul class="pagination pagination-sm mb-0">
+                    @{
+                        int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+                        for (int i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == pageNumber ? "active" : "")">
+                                <a class="page-link" href="javascript:void(0)" onclick="changePage(@i)">@i</a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+</div>
+
+<!-- Add User Modal -->
+<div class="modal fade" id="addUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content shadow-lg border-0 rounded-4">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white rounded-top-4">
+                <h5 class="modal-title fw-bold" id="addUserModalLabel">
+                    <i class="bi bi-person-plus me-2"></i>Add New User
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body px-4 py-3">
+                <input type="hidden" asp-for="UserID" />
+
+                <div class="row g-4">
+                    <!-- Left Section (Form Fields) -->
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="UserName" class="form-label fw-semibold">Full Name</label>
+                            <input type="text" asp-for="UserName" class="form-control form-control-lg" placeholder="Enter full name" />
+                            <span asp-validation-for="UserName" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="MailTypeID" class="form-label fw-semibold">Mail Type</label>
+                            @Html.DropDownList("MailTypeID", ViewBag.MailTypeList as List<SelectListItem>, new { @class = "form-select form-select-lg" })
+                            <span asp-validation-for="MailTypeID" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="Email" class="form-label fw-semibold">Email Address</label>
+                            <input type="email" asp-for="Email" class="form-control form-control-lg" placeholder="example@domain.com" />
+                            <span asp-validation-for="Email" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="PhoneNumber" class="form-label fw-semibold">Phone Number</label>
+                            <input type="text" asp-for="PhoneNumber" class="form-control form-control-lg" placeholder="Enter phone number" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="RoleID" class="form-label fw-semibold">User Role</label>
+                            @Html.DropDownList("RoleID", ViewBag.RoleList as List<SelectListItem>, new { @class = "form-select form-select-lg" })
+                            <span asp-validation-for="RoleID" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="GenderID" class="form-label fw-semibold">Gender</label>
+                            @Html.DropDownList("GenderID", ViewBag.GenderList as List<SelectListItem>, new { @class = "form-select form-select-lg" })
+                            <span asp-validation-for="GenderID" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <!-- Right Section (Image Upload) -->
+                    <div class="col-md-4 text-center border-start">
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                            <div class="border rounded-circle overflow-hidden mb-3" style="width: 120px; height: 120px;">
+                                <img id="profilePreview" src="/images/default-user.png" alt="Profile" class="img-fluid w-100 h-100 object-fit-cover" />
+                            </div>
+
+                            <button class="btn btn-outline-primary btn-sm mb-2 px-4" onclick="openFileUpload('UserCreation')">
+                                <i class="bi bi-upload me-1"></i>Upload Profile
+                            </button>
+
+                            <span id="PhotoPath" class="text-danger small mb-2"></span>
+
+                            <button type="button" class="btn btn-outline-info btn-sm" id="showFile" style="display:none" onclick="openFileViewModalshow()">
+                                <i class="bi bi-eye me-1"></i>View
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer d-flex justify-content-between px-4">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="window.location.href='/UserCreation/Index'">
+                    <i class="bi bi-x-circle me-1" ></i>Cancel
+                </button>
+                <button type="button" id="btnSaveUser" class="btn btn-success px-4">
+                    <i class="bi bi-check-circle me-1"></i>Save User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="permissionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+
+            <!-- Header -->
+            <div class="modal-header text-white"
+                 style="background: linear-gradient(135deg, #4facfe, #4facfe);">
+                <h5 class="modal-title fw-bol   d d-flex align-items-center">
+                    <i class="bi bi-ui-checks-grid me-2"></i> Manage Extra Permissions
+                </h5>
+                <button type="button"
+                        class="btn btn-light rounded-circle d-flex align-items-center justify-content-center shadow-sm"
+                        onclick="window.location.href='/UserCreation/Index'"
+                        style="width: 38px; height: 38px; border: none;">
+                    <i class="bi bi-x-lg text-dark fw-bold"></i>
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div class="modal-body bg-light">
+
+                <!-- Role dropdown -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold text-dark">Select Role</label>
+                        <select id="roleDropdown"
+                                class="form-select shadow-sm border rounded-3 px-3 py-2"
+                                onchange="onRoleChange()"
+                                style="transition: all 0.2s ease;">
+                            <option value="">-- Choose Role --</option>
+                            @if (ViewBag.Roles != null)
+                            {
+                                List<RolePermission> roles = ViewBag.Roles as List<RolePermission>;
+                                @foreach (var role in roles)
+                                {
+                                    <option value="@role.RoleID">@role.RoleName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Global Select All -->
+                <div class="alert alert-light border rounded-3 shadow-sm d-flex align-items-center justify-content-between px-3 py-2">
+                    <span class="fw-bold text-dark">
+                        <i class="bi bi-check2-circle text-success"></i> Select All Permissions
+                    </span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="selectAllGlobal">
+                    </div>
+                </div>
+
+                <!-- Permissions container -->
+                <div id="permissionsContainer" class="accordion mt-3">
+                    <p class="text-muted">Choose a role to load permissions...</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="modal-footer border-0 bg-light d-flex justify-content-end gap-2">
+                <!-- Save Button -->
+                <button type="button"
+                        class="btn text-white fw-semibold d-flex align-items-center gap-2"
+                        style="background: linear-gradient(135deg, #42e695, #3bb2b8); border-radius: 10px; padding: 0.6rem 1.4rem; transition: all 0.3s;"
+                        id="SaveRolePermissions"
+                        onclick="saveExtraPermissions()">
+                    <i class="bi bi-save-fill"></i> Save
+                </button>
+
+                <!-- Close Button -->
+                <button type="button"
+                        class="btn btn-warning border fw-semibold d-flex align-items-center gap-2"
+                        style="border-radius: 10px; padding: 0.6rem 1.4rem; transition: all 0.3s;"
+                        onclick="window.location.href='/UserCreation/Index'">
+                    <i class="bi bi-x-circle"></i> Close
+                </button>
+            </div>
+
+
+
+        </div>
+    </div>
+</div>
+
+<script src="~/js/usercreation.js"></script>
+
+
+@section Scripts {
+
+    <script>
+        (function () {
+            // Current server-side values
+            const current = {
+                pageNumber: parseInt('@pageNumber'),
+                pageSize: parseInt('@pageSize'),
+                search: '@(search ?? "")',
+                searchCol: '@(searchCol ?? "")',
+                sortColumn: '@(sortColumn ?? "")',
+                sortDir: '@(sortDir ?? "ASC")',
+                status: '@(ViewBag.Status ?? "")'
+            };
+
+            function buildUrl(params) {
+                const qs = new URLSearchParams();
+                qs.set('pageNumber', params.pageNumber ?? current.pageNumber);
+                qs.set('pageSize', params.pageSize ?? current.pageSize);
+                if ((params.search ?? current.search) !== '') qs.set('search', params.search ?? current.search);
+                qs.set('searchCol', params.searchCol ?? current.searchCol);
+                qs.set('sortColumn', params.sortColumn ?? current.sortColumn);
+                qs.set('sortDir', params.sortDir ?? current.sortDir);
+                if ((params.status ?? current.status) !== '') qs.set('status', params.status ?? current.status);
+                return `/UserCreation/Index?` + qs.toString();
+            }
+
+            function navigateTo(params) {
+                window.location.href = buildUrl(params);
+            }
+
+            // Page change
+            window.changePage = function (page) {
+                navigateTo({ pageNumber: page });
+            };
+
+            // Sorting
+            window.sortTable = function (column) {
+                let newDir = current.sortDir === 'ASC' ? 'DESC' : 'ASC';
+                if (current.sortColumn !== column) newDir = 'ASC';
+                navigateTo({ pageNumber: 1, sortColumn: column, sortDir: newDir });
+            };
+
+            // Search button
+            $('#btnSearch').click(function () {
+                const search = $('#search').val();
+                const searchCol = $('#searchCol').val();
+                const status = $('#activeStatus').val();
+                navigateTo({ pageNumber: 1, search: search, searchCol: searchCol, status: status });
+            });
+
+            // Page Size change
+            $('#pageSize').on('change', function () {
+                navigateTo({ pageNumber: 1, pageSize: parseInt($(this).val(), 10) });
+            });
+        })();
+
+        // Edit/Delete functions
+
+    </script>
+
+}
+

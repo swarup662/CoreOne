@@ -5,7 +5,7 @@ $(document).ready(function () {
 });
 
 function closeUserCreationPage() {
-    window.location.href = '/UserCreationUI/Index';
+    window.location.href = '/UserCreation/Index';
 }
 
 
@@ -87,7 +87,7 @@ $("#btnSaveUser").click(async function () {
     };
     // --- All validations passed, proceed to save ---
     $.ajax({
-        url: '/UserCreationUI/SaveUser',
+        url: '/UserCreation/SaveUser',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(payload),
@@ -139,7 +139,7 @@ function validateField(fieldId) {
         payload[fieldId] = $("#" + fieldId).val()?.trim() || "";
 
         $.ajax({
-            url: '/UserCreationUI/ValidateField',
+            url: '/UserCreation/ValidateField',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(payload),
@@ -179,7 +179,7 @@ function editUser(id) {
     $('#addUserModal').attr('aria-labelledby', 'userModalLabel');
 
     $.ajax({
-        url: '/UserCreationUI/GetUserById',// UI controller action
+        url: '/UserCreation/GetUserById',// UI controller action
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(id),
@@ -219,7 +219,7 @@ function editUser(id) {
 function deleteUser(id) {
     if (confirm("Are you sure you want to Deactivate this user?")) {
         $.ajax({
-            url: '/UserCreationUI/DeleteUser',
+            url: '/UserCreation/DeleteUser',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(id),
@@ -286,7 +286,7 @@ function fetchPermissions(userId, roleId, ) {
     $("#permissionsContainer").html("<p class='text-muted'>Loading...</p>");
 
     $.ajax({
-        url: "/UserCreationUI/GetRoleAndExtraPermissions",
+        url: "/UserCreation/GetRoleAndExtraPermissions",
         type: "GET",
         data: { userId: userId ,roleId: roleId },
         success: function (html) {

@@ -1,5 +1,5 @@
-﻿using CoreOne.API.Helpers;
-using CoreOne.API.Services;
+﻿using CoreOne.API.Infrastructure.Data;
+using CoreOne.API.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 
@@ -9,9 +9,9 @@ namespace CoreOne.API.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly TokenService _tokenService;
-        private readonly DBHelper _dbHelper;
+        private readonly DBContext _dbHelper;
 
-        public AuthorizationMiddleware(RequestDelegate next, TokenService tokenService, DBHelper dbHelper)
+        public AuthorizationMiddleware(RequestDelegate next, TokenService tokenService, DBContext dbHelper)
         {
             _next = next;
             _tokenService = tokenService;
