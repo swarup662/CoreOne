@@ -1,4 +1,5 @@
 ﻿@using CoreOne.COMMON.Models
+@using Newtonsoft.Json
 @model CoreOne.COMMON.Models.UserCreation
 
 @{
@@ -28,7 +29,39 @@
     }
 
 </style>
-    <div class="container-fluid">
+
+<script>
+    async function loadUserPhotoByFilePath(filePath, elementId) {
+        // Use the same logic as loadProfilePhoto
+        const img = document.getElementById(elementId);
+        const defaultSrc = "/images/default-user.png";
+
+        if (!img) return;
+
+        // Handle invalid, null, or empty path
+        if (!filePath || filePath.trim() === "" || filePath === "null" || filePath === "undefined") {
+            img.src = defaultSrc;
+            return;
+        }
+
+        try {
+            // Use your existing API exactly as in loadProfilePhoto
+            const resp = await fetch(`/api/FileUpload/viewSaved?filePath=${encodeURIComponent(filePath)}`);
+            if (!resp.ok) throw new Error("Photo not found");
+
+            const blob = await resp.blob();
+            const blobUrl = URL.createObjectURL(blob);
+
+            img.src = blobUrl;
+        } catch (err) {
+            console.error("Error loading user photo:", err);
+            img.src = defaultSrc;
+        }
+    }
+</script>
+
+
+<div class="container-fluid">
     <div class="row">
         <div class="col-12">
             <div class="page-title-box d-flex justify-content-between align-items-center">
@@ -87,45 +120,55 @@
     </div>
  
     </div>
-   
 
 
-    <!-- User Table -->
-    <div class="card glass-card p-3 shadow-lg">
+    <div class="card glass-card p-3 shadow-sm">
         <div class="table-responsive">
-            <table class="table table-hover align-middle text-center mb-0">
-                <thead class="table-light">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light text-dark">
                     <tr>
-                        <th onclick="sortTable('UserName')" class="sortable">
+                        <th class="text-center" style="width: 5%;">#</th>
+                        <th class="text-center" style="width: 10%;">Profile</th>
+                        <th class="text-start sortable" onclick="sortTable('UserName')">
                             Name @Html.Raw(sortColumn == "UserName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
                         </th>
-                        <th onclick="sortTable('Email')" class="sortable">
+                        <th class="text-start sortable" onclick="sortTable('Email')">
                             Email @Html.Raw(sortColumn == "Email" ? (sortDir == "ASC" ? "▲" : "▼") : "")
                         </th>
-                        <th>Phone</th>
-                        <th onclick="sortTable('RoleName')" class="sortable">
+                        <th class="text-start">Phone</th>
+                        <th class="text-start sortable" onclick="sortTable('RoleName')">
                             Role @Html.Raw(sortColumn == "RoleName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
                         </th>
-                        <th onclick="sortTable('GenderName')" class="sortable">
+                        <th class="text-start sortable" onclick="sortTable('GenderName')">
                             Gender @Html.Raw(sortColumn == "GenderName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
                         </th>
-                        <th>Status</th>
-                       
-                        <th>Actions</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @{
+                        int count = ((pageNumber - 1) * pageSize) + 1;
+                    }
                     @if (users.Any())
                     {
                         foreach (var user in users)
                         {
-                            <tr>
-                                <td>@user.UserName</td>
-                                <td>@user.Email</td>
-                                <td>@user.PhoneNumber</td>
-                                <td>@user.RoleName</td>
-                                <td>@user.GenderName</td>
-                                <td>
+                            <tr class="align-middle">
+                                <td class="text-center">@count</td>
+                                <td class="text-center">
+                                    <img id="userPhoto_@user.UserID"
+                                         src="/images/default-user.png"
+                                         alt="Profile"
+                                         class="rounded-circle"
+                                         style="width:50px; height:50px; object-fit:cover; border:1px solid #ddd;">
+                                </td>
+                                <td class="text-start fw-semibold">@user.UserName</td>
+                                <td class="text-start">@user.Email</td>
+                                <td class="text-start">@user.PhoneNumber</td>
+                                <td class="text-start">@user.RoleName</td>
+                                <td class="text-start">@user.GenderName</td>
+                                <td class="text-center">
                                     @{
                                         var status = user.ActiveFlag switch
                                         {
@@ -134,49 +177,50 @@
                                             0 => "Deactivated",
                                             _ => "Unknown"
                                         };
-                                        var color = user.ActiveFlag == 1 ? "text-success" :
-                                        user.ActiveFlag == 2 ? "text-danger" :
-                                        "text-secondary";
+                                        var badgeClass = user.ActiveFlag == 1 ? "bg-success" :
+                                        user.ActiveFlag == 2 ? "bg-danger" :
+                                        "bg-secondary";
                                     }
-                                    <span class="@color fw-semibold">@status</span>
+                                    <span class="badge @badgeClass fw-semibold">@status</span>
                                 </td>
-                             
-                                <td>
-                                    <!-- Edit Button -->
-                                    <button class="btn btn-sm btn-outline-primary me-1"
-                                            onclick="editUser(@user.UserID)"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="Edit User">
-                                        <i class="mdi mdi-pencil"></i>
-                                    </button>
+                                <td class="text-center">
+                                    <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                        <!-- Edit -->
+                                        <button class="btn btn-sm btn-outline-primary shadow-sm"
+                                                onclick="editUser(@user.UserID)"
+                                                title="Edit User">
+                                            <i class="mdi mdi-pencil-outline"></i>
+                                        </button>
 
-                                    <!-- Delete Button -->
-                                    <button class="btn btn-sm btn-outline-danger me-1"
-                                            onclick="deleteUser(@user.UserID)"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="Delete User">
-                                        <i class="mdi mdi-delete"></i>
-                                    </button>
+                                        <!-- Delete -->
+                                        <button class="btn btn-sm btn-outline-danger shadow-sm"
+                                                onclick="deleteUser(@user.UserID)"
+                                                title="Delete User">
+                                            <i class="mdi mdi-delete-outline"></i>
+                                        </button>
 
-                                    <!-- Extra Permission Button -->
-                                    <button class="btn btn-sm btn-outline-secondary"
-                                            onclick="extraPermission(@user.UserID, @user.RoleID)"
-                                            data-bs-toggle="tooltip"
-                                            data-bs-placement="top"
-                                            title="Extra Permission">
-                                        <i class="mdi mdi-shield-account"></i>
-                                    </button>
-
+                                        <!-- Extra Permission -->
+                                        <button class="btn btn-sm btn-outline-info shadow-sm"
+                                                onclick="extraPermission(@user.UserID, @user.RoleID)"
+                                                title="Extra Permission">
+                                            <i class="mdi mdi-shield-account-outline"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
+
+                            <script>
+                                // Load user photo
+                                loadUserPhotoByFilePath(@Html.Raw(JsonConvert.SerializeObject(user.PhotoPath)), 'userPhoto_@user.UserID');
+                            </script>
+
+                            count++;
                         }
                     }
                     else
                     {
                         <tr>
-                            <td colspan="7" class="text-muted text-center py-4">No users found</td>
+                            <td colspan="9" class="text-center text-muted py-4">No users found</td>
                         </tr>
                     }
                 </tbody>
@@ -184,8 +228,8 @@
         </div>
 
         <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <div class="text-muted">
+        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
+            <div class="text-muted small">
                 Showing page <b>@pageNumber</b> of <b>@Math.Ceiling((double)totalRecords / pageSize)</b>
             </div>
             <nav>
@@ -203,6 +247,7 @@
             </nav>
         </div>
     </div>
+
 </div>
 
 <!-- Add User Modal -->
@@ -384,7 +429,7 @@
 <script src="~/js/usercreation.js"></script>
 
 @section Scripts {
-   
+
     <script>
         (function () {
             // Current server-side values

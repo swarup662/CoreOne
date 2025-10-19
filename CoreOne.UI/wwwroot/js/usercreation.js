@@ -267,6 +267,9 @@ async function loadProfilePhoto(filePath) {
 
 
 
+
+
+
 function openExtraPermissionModal(userId,roleId) {
     isAddMode = false;
     currentRoleId = roleId;

@@ -168,11 +168,31 @@ function showPreview(tempId, contentType) {
     if ($placeholder.length) $placeholder.hide();
 
     if (contentType.startsWith("image/") || contentType === "application/pdf") {
-        $iframe.show().attr("src",
-            `/api/FileUpload/viewTemp?tempId=${tempId}&inline=true` +
-            (contentType === "application/pdf" ? "#toolbar=0&navpanes=0&scrollbar=0" : "")
-        );
-    } else {
+        const fileUrl = `/api/FileUpload/viewTemp?tempId=${tempId}&inline=true`;
+
+        if (contentType.startsWith("image/")) {
+            // Hide iframe if it exists
+            $iframe.hide();
+
+            // Check if image element already exists, else create one
+            let $img = $("#filePreviewImage");
+            if ($img.length === 0) {
+                $img = $('<img id="filePreviewImage" style="max-width:100%; height:auto; display:block; margin:0 auto;" />');
+                $iframe.after($img); // place it after the iframe in DOM
+            }
+
+            // Show the image and set its source
+            $img.attr("src", fileUrl).show();
+
+        } else {
+            // PDF case
+            $("#filePreviewImage").hide(); // hide the image if showing
+            $iframe
+                .show()
+                .attr("src", fileUrl + "#toolbar=0&navpanes=0&scrollbar=0");
+        }
+    }
+ else {
         if (!$placeholder.length) {
             $previewSection.append("<div id='previewPlaceholder' style='padding:20px'><p>No preview available</p></div>");
             $placeholder = $("#previewPlaceholder");
@@ -270,13 +290,21 @@ function prepareSavedFilePreview(filePath) {
     const $previewSection = $("#viewFilePreviewSection");
     const $loading = $("#viewFileLoading");
 
+    // Create or reference an <img> element for image previews
+    let $img = $("#viewFileImage");
+    if ($img.length === 0) {
+        $img = $('<img id="viewFileImage" style="max-width:100%; height:auto; display:none; margin:0 auto; object-fit:contain;" />');
+        $iframe.after($img);
+    }
+
     $iframe.hide().attr("src", "");
+    $img.hide();
     $placeholder.hide();
     $previewSection.hide();
     if ($loading.length) $loading.show();
 
     const ext = filePath.split('.').pop().toLowerCase();
-    const imageExts = ["jpg", "jpeg", "png", "gif"];
+    const imageExts = ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"];
     const pdfExts = ["pdf"];
 
     $.ajax({
@@ -287,13 +315,19 @@ function prepareSavedFilePreview(filePath) {
             const blobUrl = URL.createObjectURL(blob);
 
             if (imageExts.includes(ext)) {
-                $iframe.show().attr("src", blobUrl);
+                // 🖼 Show image
+                $iframe.hide();
+                $img.attr("src", blobUrl).show();
             } else if (pdfExts.includes(ext)) {
+                // 📄 Show PDF
+                $img.hide();
                 $iframe.show().attr("src", blobUrl + "#toolbar=0&navpanes=0&scrollbar=0");
             } else {
+                // 🚫 Unsupported file type
                 $placeholder.html(`<p class="text-muted">No preview available for this file type.</p>`).show();
             }
 
+            // Set up download button
             $downloadBtn.attr({
                 href: blobUrl,
                 download: filePath.split("/").pop(),
@@ -303,14 +337,24 @@ function prepareSavedFilePreview(filePath) {
             if ($loading.length) $loading.hide();
             $previewSection.show();
 
+            // 🔍 Zoom functionality (only for PDFs)
             $("#zoomInBtnView").off("click").on("click", function () {
-                zoomLevel += 0.1;
-                $iframe.css("transform", `scale(${zoomLevel})`);
+                if ($iframe.is(":visible")) {
+                    zoomLevel += 0.1;
+                    $iframe.css("transform", `scale(${zoomLevel})`);
+                } else if ($img.is(":visible")) {
+                    zoomLevel += 0.1;
+                    $img.css("transform", `scale(${zoomLevel})`);
+                }
             });
 
             $("#zoomOutBtnView").off("click").on("click", function () {
                 if (zoomLevel > 0.2) zoomLevel -= 0.1;
-                $iframe.css("transform", `scale(${zoomLevel})`);
+                if ($iframe.is(":visible")) {
+                    $iframe.css("transform", `scale(${zoomLevel})`);
+                } else if ($img.is(":visible")) {
+                    $img.css("transform", `scale(${zoomLevel})`);
+                }
             });
         },
         error: function () {

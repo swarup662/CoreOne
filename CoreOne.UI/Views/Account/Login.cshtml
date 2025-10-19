@@ -69,10 +69,55 @@
         /* Hover effect: brighter + subtle lift */
         .login-btn:hover {
             background: linear-gradient(135deg, #f75964 0%, #078c46 100%);
-            ;
+          
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
+
+    /* 🔹 Container */
+    .login-header {
+        padding-top: 10px;
+        padding-bottom: 15px;
+        text-align: center;
+    }
+
+    /* 🌍 Icon Style */
+    .logo-icon {
+        font-size: 32px;
+        color: #89a4cd;
+        text-shadow: 0 0 10px rgba(137, 164, 205, 0.6);
+        transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease;
+    }
+
+        .logo-icon:hover {
+            color: #a5bdf0;
+            text-shadow: 0 0 14px rgba(137, 164, 205, 0.8);
+            transform: scale(1.05);
+        }
+
+    /* 🌈 App Name Gradient Text */
+    .app-name {
+        font-size: 28px;
+        background: linear-gradient(90deg, indianred, #89a4cd);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        transition: background 0.3s ease, transform 0.3s ease;
+    }
+
+   
+
+    /* 💬 Subtitle */
+    .subtitle {
+        color: rgba(255, 255, 255, 0.85);
+        font-size: 15px;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        margin-top: 5px;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    }
 
 
 </style>
@@ -92,14 +137,16 @@
 
                         <div class="card-body">
                             <div class="text-center w-75 m-auto login-header">
-                                <div class="auth-logo mb-2">
-                                    <a href="/Home/Index" class="logo logo-dark text-center d-flex align-items-center justify-content-center gap-2 text-decoration-none">
-                                        <i class="fas fa-globe logo-icon"></i>
+                                <div class="auth-logo mb-3">
+                                    <a href="/Home/Index"
+                                       class="logo d-flex align-items-center justify-content-center text-decoration-none">
+                                        <i class="fas fa-globe logo-icon me-2"></i>
                                         <span class="fw-bold app-name">CoreOne</span>
                                     </a>
                                 </div>
-                                <p class="subtitle">Enter your username and password to access admin panel.</p>
+                                <p class="subtitle">Enter your username and password to access the admin panel.</p>
                             </div>
+
 
 
                             <form method="post">
