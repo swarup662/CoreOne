@@ -64,16 +64,16 @@
 
 
 
-<div class="container-fluid mt-2 p-1" style="background: #dee2e6; border-radius: 9px;">
+<div class="container-fluid mt-2 p-2" style="background: linear-gradient(135deg, #d5d9de, #f4f5f6); border-radius: 9px;">
 
-    <div class="row">
+    <div class="row" style="margin-top: -19px; margin-bottom: -6px;">
         <div class="col-12">
             <div class="page-title-box">
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript:void(0);">Menu & Module</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">SetUp</a></li>
                         <li class="breadcrumb-item"><a href="javascript:void(0);">Dashboard</a></li>
-                        <li class="breadcrumb-item active">SetUp</li>
+                        
                     </ol>
                 </div>
                 <h4 class="page-title">Module SetUp</h4>
@@ -81,35 +81,57 @@
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
+
+    <div class="card" style="border-radius: 9px;">
+    <div class="card-body">
+
+
+
+
+
+          <div class="row p-2">
             <div class="row justify-content-between">
                 <div class="col-auto">
-                    <button type="button" class="btn btn-blue waves-effect waves-light float-end rounded-pill" style="background: linear-gradient(135deg, #8173fa, #5a48e5);"
+                            <button type="button" class="btn btn-blue waves-effect waves-light float-end" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/ModuleSetup/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
                     </button>
                 </div>
                 <div class="col-auto">
 
-                    <button type="button" class="btn btn-success float-end rounded-pill" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);">
+                            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                             <i class="mdi mdi-plus-circle"></i> Create Module SetUp
                         </button>
                
                 </div>
             </div>
+
         </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-
-            <div class="row mb-3 align-items-center">
-                <div class="col-md-3">
-                    <input type="search" id="searchBox" value="@search" class="form-control rounded-pill" placeholder="Search..." />
+            <div class="row align-items-center p-2" style="background: linear-gradient(135deg, #d5d9de, #f4f5f6); border-radius: 9px;">
+                <div class="col-md-5">
+                    <button type="button" class="btn btn-blue waves-effect waves-light float-end" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
+                            onclick="window.location.href='/ModuleSetup/Index'">
+                        <i class="mdi mdi-refresh-circle"></i> Refresh
+                    </button>
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select rounded-pill" id="searchField">
+                    <button id="btnSearch" class="btn" style="display:none; background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
+                        <i class="mdi mdi-magnify"></i> Search
+                    </button>
+                </div>
+                <div class="col-md-5 ms-auto d-flex justify-content-end">
+                    <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
+                        <i class="mdi mdi-plus-circle"></i> Create Module SetUp
+                    </button>
+                </div>
+            </div>
+
+            <div class="row align-items-center p-2" style="background: linear-gradient(135deg, #d5d9de, #f4f5f6); border-radius: 9px;">
+                <div class="col-md-3">
+                    <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;" />
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="searchField" style="    border-radius: 11px;">
                         @{
                             string[] searchableFields = { "MenuName", "ModuleName" };
                             string[] searchableNames = { "Menu", "Modules" };
@@ -122,12 +144,12 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button id="btnSearch" class="btn rounded-pill" style="background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;">
+                    <button id="btnSearch" class="btn" style="background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
                         <i class="mdi mdi-magnify"></i> Search
                     </button>
                 </div>
                 <div class="col-md-2 ms-auto d-flex justify-content-end">
-                    <select class="form-select rounded-pill" id="pageSize">
+                    <select class="form-select" id="pageSize" style="border-radius: 11px;">
                         @{
                             int[] pageSizes = { 1, 10, 20, 50, 100 };
                             foreach (var size in pageSizes)
@@ -138,6 +160,10 @@
                     </select>
                 </div>
             </div>
+    
+    <div class="card">
+        <div class="card-body">
+
 
             <style>
                 .module-badge {
@@ -236,6 +262,11 @@
                     </li>
                 </ul>
             </nav>
+
+        </div>
+    </div>
+
+
 
         </div>
     </div>
