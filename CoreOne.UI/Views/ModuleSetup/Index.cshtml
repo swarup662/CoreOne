@@ -32,13 +32,16 @@
 <style>
     /* Table base */
     .table {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+     
+        border-collapse: separate; /* needed for border-radius */
+        border-spacing: 0; /* remove extra spacing */
+        border-radius: 0.75rem; /* adjust radius as needed */
+        overflow: hidden; /* ensures corners are rounded */
     }
 
         /* Table header */
         .table thead tr {
             background: linear-gradient(135deg, #4facfe, #00f2fe);
-         
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -49,22 +52,132 @@
             transition: all 0.3s ease;
         }
 
-    /* Table cells */
-    .table th,
-    .table td {
-        border: 1px solid #d1d5db; /* light gray borders */
-        vertical-align: middle;
-        padding: 0.75rem 1rem;
+        /* Table cells */
+        .table th,
+        .table td {
+            border: 1px solid #d1d5db; /* light gray borders */
+            vertical-align: middle;
+            padding: 0.75rem 1rem;
+        }
+
+        /* Optional: round only top and bottom corners */
+        .table thead tr:first-child th:first-child {
+            border-top-left-radius: 0.75rem;
+        }
+
+        .table thead tr:first-child th:last-child {
+            border-top-right-radius: 0.75rem;
+        }
+
+        .table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 0.75rem;
+        }
+
+        .table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 0.75rem;
+        }
+</style>
+<style>
+    /* Accordion items spacing */
+    .accordion-item {
+        border: none;
+        margin-bottom: 0.5rem; /* space between accordion items */
     }
 
-   
+    /* Accordion headers: fully rounded, gradient, shadows */
+    .accordion-button {
+        font-size: 0.95rem;
+        border-radius: 10px; /* fully rounded */
+        background: linear-gradient(145deg, #c3dbff, #dde9f9);
+        color: #0d6efd;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        box-shadow: 2px 2px 6px rgba(0,0,0,0.06), -2px -2px 6px rgba(255,255,255,0.7);
+        border: none;
+    }
 
- 
+        /* Hover effect: light gradient + subtle lift */
+        .accordion-button:hover {
+            background: background: linear-gradient(145deg, #c3dbff, #dde9f9);
+            transform: translateY(-1px);
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.08), -3px -3px 8px rgba(255,255,255,0.7);
+        }
+
+        /* Expanded header: blue gradient + white text */
+        .accordion-button:not(.collapsed) {
+            background: linear-gradient(145deg, #1d68d5, #00af6e);
+            color: #fff;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
+        }
+
+    /* Accordion body: rounded bottom corners, shadow */
+    .accordion-body {
+        background-color: #fff;
+        border-radius: 0 0 10px 10px; /* only bottom corners rounded */
+        padding: 0.75rem !important;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.03);
+        border-top: none;
+    }
+
+    /* Inputs: compact and modern */
+    .form-control.form-control-sm {
+        border-radius: 6px;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    /* Icon scroll container */
+    .icon-scroll-container {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 6px;
+        border-radius: 8px;
+        background-color: #f5f7fa;
+        box-shadow: inset 0 0 3px rgba(0,0,0,0.05);
+        margin-top: 4px;
+    }
+
+    /* Icon items: circle, hover scale, shadow */
+    .icon-item {
+        flex: 0 0 auto;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        border-radius: 50%;
+        background-color: #fff;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        line-height: 1;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        margin-right: 4px;
+    }
+
+        .icon-item:hover {
+            background-color: #e6f0ff;
+            transform: scale(1.15);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.12);
+        }
+
+        .icon-item.selected {
+            border: 2px solid #0d6efd;
+            background-color: #d0e4ff;
+            transform: scale(1.15);
+        }
+
+    /* Tables: compact */
+    .table-sm th, .table-sm td {
+        padding: 0.3rem 0.5rem;
+        font-size: 0.85rem;
+    }
 </style>
 
 
 
-<div class="container-fluid mt-2 p-2" style="background: linear-gradient(135deg, #d5d9de, #f4f5f6); border-radius: 9px;">
+<div class="container-fluid  p-2" style="background:rgba(255, 255, 255, 0.08);">
 
     <div class="row" style="margin-top: -19px; margin-bottom: -6px;">
         <div class="col-12">
@@ -82,56 +195,68 @@
     </div>
 
 
-    <div class="card" style="border-radius: 9px;">
+    <div class="card" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px;
+    border: 1px solid #b1d8ff;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    color: white;">
     <div class="card-body">
 
 
 
 
 
-          <div class="row p-2">
-            <div class="row justify-content-between">
-                <div class="col-auto">
-                            <button type="button" class="btn btn-blue waves-effect waves-light float-end" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
-                            onclick="window.location.href='/ModuleSetup/Index'">
-                        <i class="mdi mdi-refresh-circle"></i> Refresh
-                    </button>
-                </div>
-                <div class="col-auto">
+      
 
-                            <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
-                            <i class="mdi mdi-plus-circle"></i> Create Module SetUp
-                        </button>
-               
-                </div>
-            </div>
-
-        </div>
-            <div class="row align-items-center p-2" style="background: linear-gradient(135deg, #d5d9de, #f4f5f6); border-radius: 9px;">
-                <div class="col-md-5">
-                    <button type="button" class="btn btn-blue waves-effect waves-light float-end" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
+            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px;
+    border: 1px solid #b1d8ff;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    color: white;">
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/ModuleSetup/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
                     </button>
                 </div>
                 <div class="col-md-2">
-                    <button id="btnSearch" class="btn" style="display:none; background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
+                    <button class="btn" style="display:none; background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
                         <i class="mdi mdi-magnify"></i> Search
                     </button>
                 </div>
-                <div class="col-md-5 ms-auto d-flex justify-content-end">
+                <div class="col-md-2">
+                    <button class="btn" style="display:none; background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
+                        <i class="mdi mdi-magnify"></i> Search
+                    </button>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn" style="display:none; background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
+                        <i class="mdi mdi-magnify"></i> Search
+                    </button>
+                </div>
+                <div class="col-md-4 ms-auto d-flex justify-content-end">
                     <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                         <i class="mdi mdi-plus-circle"></i> Create Module SetUp
                     </button>
                 </div>
             </div>
 
-            <div class="row align-items-center p-2" style="background: linear-gradient(135deg, #d5d9de, #f4f5f6); border-radius: 9px;">
+            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px;
+    border: 1px solid #b1d8ff;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    color: white;">
                 <div class="col-md-3">
-                    <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;" />
+                    <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" id="searchField" style="    border-radius: 11px;">
+                    <select class="form-select" id="searchField" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
                         @{
                             string[] searchableFields = { "MenuName", "ModuleName" };
                             string[] searchableNames = { "Menu", "Modules" };
@@ -144,12 +269,31 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button id="btnSearch" class="btn" style="background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
-                        <i class="mdi mdi-magnify"></i> Search
+                    <button id="btnSearch" class="btn icon-btn">
+                        <i class="mdi mdi-magnify"></i>
                     </button>
+                    <style>
+                        .icon-btn {
+                            width: 40px;
+                            height: 40px;
+                            padding: 0;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            background: linear-gradient(135deg, #f7f7f7, #ededed);
+                            color: #98a6ad;
+                            border: 1px solid #adb5bd;
+                            cursor: pointer;
+                            font-size: 18px;
+                            transition: all 0.3s ease;
+                        }
+
+                            
+                    </style>
                 </div>
                 <div class="col-md-2 ms-auto d-flex justify-content-end">
-                    <select class="form-select" id="pageSize" style="border-radius: 11px;">
+                    <select class="form-select" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
                         @{
                             int[] pageSizes = { 1, 10, 20, 50, 100 };
                             foreach (var size in pageSizes)
@@ -160,9 +304,14 @@
                     </select>
                 </div>
             </div>
-    
-    <div class="card">
-        <div class="card-body">
+
+            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px;
+    border: 1px solid #b1d8ff;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    color: white;">
 
 
             <style>
@@ -184,7 +333,9 @@
 
             </style>
 
-            <table class="table table-bordered table-hover">
+            <table class="table table-bordered table-hover table-xl mt-2">
+                
+                
                 <thead>
                     <tr style="background: #f3f7f9;color:black">
                         <th style="color:black">Sl No</th>
@@ -241,6 +392,7 @@
                         }
                     }
                 </tbody>
+
             </table>
 
             <!-- Pagination -->
@@ -263,7 +415,6 @@
                 </ul>
             </nav>
 
-        </div>
     </div>
 
 
@@ -392,104 +543,7 @@
     </div>
 </div>
 
-<style>
-    /* Accordion items spacing */
-    .accordion-item {
-        border: none;
-        margin-bottom: 0.5rem; /* space between accordion items */
-    }
 
-    /* Accordion headers: fully rounded, gradient, shadows */
-    .accordion-button {
-        font-size: 0.95rem;
-        border-radius: 10px; /* fully rounded */
-        background: linear-gradient(145deg, #c3dbff, #dde9f9);
-        color: #0d6efd;
-        font-weight: 600;
-
-        transition: all 0.3s ease;
-        padding: 0.5rem 1rem;
-        box-shadow: 2px 2px 6px rgba(0,0,0,0.06), -2px -2px 6px rgba(255,255,255,0.7);
-        border: none;
-    }
-
-        /* Hover effect: light gradient + subtle lift */
-        .accordion-button:hover {
-            background: background: linear-gradient(145deg, #c3dbff, #dde9f9);
-            transform: translateY(-1px);
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.08), -3px -3px 8px rgba(255,255,255,0.7);
-        }
-
-        /* Expanded header: blue gradient + white text */
-        .accordion-button:not(.collapsed) {
-            background: linear-gradient(145deg, #1d68d5, #00af6e);
-            color: #fff;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
-        }
-
-    /* Accordion body: rounded bottom corners, shadow */
-    .accordion-body {
-        background-color: #fff;
-        border-radius: 0 0 10px 10px; /* only bottom corners rounded */
-        padding: 0.75rem !important;
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.03);
-        border-top: none;
-    }
-
-    /* Inputs: compact and modern */
-    .form-control.form-control-sm {
-        border-radius: 6px;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-    }
-
-    /* Icon scroll container */
-    .icon-scroll-container {
-        overflow-x: auto;
-        white-space: nowrap;
-        padding: 6px;
-        border-radius: 8px;
-        background-color: #f5f7fa;
-        box-shadow: inset 0 0 3px rgba(0,0,0,0.05);
-        margin-top: 4px;
-    }
-
-    /* Icon items: circle, hover scale, shadow */
-    .icon-item {
-        flex: 0 0 auto;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        border-radius: 50%;
-        background-color: #fff;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        line-height: 1;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-        margin-right: 4px;
-    }
-
-        .icon-item:hover {
-            background-color: #e6f0ff;
-            transform: scale(1.15);
-            box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-        }
-
-        .icon-item.selected {
-            border: 2px solid #0d6efd;
-            background-color: #d0e4ff;
-            transform: scale(1.15);
-        }
-
-    /* Tables: compact */
-    .table-sm th, .table-sm td {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.85rem;
-    }
-</style>
 
 
 
