@@ -77,6 +77,15 @@
 
 
 
+/* Gradient border for modal */
+.gradient-border {
+    border: 5px solid; /* thickness of border */
+    border-image-slice: 1;
+    border-width: 5px;
+    border-image-source: linear-gradient(45deg, #f75964, #f7b159, #6a82fb);
+    border-radius: 5px; /* rounded corners */
+    overflow: hidden; /* ensures gradient border shows properly */
+}
 
 
 

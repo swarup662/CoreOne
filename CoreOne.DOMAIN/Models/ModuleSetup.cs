@@ -77,6 +77,18 @@ namespace CoreOne.DOMAIN.Models
         public int Sequence { get; set; }
         public int ParentID { get; set; }
     }
+    // Strongly-typed DTO
+    public class ActionDropdownDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+    public class SaveActionModel
+    {
+        public int ModuleID { get; set; }           // must match JSON property "ModuleID"
+        public List<ActionDto>? Actions { get; set; } // must match JSON property "Actions"
+        public int CreatedBy { get; set; }          // must match JSON property "CreatedBy"
+    }
 
 
 

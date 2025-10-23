@@ -133,5 +133,54 @@ namespace CoreOne.API.Repositories
             _dbHelper.ExecuteSP_ReturnInt("sp_DeleteMenuWithModules", new Dictionary<string, object> { { "@MenuModuleID", menuId } });
         }
 
+
+        public DataTable GetActionDropdown()
+        {
+            // Only ActionID and ActionName
+            return _dbHelper.ExecuteSP_ReturnDataTable("GetActionIDsAndNames", new Dictionary<string, object>());
+        }
+
+
+        public DataTable GetActionsByModuleID(int moduleID)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { "@ModuleID", moduleID }
+            };
+            return _dbHelper.ExecuteSP_ReturnDataTable("sp_GetActionsByModuleID", parameters);
+        }
+
+        public void SaveModuleActions(int moduleID, List<ActionDto> actions, int createdBy)
+        {
+            if (actions == null || actions.Count == 0)
+                return; // Nothing to save
+
+            // Prepare DataTable for TVP
+            var dtActions = new DataTable();
+            dtActions.Columns.Add("ActionID", typeof(int));
+
+            foreach (var action in actions)
+            {
+                if (action.ActionID > 0) // only valid IDs
+                    dtActions.Rows.Add(action.ActionID);
+            }
+
+            // SP scalar parameters
+            var parameters = new Dictionary<string, object>
+    {
+        { "@MenuModuleID", moduleID },
+        { "@CreatedBy", createdBy }
+    };
+
+            // Execute stored procedure with TVP
+            _dbHelper.ExecuteSP_WithTableType_ReturnInt(
+                "sp_SaveModuleActionsTVP",
+                "@Actions",
+                "ActionTableType",
+                dtActions,
+                parameters
+            );
+        }
+
     }
 }

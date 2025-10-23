@@ -13,13 +13,12 @@ namespace CoreOne.DOMAIN.Models
         public string Description { get; set; }
         public bool ActiveFlag { get; set; }
     }
-  
+
     public class ActionDto
     {
-        public int ActionID { get; set; }
-        public string ActionName { get; set; }
-        public int ModuleId { get; set; }
-       
+        public int ActionID { get; set; }      // must match JSON property "ActionID"
+        public string? ActionName { get; set; } // must match JSON property "ActionName"
+        public int ModuleId { get; set; }      // optional
     }
 
 
