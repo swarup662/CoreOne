@@ -13,6 +13,7 @@ namespace CoreOne.API.Interfaces
         UserCreation? GetUserById(int userId);
         Task<int> SaveExtraPermissionAsync(int CreatedBy ,IEnumerable<ExtraPermission> permissions);
         Task<IEnumerable<ExtraPermission>> GetExtraPermissionByUserId(int UserId, int CreatedBy);
+        int DeleteUser(string recType, UserCreationDTO user);
 
 
 

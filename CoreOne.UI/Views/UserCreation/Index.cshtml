@@ -66,10 +66,12 @@
         <div class="col-12">
             <div class="page-title-box d-flex justify-content-between align-items-center">
                 <h4 class="page-title fw-bold text-gradient">User Management</h4>
+                 <has-permission module-id="4" action-id="1">
                 <button class="btn btn-primary rounded-pill shadow-sm" id="btnAddUser"
                         data-bs-toggle="modal" data-bs-target="#addUserModal">
                     <i class="mdi mdi-plus-circle"></i> Add User
                 </button>
+                </has-permission>
             </div>
         </div>
     </div>
@@ -139,26 +141,40 @@
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                         <has-permission module-id="4" action-id="2">
                                         <!-- Edit -->
                                         <button class="btn btn-sm btn-outline-primary shadow-sm"
                                                 onclick="editUser(@user.UserID)"
                                                 title="Edit User">
                                             <i class="mdi mdi-pencil-outline"></i>
                                         </button>
+                                        </has-permission>
+                                         <has-permission module-id="4" action-id="4">
+                                        <!-- Edit -->
+                                        <button class="btn btn-sm btn-outline-primary shadow-sm"
+                                                onclick="viewUser(@user.UserID)"
+                                                title="View User">
+                                            <i class="bi bi-eye-fill me-1"></i>
+                                        </button>
+                                        </has-permission>
+
 
                                         <!-- Delete -->
+                                         <has-permission module-id="4" action-id="3">
                                         <button class="btn btn-sm btn-outline-danger shadow-sm"
                                                 onclick="deleteUser(@user.UserID)"
                                                 title="Delete User">
                                             <i class="mdi mdi-delete-outline"></i>
                                         </button>
-
+                                            </has-permission>
                                         <!-- Extra Permission -->
+                                         <has-permission module-id="4" action-id="7">
                                         <button class="btn btn-sm btn-outline-info shadow-sm"
                                                 onclick="extraPermission(@user.UserID, @user.RoleID)"
                                                 title="Extra Permission">
                                             <i class="mdi mdi-shield-account-outline"></i>
                                         </button>
+                                        </has-permission>
                                     </div>
                                 </td>
                             </tr>

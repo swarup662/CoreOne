@@ -330,13 +330,33 @@ namespace CoreOne.UI.Controllers
             var client = _httpClientFactory.CreateClient();
             var url = _api.BaseUrlUserCreation + "/DeleteUser";
 
-            var payload = new UserCreation { UserID = userId, CreatedBy = user.UserID };
-            var json = JsonConvert.SerializeObject(payload);
+            var model = new UserCreationDTO();
+            model.CreatedBy = user.UserID;
+            model.UserID = userId;
+            var json = JsonConvert.SerializeObject(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-
             var resp = await client.PostAsync(url, content);
+            if (resp.IsSuccessStatusCode)
+            {
+                var responseString = await resp.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<dynamic>(responseString);
 
-            return Json(new { success = resp.IsSuccessStatusCode });
+                int resUserId = result.userID;
+
+                if (resUserId > 0)
+                {
+                    return Json(new { success = true, message = "success" });
+                }
+                
+                else
+                {
+                    return Json(new { success = true, message = "error" });
+
+                }
+            }
+
+            return Json(new { success = false, message = "Could not save user. Please try again." });
+        
         }
 
         [HttpPost]

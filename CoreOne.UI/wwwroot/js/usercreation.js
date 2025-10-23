@@ -206,8 +206,50 @@ function editUser(id) {
             }
 
             //------------------------------------------------------//
-           
-        $('#addUserModal').modal('show');
+
+            $('#addUserModal').modal('show');
+        },
+        error: function () {
+            alert('Could not load user details!');
+            $('#addUserModal').modal('hide');
+        }
+    });
+}
+function viewUser(id) {
+    // Update modal header and aria-labelledby for edit
+    $('#addUserModalLabel').text('Edit User');
+    $('#addUserModal').attr('aria-labelledby', 'userModalLabel');
+
+    $.ajax({
+        url: '/UserCreation/GetUserById',// UI controller action
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(id),
+        success: function (user) {
+            $('#UserID').val(user.userID);
+            $('#UserName').val(user.userName);
+            $('#Email').val(user.email);
+            $('#PhoneNumber').val(user.phoneNumber);
+            $('#RoleID').val(user.roleID);
+            $('#GenderID').val(user.genderID);
+            $('#MailTypeID').val(user.mailTypeID);
+            $("#btnSaveUser").remove();
+            //-----------file uploadation code-------------------//
+
+
+            $('#showFile').show();
+            if (user.photoPath === "" || user.photoPath === null || user.photoPath === undefined) {
+                $('#showFile').hide();
+
+            }
+            else {
+                loadProfilePhoto(user.photoPath);
+                prepareSavedFilePreview(user.photoPath);
+            }
+
+            //------------------------------------------------------//
+
+            $('#addUserModal').modal('show');
         },
         error: function () {
             alert('Could not load user details!');
@@ -217,18 +259,41 @@ function editUser(id) {
 }
 
 function deleteUser(id) {
-    if (confirm("Are you sure you want to Deactivate this user?")) {
-        $.ajax({
-            url: '/UserCreation/DeleteUser',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(id),
-            success: function (res) {
-                if (res.success) location.reload();
-                else alert("Failed to delete user");
-            }
-        });
-    }
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you really want to deactivate this user?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, deactivate',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/UserCreation/DeleteUser',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(id),
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire({
+                            title: 'Deactivated!',
+                            text: 'User has been deactivated.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Failed!',
+                            text: 'Failed to deactivate user.',
+                            icon: 'error'
+                        });
+                    }
+                }
+            });
+        }
+    });
 }
 
 

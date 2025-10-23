@@ -11,13 +11,13 @@ namespace CoreOne.UI.Middleware
     {
         private readonly RequestDelegate _next;
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly ApiSettingsHelper _apiSettings;
-        private readonly string BaseUrlAuth;
-        public UiErrorLoggingMiddleware(RequestDelegate next, IHttpClientFactory httpClientFactory, IConfiguration config)
+
+        private readonly ApiSettingsHelper _api;
+        public UiErrorLoggingMiddleware(RequestDelegate next, IHttpClientFactory httpClientFactory, IConfiguration config, SettingsService settingsService)
         {
             _next = next;
             _httpClientFactory = httpClientFactory;
-            BaseUrlAuth = config["ApiLinks:BaseUrlAuth"];
+            _api = settingsService.ApiSettings;
         }
 
         public async Task Invoke(HttpContext context)
@@ -64,7 +64,7 @@ namespace CoreOne.UI.Middleware
                
                 var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
 
-                var response= await client.PostAsync(BaseUrlAuth + "/LogHttpError", content);
+                var response= await client.PostAsync(_api.BaseUrlAuthentication + "/LogHttpError", content);
             }
             catch
             {
@@ -94,7 +94,7 @@ namespace CoreOne.UI.Middleware
                
                 var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
 
-                var response =await client.PostAsync(BaseUrlAuth + "/LogException", content);
+                var response =await client.PostAsync(_api.BaseUrlAuthentication + "/LogException", content);
             }
             catch
             {

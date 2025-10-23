@@ -212,5 +212,29 @@ namespace CoreOne.API.Repositories
             return await Task.FromResult(list);
         }
 
+
+
+        public int DeleteUser(string recType, UserCreationDTO user)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                {"@RecType", recType},
+                {"@UserID", user.UserID},
+                {"@UserName", user.UserName},
+                {"@PasswordHash", user.PasswordHash},
+                {"@Email", (object?)user.Email ?? DBNull.Value},
+                {"@MailTypeID", (object?)user.MailTypeID ?? DBNull.Value},
+                 {"@GenderID", (object?)user.GenderID ?? DBNull.Value},
+                {"@PhoneNumber", (object?)user.PhoneNumber ?? DBNull.Value},
+                {"@RoleID", (object?)user.RoleID ?? DBNull.Value},
+                {"@PhotoPath", (object?)user.PhotoPath ?? DBNull.Value},
+                {"@PhotoName", (object?)user.PhotoName ?? DBNull.Value},
+                {"@UserID_Action", user.CreatedBy ?? 0}
+            };
+
+            return _dbHelper.ExecuteSP_ReturnInt("sp_Users_CRUD", parameters);
+        }
+
+
     }
 }

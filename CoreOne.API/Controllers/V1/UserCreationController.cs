@@ -141,11 +141,11 @@ namespace CoreOne.API.Controllers.V1
         }
 
         [HttpPost("DeleteUser")]
-        public IActionResult DeleteUser([FromBody] UserCreation user)
+        public IActionResult DeleteUser( UserCreationDTO user)
         {
-            if (user.UserID <= 0) return BadRequest("Invalid UserID.");
+            //if (user.UserID <= 0) return BadRequest("Invalid UserID.");
 
-            int result = _userRepo.SaveUser("Delete", user);
+            int result = _userRepo.DeleteUser("Delete", user);
 
             if (result > 0)
                 return Ok(new { UserID = result, Message = "User deleted successfully." });
