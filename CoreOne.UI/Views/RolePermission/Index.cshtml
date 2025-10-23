@@ -44,16 +44,17 @@
     }
 }
 
-<div class="container-fluid">
+<link href="~/css/rolepermission.css" rel="stylesheet" />
 
-    <div class="row">
+<div class="container-fluid  p-2" style="background:rgba(255, 255, 255, 0.08);">
+    <div class="row" style="margin-top: -19px; margin-bottom: -6px;">
         <div class="col-12">
             <div class="page-title-box">
                 <div class="page-title-right">
                     <ol class="breadcrumb m-0">
-                        <li class="breadcrumb-item"><a href="javascript: void(0);">Authorization</a></li>
-                       
-                        <li class="breadcrumb-item active">Role Permission</li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Authorization</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Dashboard</a></li>
+
                     </ol>
                 </div>
                 <h4 class="page-title">Role Permission</h4>
@@ -61,42 +62,46 @@
         </div>
     </div>
 
-    <div class="card">
+
+
+
+
+    <div class="card" style="background:rgba(255, 255, 255, 0.08);border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
         <div class="card-body">
-            <div class="row justify-content-between">
-                <div class="col-auto">
-                    <button type="button" class="btn btn-blue waves-effect waves-light float-end"
+
+            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/RolePermission/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
                     </button>
 
+
                 </div>
-                <div class="col-auto">
+                <div class="col-md-5">
+                </div>
+
+                <div class="col-md-4 ms-auto d-flex justify-content-end">
+
                     <has-permission module-id="6" action-id="1">
-                   
-                        <button type="button" class="btn btn-success waves-effect waves-light float-end" onclick="openAddPermissionModal()">
+
+                        <button type="button" class="btn btn-success waves-effect waves-light float-end" onclick="openAddPermissionModal()" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                             <i class="mdi mdi-plus-circle"></i> Create Permission
                         </button>
                     </has-permission>
-                  
-
-                </div><!-- end col-->
-            </div> <!-- end row -->
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-
-            <div class="row mb-3">
-                <!-- Search Box (live) -->
-                <div class="col-md-4">
-                    <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." />
                 </div>
+            </div>
 
+            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
 
-                <div class="col-sm-3">
-                    <select class="form-select my-1 my-lg-0" id="searchField">
+                <div class="col-md-3">
+                    <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="searchField" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
                         @{
                             string[] searchableFields = new string[] { "RoleName" };//table column name
                             string[] searchableNames = new string[] { "Role Name" }; //user show name
@@ -108,176 +113,219 @@
                         }
                     </select>
                 </div>
+                <div class="col-md-2">
+                    <button id="btnSearch" class="btn icon-btn" style="display:none">
+                        <i class="mdi mdi-magnify"></i>
+                    </button>
 
-
-
-                <div class="col-sm-5">
-                    <div class="d-flex justify-content-end">
-                        <select class="form-select my-1 my-lg-0 w-50" id="pageSize">
-                            @{
-                                int[] pageSizes = new int[] { 1, 10, 20, 50, 100 };
-                                foreach (var size in pageSizes)
-                                {
-                                    <option value="@size" selected="@(size == pageSize)">@size</option>
-                                }
-                            }
-                        </select>
-                    </div>
                 </div>
-
-
-                <!-- Info (top) -->
-
+                <div class="col-md-2 ms-auto d-flex justify-content-end">
+                    <select class="form-select" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
+                        @{
+                            int[] pageSizes = new int[] { 1, 10, 20, 50, 100 };
+                            foreach (var size in pageSizes)
+                            {
+                                <option value="@size" selected="@(size == pageSize)">@size</option>
+                            }
+                        }
+                    </select>
+                </div>
             </div>
 
-            <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th style="color:#343a40">Sl No</th>
+            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <table class="table table-bordered table-hover table-xl mt-2">
+                    <thead>
+                        <tr style="background: #f3f7f9;color:black">
+                            <th style="color:#343a40">Sl No</th>
 
-                        <th class="text-center">
-                            <a href="javascript:void(0)" onclick="sortTable('RoleName')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:#343a40;">
-                                <span>Role Name</span>
-                                <span>
-                                    @if (sortColumn == "RoleName")
-                                    {
-                                        if (sortDir == "ASC")
+                            <th class="text-center" style="color:black">
+                                <a href="javascript:void(0)" onclick="sortTable('RoleName')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:black">
+                                    <span>Role Name</span>
+                                    <span>
+                                        @if (sortColumn == "RoleName")
                                         {
-                                            <i class="bi bi-arrow-up"></i>
+                                            if (sortDir == "ASC")
+                                            {
+                                                <i class="bi bi-arrow-up"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-arrow-down"></i>
+                                            }
                                         }
                                         else
                                         {
-                                            <i class="bi bi-arrow-down"></i>
+                                            <i class="bi bi-arrow-down-up text-muted"></i>
+                                        }
+                                    </span>
+                                </a>
+                            </th>
+
+
+
+
+
+
+
+                            <th class="text-center" style="color:black">Action</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                        @{
+                            int count = ((pageNumber - 1) * pageSize) + 1;
+                        }
+                        @foreach (var r in rolePermissions)
+                        {
+                            <tr>
+                                <td>@count</td>
+                                <td class="text-body fw-semibold">@r.RoleName</td>
+
+
+
+
+                                <td class="text-center d-flex justify-content-center gap-2">
+                                    <has-permission module-id="6" action-id="8">
+                                        <!-- Manage -->
+                                        <button class="btn btn-primary btn-sm rounded-pill px-3"
+                                                onclick="openPermissionModal(@r.RoleID, '@r.RoleName')">
+                                            <i class="bi bi-gear-fill me-1"></i> Manage
+                                        </button>
+                                    </has-permission>
+                                    <has-permission module-id="6" action-id="4">
+                                        <!-- View -->
+                                        <button class="btn btn-warning text-white btn-sm rounded-pill px-3"
+                                                onclick="ViewPermissionModal(@r.RoleID, '@r.RoleName')">
+                                            <i class="bi bi-eye-fill me-1"></i> View
+                                        </button>
+                                    </has-permission>
+                                    <has-permission module-id="6" action-id="9">
+                                        <!-- Deactivate -->
+                                        <button class="btn btn-danger btn-sm rounded-pill px-3"
+                                                onclick="deactivatePermission(@r.RoleID)">
+                                            <i class="bi bi-x-circle-fill me-1"></i> Deactivate
+                                        </button>
+                                    </has-permission>
+                                </td>
+
+
+
+
+                            </tr>
+                            count++;
+                        }
+                        @if (!rolePermissions.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No records found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+
+                <div class="row">
+                        <table class="table table-bordered table-striped">
+                        </table>
+
+                        <!-- Bottom info -->
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <small class="text-muted">
+                                    Showing page <strong>@pageNumber</strong> of <strong>@totalPages</strong> — <strong>@totalRecords</strong> records
+                                </small>
+                            </div>
+
+                            <!-- Pagination window (max 5 pages) -->
+                            <nav aria-label="Role pagination">
+                                <ul class="pagination pagination-rounded mb-0">
+                                    <!-- Prev -->
+                                    <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
+                                        <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber - 1)">« Prev</a>
+                                    </li>
+
+                                    <!-- If startPage > 1 show first page and ellipsis -->
+                                    @if (startPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="javascript:void(0)" data-page="1">1</a>
+                                        </li>
+                                        @if (startPage > 2)
+                                        {
+                                            <li class="page-item disabled"><span class="page-link">…</span></li>
                                         }
                                     }
-                                    else
+
+                                    <!-- Window pages -->
+                                    @for (int i = startPage; i <= endPage; i++)
                                     {
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
+                                        <li class="page-item @(i == pageNumber ? "active" : "")">
+                                            <a class="page-link" href="javascript:void(0)" data-page="@i">@i</a>
+                                        </li>
                                     }
-                                </span>
-                            </a>
-                        </th>
 
-                      
+                                    <!-- If endPage < totalPages show ellipsis and last page -->
+                                    @if (endPage < totalPages)
+                                    {
+                                        if (endPage < totalPages - 1)
+                                        {
+                                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                                        }
+                                        <li class="page-item">
+                                            <a class="page-link" href="javascript:void(0)" data-page="@totalPages">@totalPages</a>
+                                        </li>
+                                    }
 
-                   
-
-                        
-
-                        <th class ="text-center" style="color:#343a40">Action</th>
-                    </tr>
-                </thead>
-
-
-                <tbody>
-                    @{
-                        int count = ((pageNumber - 1) * pageSize) + 1;
-                    }
-                    @foreach (var r in rolePermissions)
-                    {
-                        <tr>
-                            <td>@count</td>
-                            <td class="text-body fw-semibold">@r.RoleName</td>
-                            
-
-
-                           
-                            <td class="text-center d-flex justify-content-center gap-2">
-                                <has-permission module-id="6" action-id="8">
-                                <!-- Manage -->
-                                <button class="btn btn-primary btn-sm rounded-pill px-3"
-                                        onclick="openPermissionModal(@r.RoleID, '@r.RoleName')">
-                                    <i class="bi bi-gear-fill me-1"></i> Manage
-                                </button>
-                                  </has-permission>
-                                <has-permission module-id="6" action-id="4">
-                                <!-- View -->
-                                <button class="btn btn-warning text-white btn-sm rounded-pill px-3"
-                                        onclick="ViewPermissionModal(@r.RoleID, '@r.RoleName')">
-                                    <i class="bi bi-eye-fill me-1"></i> View
-                                </button>
-                                  </has-permission>
-                                <has-permission module-id="6" action-id="9">
-                                <!-- Deactivate -->
-                                <button class="btn btn-danger btn-sm rounded-pill px-3"
-                                        onclick="deactivatePermission(@r.RoleID)">
-                                    <i class="bi bi-x-circle-fill me-1"></i> Deactivate
-                                </button>
-                                  </has-permission>
-                            </td>
-
-
-
-                           
-                        </tr>
-                        count++;
-                    }
-                    @if (!rolePermissions.Any())
-                    {
-                        <tr>
-                            <td colspan="6" class="text-center text-muted">No records found</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-            <!-- Bottom info -->
-            <div class="d-flex justify-content-between align-items-center mt-2">
-                <div>
-                    <small class="text-muted">
-                        Showing page <strong>@pageNumber</strong> of <strong>@totalPages</strong> — <strong>@totalRecords</strong> records
-                    </small>
+                                    <!-- Next -->
+                                    <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                                        <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber + 1)">Next »</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
                 </div>
 
-                <!-- Pagination window (max 5 pages) -->
-                <nav aria-label="Role pagination">
-                    <ul class="pagination pagination-rounded mb-0">
-                        <!-- Prev -->
-                        <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
-                            <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber - 1)">« Prev</a>
-                        </li>
-
-                        <!-- If startPage > 1 show first page and ellipsis -->
-                        @if (startPage > 1)
-                        {
-                            <li class="page-item">
-                                <a class="page-link" href="javascript:void(0)" data-page="1">1</a>
-                            </li>
-                            @if (startPage > 2)
-                            {
-                                <li class="page-item disabled"><span class="page-link">…</span></li>
-                            }
-                        }
-
-                        <!-- Window pages -->
-                        @for (int i = startPage; i <= endPage; i++)
-                        {
-                            <li class="page-item @(i == pageNumber ? "active" : "")">
-                                <a class="page-link" href="javascript:void(0)" data-page="@i">@i</a>
-                            </li>
-                        }
-
-                        <!-- If endPage < totalPages show ellipsis and last page -->
-                        @if (endPage < totalPages)
-                        {
-                            if (endPage < totalPages - 1)
-                            {
-                                <li class="page-item disabled"><span class="page-link">…</span></li>
-                            }
-                            <li class="page-item">
-                                <a class="page-link" href="javascript:void(0)" data-page="@totalPages">@totalPages</a>
-                            </li>
-                        }
-
-                        <!-- Next -->
-                        <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
-                            <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber + 1)">Next »</a>
-                        </li>
-                    </ul>
-                </nav>
             </div>
+
+
+
         </div>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 </div>
 
@@ -296,10 +344,9 @@
                     <i class="bi bi-ui-checks-grid me-2"></i> Manage Role Permissions
                 </h5>
                 <button type="button"
-                        class="btn btn-light rounded-circle d-flex align-items-center justify-content-center shadow-sm"
-                        onclick="window.location.href='/RolePermission/Index'"
-                        style="width: 38px; height: 38px; border: none;">
-                    <i class="bi bi-x-lg text-dark fw-bold"></i>
+                        class="btn btn-light btn-close-circle shadow-sm"
+                        onclick="window.location.href='/RolePermission/Index'">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
@@ -343,23 +390,19 @@
                 </div>
             </div>
 
-            <!-- Footer -->
-            <div class="modal-footer border-0 bg-light d-flex justify-content-end gap-2">
-                <!-- Save Button -->
+
+
+
+            <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
                 <button type="button"
-                        class="btn text-white fw-semibold d-flex align-items-center gap-2"
-                        style="background: linear-gradient(135deg, #42e695, #3bb2b8); border-radius: 10px; padding: 0.6rem 1.4rem; transition: all 0.3s;"
-                        id="SaveRolePermissions"
-                        onclick="savePermissions()">
-                    <i class="bi bi-save-fill"></i> Save
+                        onclick="window.location.href='/RolePermission/Index'"
+                        class="btn btn-warning btn-sm"
+                        data-bs-dismiss="modal">
+                    <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
                 </button>
 
-                <!-- Close Button -->
-                <button type="button"
-                        class="btn btn-warning border fw-semibold d-flex align-items-center gap-2"
-                        style="border-radius: 10px; padding: 0.6rem 1.4rem; transition: all 0.3s;"
-                        onclick="window.location.href='/RolePermission/Index'">
-                    <i class="bi bi-x-circle"></i> Close
+                <button type="button" id="SaveRolePermissions" onclick="savePermissions()" class="btn btn-sm" style="background:forestgreen; color:white">
+                    <i class="mdi mdi-content-save-outline me-1"></i> Save
                 </button>
             </div>
 
