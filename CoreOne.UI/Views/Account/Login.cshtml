@@ -1,87 +1,18 @@
-﻿ @model CoreOne.DOMAIN.Models.LoginViewModel
+﻿@model CoreOne.DOMAIN.Models.LoginViewModel
 
 @{
     Layout = "_LoginLayout";
 }
-@* 
-    <input />
-    <input />
-    <button type="submit">Login</button>
-
- *@
-
 
 <style>
     body.authentication-bg-pattern {
         background-image: url('@Url.Content("~/assets/images/bg-material1.jpg")');
+        background-attachment: fixed;
+        background-size: cover;
+        background-repeat: no-repeat;
     }
+
     /* 🔹 Logo Icon */
-    .logo-icon {
-        font-size: 28px;
-        color: #dee2e7;
-        text-shadow: 0 0 10px rgba(137, 164, 205, 0.6);
-        transition: transform 0.3s ease, text-shadow 0.3s ease;
-    }
-
-        .logo-icon:hover {
-            transform: scale(1.1) rotate(5deg);
-            text-shadow: 0 0 15px rgba(137, 164, 205, 0.8);
-        }
-
-    /* 🔹 App Name Text */
-    .app-name {
-        font-size: 26px;
-        letter-spacing: 1px;
-        background: linear-gradient(90deg, #c33030, #0f54bd);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
-    /* 🔹 Subtitle */
-    .subtitle {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 14px;
-        margin-top: 10px;
-        letter-spacing: 0.4px;
-    }
-
-    /* 🔹 Container alignment */
-    .login-header {
-        padding-top: 10px;
-        padding-bottom: 5px;
-        text-align: center;
-    }
-    /* 🌈 Gradient Login Button */
-    .login-btn {
-        background: linear-gradient(135deg, #f75964 0%, #078c46 100%);
-        color: white;
-        border: none;
-        border-radius: 10px;
-        padding: 10px 0;
-        font-weight: 600;
-        letter-spacing: 0.5px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        transition: all 0.3s ease;
-    }
-
-        /* Hover effect: brighter + subtle lift */
-        .login-btn:hover {
-            background: linear-gradient(135deg, #f75964 0%, #078c46 100%);
-          
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-    /* 🔹 Container */
-    .login-header {
-        padding-top: 10px;
-        padding-bottom: 15px;
-        text-align: center;
-    }
-
-    /* 🌍 Icon Style */
     .logo-icon {
         font-size: 32px;
         color: #89a4cd;
@@ -95,7 +26,7 @@
             transform: scale(1.05);
         }
 
-    /* 🌈 App Name Gradient Text */
+    /* 🔹 App Name Text */
     .app-name {
         font-size: 28px;
         background: linear-gradient(90deg, #c33030, #0f54bd);
@@ -107,8 +38,6 @@
         transition: background 0.3s ease, transform 0.3s ease;
     }
 
-   
-
     /* 💬 Subtitle */
     .subtitle {
         color: rgba(255, 255, 255, 0.85);
@@ -119,11 +48,35 @@
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
     }
 
+    /* 🌈 Gradient Login Button */
+    .login-btn {
+        background: linear-gradient(135deg, #f75964 0%, #078c46 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 0;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
 
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+    /* 🌫️ Glass Effect Style */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        color: white;
+    }
 </style>
-
-
-
 
 <body class="authentication-bg authentication-bg-pattern">
 
@@ -133,13 +86,11 @@
                 <div class="col-md-8 col-lg-6 col-xl-4 mt-5">
 
                     <!-- Glass effect card -->
-                    <div class="card bg-pattern glass-card">
-
+                    <div class="card glass-card">
                         <div class="card-body">
                             <div class="text-center w-75 m-auto login-header">
                                 <div class="auth-logo mb-3">
-                                    <a href="/Home/Index"
-                                       class="logo d-flex align-items-center justify-content-center text-decoration-none">
+                                    <a href="/Home/Index" class="logo d-flex align-items-center justify-content-center text-decoration-none">
                                         <i class="fas fa-globe logo-icon me-2"></i>
                                         <span class="fw-bold app-name">CoreOne</span>
                                     </a>
@@ -147,10 +98,7 @@
                                 <p class="subtitle">Enter your username and password to access the admin panel.</p>
                             </div>
 
-
-
                             <form method="post">
-
                                 <div class="mb-3">
                                     <label class="form-label" style="color:white">Username</label>
                                     <input type="text" class="form-control" asp-for="UserName" placeholder="Enter your username" />
@@ -161,8 +109,8 @@
                                     <label for="password" class="form-label" style="color:white">Password</label>
                                     <div class="input-group input-group-merge">
                                         <input type="password" id="password" class="form-control" asp-for="Password" placeholder="Enter your password" />
-                                        <div class="input-group-text" data-password="false">
-                                            <span class="password-eye"></span>
+                                        <div class="input-group-text" id="togglePassword" style="cursor: pointer;">
+                                            <i data-feather="eye"></i>
                                         </div>
                                     </div>
                                     <span class="text-danger" asp-validation-for="Password"></span>
@@ -184,6 +132,7 @@
                                 {
                                     <div id="successMessage" class="alert alert-success">@TempData["SuccessMessage"]</div>
                                 }
+
                                 <div class="text-center d-grid">
                                     <button class="btn login-btn" type="submit">Log In</button>
                                 </div>
@@ -192,138 +141,87 @@
                                     <a href="/Account/ForgotPassword" class="text-decoration-none" style="color:white">Forgot Password?</a>
                                 </div>
                             </form>
-
-                        </div> <!-- end card-body -->
+                        </div>
                     </div>
                     <!-- end card -->
-
-           
-
-                </div> <!-- end col -->
+                </div>
             </div>
         </div>
     </div>
 
+    @* Transparent Toast Container *@
+    @{
+        var message = TempData["message"];
+    }
+
+    @if (message != null)
+    {
+        var messagetype = TempData["messagetype"]?.ToString() ?? "warning";
+        var toastColor = messagetype.ToLower() switch
+        {
+            "error" => "danger",
+            "success" => "success",
+            _ => "warning"
+        };
+        var toastBg = messagetype.ToLower() switch
+        {
+            "error" => "rgba(255,0,0,0.1)",
+            "success" => "rgba(40,167,69,0.15)",
+            _ => "rgba(255,193,7,0.15)"
+        };
+        var toastIcon = messagetype.ToLower() switch
+        {
+            "error" => "bi-exclamation-triangle-fill",
+            "success" => "bi-check-circle-fill",
+            _ => "bi-exclamation-circle-fill"
+        };
+        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+            <div class="toast show border border-@toastColor rounded shadow-sm" style="background-color:@toastBg;" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body text-@toastColor d-flex align-items-center">
+                        <i class="bi @toastIcon me-2 fs-5"></i>
+                        @message
+                    </div>
+                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    }
+
     <script src="~/assets/js/vendor.min.js"></script>
     <script src="~/assets/js/app.min.js"></script>
-
-    <style>
-        /* 🌫️ Glass Effect Style */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-            color: white;
-        }
-
-        .authentication-bg-pattern {
-            background: url('/assets/images/bg-pattern.png') center center / cover no-repeat;
-            background-attachment: fixed;
-        }
-    </style>
-</body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@* Transparent Toast Container (top-right) *@
-@{
-    var message = TempData["message"];
-
-}
-
-@if (message != null)
-{
-    var messagetype = TempData["messagetype"];
-    string messageType = "";
-    if (messagetype is not null)
-    {
-        messageType = messagetype.ToString();
-    }
-    if (string.Equals(messageType, "error", StringComparison.OrdinalIgnoreCase))
-    {
-        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
-            <div class="toast show border border-danger rounded shadow-sm" style="background-color: rgba(255, 0, 0, 0.1);" role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body text-danger d-flex align-items-center">
-                        <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
-                        @message
-                    </div>
-                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
-    }
-    else if (string.Equals(messageType, "success", StringComparison.OrdinalIgnoreCase))
-    {
-        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0" style="z-index: 1080; padding: 7rem 1rem 1rem 1rem;">
-            <div class="toast show border border-success rounded shadow-sm"
-                 style="background-color: rgba(40, 167, 69, 0.15);"
-                 role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body text-success d-flex align-items-center">
-                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-                        @message
-                    </div>
-                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
-    }
-    else
-    {
-        // Fallback: Warning when messageType is null or unrecognized
-        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 mt-5 me-3" style="z-index: 1080;">
-            <div class="toast show border border-warning rounded shadow-sm"
-                 style="background-color: rgba(255, 193, 7, 0.15);"
-                 role="alert" aria-live="assertive" aria-atomic="true">
-                <div class="d-flex">
-                    <div class="toast-body text-warning d-flex align-items-center">
-                        <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
-                        @message
-                    </div>
-                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                </div>
-            </div>
-        </div>
-    }
-}
-
-
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Initialize Feather icons
+            feather.replace();
+
+            // Toggle password visibility reliably
+            const togglePassword = document.getElementById("togglePassword");
+            const passwordField = document.getElementById("password");
+
+            if (togglePassword && passwordField) {
+                togglePassword.addEventListener("click", function () {
+                    if (passwordField.type === "password") {
+                        passwordField.type = "text";
+                        this.innerHTML = '<i data-feather="eye-off"></i>';
+                    } else {
+                        passwordField.type = "password";
+                        this.innerHTML = '<i data-feather="eye"></i>';
+                    }
+                    feather.replace(); // refresh icon
+                });
+            }
+
+            // Initialize Bootstrap Toasts
             var toastElList = [].slice.call(document.querySelectorAll('.toast'));
             toastElList.forEach(function (toastEl) {
-                var toast = new bootstrap.Toast(toastEl, {
-                    delay: 3000  // 4 seconds
-                });
+                var toast = new bootstrap.Toast(toastEl, { delay: 3000 });
                 toast.show();
 
-                // Optional: clear TempData when toast is closed
                 toastEl.addEventListener('hidden.bs.toast', function () {
                     fetch('@Url.Action("ClearTempData", "Account")', { method: 'POST' });
                 });
             });
         });
     </script>
-}
+</body>

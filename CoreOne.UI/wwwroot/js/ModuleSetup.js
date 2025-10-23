@@ -306,3 +306,202 @@ $("#btnSavemenu").click(async function () {
 
 
 
+
+
+
+
+// ------------------------------------------------- Action Setup ---------------------------------------------------------- //
+
+
+
+function ActionSetup(moduleID) {
+    fetch(`/ModuleSetup/GetActionsForDropdown?moduleID=${moduleID}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data); // should show array of objects with id and name
+
+            const dropdown = document.getElementById('actionDropdown');
+            dropdown.innerHTML = '<option value="">--Select Action--</option>';
+
+            data.forEach(action => {
+                const option = document.createElement('option');
+                option.value = action.id;   // <-- lowercase
+                option.text = action.name;  // <-- lowercase
+                dropdown.appendChild(option);
+            });
+
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('actionSetupModal'));
+            modal.show();
+
+            dropdown.setAttribute('data-module-id', moduleID);
+        })
+        .catch(err => console.error('Error fetching actions:', err));
+}
+
+let selectedActionsList = []; // Store {ActionID, ActionName, ModuleId} objects
+
+function ActionSetup(moduleID) {
+    const dropdown = document.getElementById('actionDropdown');
+    const selectedContainer = document.getElementById('selectedActions');
+
+    dropdown.innerHTML = '<option value="">--Select Action--</option>';
+    selectedContainer.innerHTML = '';
+    selectedActionsList = [];
+
+    fetch(`/ModuleSetup/GetActionsForDropdown?moduleID=${moduleID}`)
+        .then(resp => resp.json())
+        .then(allActions => {
+            return fetch(`/ModuleSetup/GetModuleActions?moduleID=${moduleID}`)
+                .then(resp => resp.json())
+                .then(existingActions => {
+                    existingActions = existingActions.map(a => ({
+                        ActionID: a.ActionID || a.id,
+                        ActionName: a.ActionName || a.name
+                    }));
+
+                    // ✅ Add existing DB actions (EDIT MODE)
+                    existingActions.forEach(action => {
+                        addActionButton(action.ActionID, action.ActionName, moduleID, false);
+                    });
+
+                    // ✅ Fill dropdown excluding selected
+                    allActions.forEach(action => {
+                        const id = action.ActionID || action.id;
+                        const name = action.ActionName || action.name;
+
+                        if (!selectedActionsList.find(a => a.ActionID === id)) {
+                            const option = document.createElement('option');
+                            option.value = id;
+                            option.text = name;
+                            dropdown.appendChild(option);
+                        }
+                    });
+
+                    const modal = new bootstrap.Modal(document.getElementById('actionSetupModal'));
+                    modal.show();
+                    dropdown.setAttribute('data-module-id', moduleID);
+                });
+        })
+        .catch(err => console.error('Error fetching actions:', err));
+}
+
+// ✅ Helper function to create button
+function addActionButton(actionID, actionName, moduleID, isNew = true) {
+    if (selectedActionsList.find(a => a.ActionID === actionID)) return;
+
+    selectedActionsList.push({
+        ActionID: parseInt(actionID),
+        ActionName: actionName,
+        ModuleId: parseInt(moduleID)
+    });
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-sm btn-outline-primary m-1';
+
+    // ✅ Add only for newly added actions
+    if (isNew) {
+        btn.innerHTML = `${actionName} <span class="text-danger fw-bold">✖</span>`;
+        btn.classList.add("addFlag");
+    } else {
+        btn.innerText = actionName;
+        btn.classList.add("editFlag");
+    }
+
+    btn.setAttribute('data-id', actionID);
+
+    btn.addEventListener('click', function () {
+        if (!isNew) return; // ❌ Prevent removing existing items
+
+        // ✅ Sweet alert for removal
+        Swal.fire({
+            title: 'Remove this action?',
+            text: actionName,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Remove',
+            cancelButtonText: 'Cancel'
+        }).then(result => {
+            if (result.isConfirmed) {
+                selectedActionsList = selectedActionsList.filter(a => a.ActionID != actionID);
+                btn.remove();
+
+                const dropdown = document.getElementById('actionDropdown');
+                const option = document.createElement('option');
+                option.value = actionID;
+                option.text = actionName;
+                dropdown.appendChild(option);
+            }
+        });
+    });
+
+    document.getElementById('selectedActions').appendChild(btn);
+}
+
+// ✅ Add action from dropdown
+document.getElementById('addActionBtn').addEventListener('click', function () {
+    const dropdown = document.getElementById('actionDropdown');
+    const selectedOption = dropdown.options[dropdown.selectedIndex];
+
+    const actionID = selectedOption.value;
+    const actionName = selectedOption.text;
+    const moduleID = dropdown.getAttribute('data-module-id');
+
+    if (!actionID) {
+        Swal.fire("Please select an action first!", "", "warning");
+        return;
+    }
+
+    addActionButton(actionID, actionName, moduleID, true);
+    selectedOption.remove();
+    dropdown.selectedIndex = 0;
+});
+
+// ✅ Save to API
+document.getElementById('saveActionBtn').addEventListener('click', function () {
+    if (selectedActionsList.length === 0) {
+        Swal.fire("No actions selected!", "Add at least one action.", "warning");
+        return;
+    }
+
+    const moduleID = parseInt(document.getElementById('actionDropdown').getAttribute('data-module-id'));
+    const createdBy = parseInt(document.getElementById('currentUserId')?.value || "1");
+
+    const payload = {
+        ModuleID: moduleID,
+        Actions: selectedActionsList,
+        CreatedBy: createdBy
+    };
+
+    fetch(`/ModuleSetup/SaveModuleActions`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    })
+        .then(resp => resp.json())
+        .then(result => {
+            if (result.success) {
+                Swal.fire("Saved!", "Actions saved successfully!", "success");
+                const modal = bootstrap.Modal.getInstance(document.getElementById('actionSetupModal'));
+                modal.hide();
+            } else {
+                Swal.fire("Failed!", result.message || "Could not save actions", "error");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            Swal.fire("Error!", "Unexpected error occurred", "error");
+        });
+});
+
+
+//-------------------------------====-- Action Setup ----------------------------------------------- //
+
+
+
+
+
+
+
+
