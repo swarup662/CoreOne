@@ -10,16 +10,30 @@ function closeUserCreationPage() {
 
 
 $("#btnSaveUser").click(async function () {
-  
 
+
+    const ModeUserId = parseInt($("#UserID").val()) || 0;
+    var isPasswordValid = false;
 
     // Clear validation classes & messages
-    $("#UserName, #Email, #PhoneNumber, #RoleID, #GenderID, #MailTypeID", )
+    $("#UserName, #Email, #PhoneNumber, #RoleID, #GenderID, #MailTypeID, #PasswordHash", )
         .removeClass("is-invalid is-valid");
     $(".text-danger").text('');
 
+   
     // Validate all required fields before saving
     const isUserNameValid = await validateField("UserName");
+
+    if (ModeUserId > 0) {
+        // Existing user → edit mode
+        isPasswordValid = await validatePasswordField("PasswordHash");
+    } else {
+        // New user → create mode
+        isPasswordValid = await validateField("PasswordHash");
+        
+
+    }
+    
     const isEmailValid = await validateField("Email");
     const isPhoneValid = await validateField("PhoneNumber");
     const isRoleValid = await validateField("RoleID");
@@ -28,7 +42,7 @@ $("#btnSaveUser").click(async function () {
     var relativePath = null;
     var filename = null
     // Stop if any validation fails
-    if (!isUserNameValid || !isEmailValid || !isPhoneValid ||
+    if (!isUserNameValid || !isPasswordValid || !isEmailValid || !isPhoneValid ||
         !isRoleValid || !isGenderValid || !isMailTypeValid ) {
      
         return; // 🔥 Stop here — don’t run the save AJAX
@@ -77,6 +91,7 @@ $("#btnSaveUser").click(async function () {
     var payload = {
         UserID: $("#UserID").val() || 0,
         UserName: $("#UserName").val().trim(),
+        PasswordHash: $("#PasswordHash").val().trim(),
         Email: $("#Email").val().trim(),
         PhoneNumber: $("#PhoneNumber").val().trim(),
         RoleID: $("#RoleID").val(),
@@ -165,12 +180,57 @@ function validateField(fieldId) {
         });
     });
 }
+function validatePasswordField(fieldId) {
+    return new Promise((resolve) => {
+        let payload = {};
+        payload[fieldId] = $("#" + fieldId).val()?.trim() || "";
 
+        $.ajax({
+            url: '/UserCreation/ValidatePasswordField',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(payload),
+            success: function (resp) {
+                let $input = $("#" + fieldId);
+                let $errorSpan = $input.next(".text-danger");
+
+                $input.removeClass("is-invalid is-valid");
+                $errorSpan.text('');
+
+                if (resp.errors && resp.errors[fieldId]) {
+                    $input.addClass("is-invalid");
+                    $errorSpan.text(resp.errors[fieldId][0]);
+                    resolve(false); // ❌ Validation failed
+                } else {
+                    $input.addClass("is-valid");
+                    resolve(true); // ✅ Validation passed
+                }
+            },
+            error: function () {
+                resolve(false); // If validation API fails, treat as invalid
+            }
+        });
+    });
+}
 
 // ✅ Real-time validation (on typing / dropdown change)
 $("#UserName, #Email, #PhoneNumber, #RoleID, #GenderID, #MailTypeID")
     .on("change input", function () {
         validateField(this.id);
+    });
+$("#PasswordHash")
+    .on("change input", function () {
+        const userId = parseInt($("#UserID").val()) || 0;
+
+        if (userId > 0) {
+            // Existing user → edit mode
+            validatePasswordField(this.id);
+        } else {
+            // New user → create mode
+          
+            validateField(this.id);
+
+        }
     });
 
 function editUser(id) {

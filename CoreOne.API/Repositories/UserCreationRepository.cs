@@ -1,4 +1,5 @@
-﻿using CoreOne.API.Infrastructure.Data;
+﻿using CoreOne.API.Helpers;
+using CoreOne.API.Infrastructure.Data;
 using CoreOne.API.Interfaces;
 using CoreOne.DOMAIN.Models;
 using System;
@@ -40,12 +41,48 @@ namespace CoreOne.API.Repositories
 
         public int SaveUser(string recType, UserCreation user)
         {
+            string newHash = "";
+            if (!String.IsNullOrEmpty(user.PasswordHash))
+            {
+                newHash=PasswordHelper.HashPassword(user.PasswordHash);
+                
+            }
+
             var parameters = new Dictionary<string, object>
             {
                 {"@RecType", recType},
                 {"@UserID", user.UserID},
                 {"@UserName", user.UserName},
-                {"@PasswordHash", user.PasswordHash},
+                {"@PasswordHash",newHash},
+                {"@Email", (object?)user.Email ?? DBNull.Value},
+                {"@MailTypeID", (object?)user.MailTypeID ?? DBNull.Value},
+                 {"@GenderID", (object?)user.GenderID ?? DBNull.Value},
+                {"@PhoneNumber", (object?)user.PhoneNumber ?? DBNull.Value},
+                {"@RoleID", (object?)user.RoleID ?? DBNull.Value},
+                {"@PhotoPath", (object?)user.PhotoPath ?? DBNull.Value},
+                {"@PhotoName", (object?)user.PhotoName ?? DBNull.Value},
+                {"@UserID_Action", user.CreatedBy ?? 0}
+            };
+
+            return _dbHelper.ExecuteSP_ReturnInt("sp_Users_CRUD", parameters);
+        }
+
+
+        public int UpdateUser(string recType, UserCreationEditDTO user)
+        {
+            string newHash = "";
+            if (!String.IsNullOrEmpty(user.PasswordHash))
+            {
+                newHash = PasswordHelper.HashPassword(user.PasswordHash);
+
+            }
+
+            var parameters = new Dictionary<string, object>
+            {
+                {"@RecType", recType},
+                {"@UserID", user.UserID},
+                {"@UserName", user.UserName},
+                {"@PasswordHash",newHash},
                 {"@Email", (object?)user.Email ?? DBNull.Value},
                 {"@MailTypeID", (object?)user.MailTypeID ?? DBNull.Value},
                  {"@GenderID", (object?)user.GenderID ?? DBNull.Value},
