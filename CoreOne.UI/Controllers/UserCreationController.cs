@@ -324,15 +324,16 @@ namespace CoreOne.UI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteUser([FromBody] int userId)
+        public async Task<IActionResult> DeactivateUser([FromBody] int userId)
         {
             var user = TokenHelper.UserFromToken(HttpContext);
             var client = _httpClientFactory.CreateClient();
-            var url = _api.BaseUrlUserCreation + "/DeleteUser";
+            var url = _api.BaseUrlUserCreation + "/ActivateDeactivateUser";
 
             var model = new UserCreationDTO();
             model.CreatedBy = user.UserID;
             model.UserID = userId;
+            model.RecType = "DEACTIVATE";
             var json = JsonConvert.SerializeObject(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var resp = await client.PostAsync(url, content);
@@ -357,6 +358,45 @@ namespace CoreOne.UI.Controllers
 
             return Json(new { success = false, message = "Could not save user. Please try again." });
         
+        }
+
+
+
+        [HttpPost]
+        public async Task<IActionResult> ActivateUser([FromBody] int userId)
+        {
+            var user = TokenHelper.UserFromToken(HttpContext);
+            var client = _httpClientFactory.CreateClient();
+            var url = _api.BaseUrlUserCreation + "/ActivateDeactivateUser";
+
+            var model = new UserCreationDTO();
+            model.CreatedBy = user.UserID;
+            model.UserID = userId;
+            model.RecType = "ACTIVATE";
+            var json = JsonConvert.SerializeObject(model);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var resp = await client.PostAsync(url, content);
+            if (resp.IsSuccessStatusCode)
+            {
+                var responseString = await resp.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<dynamic>(responseString);
+
+                int resUserId = result.userID;
+
+                if (resUserId > 0)
+                {
+                    return Json(new { success = true, message = "success" });
+                }
+
+                else
+                {
+                    return Json(new { success = true, message = "error" });
+
+                }
+            }
+
+            return Json(new { success = false, message = "Could not save user. Please try again." });
+
         }
 
         [HttpPost]

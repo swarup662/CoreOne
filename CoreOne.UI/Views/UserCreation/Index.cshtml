@@ -129,15 +129,25 @@
                                         var status = user.ActiveFlag switch
                                         {
                                             1 => "Active",
-                                            2 => "Blocked",
+                                          
                                             0 => "Deactivated",
                                             _ => "Unknown"
                                         };
                                         var badgeClass = user.ActiveFlag == 1 ? "bg-success" :
-                                        user.ActiveFlag == 2 ? "bg-danger" :
+                                        user.ActiveFlag == 0 ? "bg-danger" :
                                         "bg-secondary";
                                     }
                                     <span class="badge @badgeClass fw-semibold">@status</span>
+                                    @if(user.ActiveFlag == 0)
+                                    {
+                                  <has-permission module-id="4" action-id="10">
+                                  <button class="btn btn-sm p-1"
+                                        onclick="activateUser(@user.UserID)"
+                                        title="Activate User">
+                                    <i class="mdi mdi-lock-open-outline" style="font-size: 20px; color: #28a745;"></i>
+                                </button>
+                                </has-permission>
+                                                                    }
                                 </td>
                                 <td class="text-center">
                                     <div class="d-flex justify-content-center gap-1 flex-wrap">
@@ -160,13 +170,13 @@
 
 
                                         <!-- Delete -->
-                                         <has-permission module-id="4" action-id="3">
+                                         <has-permission module-id="4" action-id="9">
                                         <button class="btn btn-sm btn-outline-danger shadow-sm"
-                                                onclick="deleteUser(@user.UserID)"
-                                                title="Delete User">
-                                            <i class="mdi mdi-delete-outline"></i>
-                                        </button>
-                                            </has-permission>
+                                                    onclick="deactivateUser(@user.UserID)"
+                                                    title="Deactivate User">
+                                                <i class="mdi mdi-lock-outline" ></i>
+                                            </button>
+                                                                    </has-permission>
                                         <!-- Extra Permission -->
                                          <has-permission module-id="4" action-id="7">
                                         <button class="btn btn-sm btn-outline-info shadow-sm"

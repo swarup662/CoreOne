@@ -85,6 +85,7 @@ namespace CoreOne.DOMAIN.Models
 
     public class UserCreationDTO
     {
+        public string? RecType { get; set; }
         public int? UserID { get; set; }
 
         

@@ -214,7 +214,7 @@ namespace CoreOne.API.Repositories
 
 
 
-        public int DeleteUser(string recType, UserCreationDTO user)
+        public int ActivateDeactivateUser(string recType, UserCreationDTO user)
         {
             var parameters = new Dictionary<string, object>
             {

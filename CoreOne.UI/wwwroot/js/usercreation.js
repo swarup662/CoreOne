@@ -258,7 +258,7 @@ function viewUser(id) {
     });
 }
 
-function deleteUser(id) {
+function deactivateUser(id) {
     Swal.fire({
         title: 'Are you sure?',
         text: "Do you really want to deactivate this user?",
@@ -270,7 +270,7 @@ function deleteUser(id) {
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
-                url: '/UserCreation/DeleteUser',
+                url: '/UserCreation/DeactivateUser',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(id),
@@ -287,6 +287,43 @@ function deleteUser(id) {
                         Swal.fire({
                             title: 'Failed!',
                             text: 'Failed to deactivate user.',
+                            icon: 'error'
+                        });
+                    }
+                }
+            });
+        }
+    });
+}
+function activateUser(id) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you really want to activate this user?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, Activate',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/UserCreation/ActivateUser',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(id),
+                success: function (res) {
+                    if (res.success) {
+                        Swal.fire({
+                            title: 'Activated!',
+                            text: 'User has been Activated.',
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => location.reload());
+                    } else {
+                        Swal.fire({
+                            title: 'Failed!',
+                            text: 'Failed to activate user.',
                             icon: 'error'
                         });
                     }

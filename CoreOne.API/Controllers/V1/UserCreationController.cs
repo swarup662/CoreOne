@@ -140,12 +140,12 @@ namespace CoreOne.API.Controllers.V1
             return NotFound(new { UserID = result, Message = "User not found or not updated." });
         }
 
-        [HttpPost("DeleteUser")]
-        public IActionResult DeleteUser( UserCreationDTO user)
+        [HttpPost("ActivateDeactivateUser")]
+        public IActionResult ActivateDeactivateUser( UserCreationDTO user)
         {
             //if (user.UserID <= 0) return BadRequest("Invalid UserID.");
 
-            int result = _userRepo.DeleteUser("Delete", user);
+            int result = _userRepo.ActivateDeactivateUser(user.RecType, user);
 
             if (result > 0)
                 return Ok(new { UserID = result, Message = "User deleted successfully." });
