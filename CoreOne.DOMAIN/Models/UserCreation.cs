@@ -81,4 +81,50 @@ namespace CoreOne.DOMAIN.Models
         public string? SearchCol { get; set; }
         public string? Status { get; set; }
     }
+
+
+    public class UserCreationDTO
+    {
+        public string? RecType { get; set; }
+        public int? UserID { get; set; }
+
+        
+        public string? UserName { get; set; } = string.Empty;
+
+
+        public string? PasswordHash { get; set; } = string.Empty;
+
+        
+        public string? Email { get; set; }
+
+       
+        public int? MailTypeID { get; set; }
+
+        public string? PhoneNumber { get; set; }
+
+       
+        public int? RoleID { get; set; }
+
+        public string? RoleName { get; set; }
+
+       
+        public int? GenderID { get; set; }
+
+        public string? GenderName { get; set; }
+
+        // Optional image upload fields
+        //[Required(ErrorMessage = "Please upload a file.")]
+        public string? PhotoPath { get; set; }
+        public string? PhotoName { get; set; }
+
+        public int? ActiveFlag { get; set; }
+
+        public int? CreatedBy { get; set; }
+
+        //public DateTime? CreatedDate { get; set; }
+
+        public int? UpdatedBy { get; set; }
+
+        //public DateTime? UpdatedDate { get; set; }
+    }
 }

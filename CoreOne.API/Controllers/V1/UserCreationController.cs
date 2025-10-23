@@ -140,12 +140,12 @@ namespace CoreOne.API.Controllers.V1
             return NotFound(new { UserID = result, Message = "User not found or not updated." });
         }
 
-        [HttpPost("DeleteUser")]
-        public IActionResult DeleteUser([FromBody] UserCreation user)
+        [HttpPost("ActivateDeactivateUser")]
+        public IActionResult ActivateDeactivateUser( UserCreationDTO user)
         {
-            if (user.UserID <= 0) return BadRequest("Invalid UserID.");
+            //if (user.UserID <= 0) return BadRequest("Invalid UserID.");
 
-            int result = _userRepo.SaveUser("Delete", user);
+            int result = _userRepo.ActivateDeactivateUser(user.RecType, user);
 
             if (result > 0)
                 return Ok(new { UserID = result, Message = "User deleted successfully." });
@@ -171,5 +171,15 @@ namespace CoreOne.API.Controllers.V1
             var result = await _userRepo.SaveExtraPermissionAsync(UserId, permissions);
             return Ok(result);
         }
+
+        [HttpGet("GetExtraPermissionByUserId/{UserId}/{CreatedBy}")]
+        public async Task<IActionResult> GetByRoleId(int UserId, int CreatedBy)
+        {
+            var data = await _userRepo.GetExtraPermissionByUserId(UserId, CreatedBy);
+            return Ok(data);
+        }
+
+
+
     }
 }

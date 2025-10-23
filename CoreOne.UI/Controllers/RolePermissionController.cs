@@ -143,7 +143,7 @@ namespace CoreOne.UI.Controllers
                         <div class='form-check form-switch'>
                             <input class='form-check-input perm-checkbox' type='checkbox'
                                    data-menuid='{p.MenuModuleID}' data-actionid='{p.ActionID}' data-module='{module.Key}'
-                                   id='chk_{p.MenuModuleID}_{p.ActionID}' {(p.HasPermission ? "checked" : "")}>
+                                   id='chk_{p.MenuModuleID}_{p.ActionID}' {(p.HasPermission ? "checked='checked'" : "")}>
                             <label class='form-check-label small text-dark fw-light' for='chk_{p.MenuModuleID}_{p.ActionID}'>
                                 {p.ActionName}
                             </label>
