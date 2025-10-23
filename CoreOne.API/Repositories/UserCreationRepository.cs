@@ -130,5 +130,58 @@ namespace CoreOne.API.Repositories
             return dt;
         }
 
+
+        public async Task<int> SaveExtraPermissionAsync(int CreatedBy ,IEnumerable<ExtraPermission> extraPermissions)
+        {
+           
+            int roleId = 0;
+            var firstPermission = extraPermissions.FirstOrDefault();
+
+            if (firstPermission != null)
+            {
+                
+                 roleId = firstPermission.RoleID;
+                // use userId and roleId here
+            }
+            var dt = new DataTable();
+            dt.Columns.Add("RoleID", typeof(int));
+            dt.Columns.Add("UserID", typeof(int));
+            dt.Columns.Add("MenuModuleID", typeof(int));
+            dt.Columns.Add("ActionID", typeof(int));
+            dt.Columns.Add("ActiveFlag", typeof(int));
+
+
+            foreach (var rp in extraPermissions)
+            {
+                int ActiveFlag = 0;
+                if (rp.HasPermission)
+                {
+                    ActiveFlag = 1;
+                }
+                else
+                {
+                    ActiveFlag = 0;
+                }
+                dt.Rows.Add(
+
+                    rp.RoleID,
+                    rp.UserID,
+                    rp.MenuModuleID,
+                    rp.ActionID,
+                    ActiveFlag
+
+                );
+            }
+
+            var parameters = new Dictionary<string, object>
+            {
+                { "@RoleId", roleId },
+                { "@UserID", CreatedBy }
+            };
+
+            var result = _dbHelper.ExecuteSP_WithTableType_ReturnInt("sp_SaveExtraPermissions", "Permissions", "ExtraPermissionTableType", dt, parameters);
+            return await Task.FromResult(result);
+        }
+
     }
 }

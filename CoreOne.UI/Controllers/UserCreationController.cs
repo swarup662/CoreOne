@@ -402,12 +402,13 @@ namespace CoreOne.UI.Controllers
                 foreach (var module in parent.Value)
                 {
                     var allChecked = module.Value.All(p => p.HasPermission);
+
                     sb.Append($@"
                 <div class='card border-0 shadow-sm mb-3'>
                     <div class='card-header d-flex justify-content-between align-items-center bg-white'>
                         <strong class='text-secondary'><i class='bi bi-box me-2'></i>{module.Key}</strong>
                         <div class='form-check form-switch'>
-                            <input class='form-check-input select-all' type='checkbox' data-module='{module.Key}' {(allChecked ? "checked" : "")}>
+                            <input class='form-check-input select-all' type='checkbox' data-module='{module.Key}' disabled {(allChecked ? "checked" : "")}>
                             <label class='form-check-label fw-semibold text-primary'>Select All</label>
                         </div>
                     </div>
@@ -416,18 +417,25 @@ namespace CoreOne.UI.Controllers
 
                     foreach (var p in module.Value)
                     {
-                        sb.Append($@"
+                        var checkboxClass = p.HasPermission
+                            ? "form-check-input perm-checkbox"
+                            : "form-check-input perm-checkbox extra";
+
+                        var disabledAttr = p.HasPermission ? "disabled" : "";
+
+                                            sb.Append($@"
                     <div class='col-md-2 col-sm-4 col-6'>
                         <div class='form-check form-switch'>
-                            <input class='form-check-input perm-checkbox' type='checkbox'
+                            <input class='{checkboxClass}' type='checkbox'
                                    data-menuid='{p.MenuModuleID}' data-actionid='{p.ActionID}' data-module='{module.Key}'
-                                   id='chk_{p.MenuModuleID}_{p.ActionID}' {(p.HasPermission ? "checked" : "")}>
+                                   id='chk_{p.MenuModuleID}_{p.ActionID}' {(p.HasPermission ? "checked" : "")} {disabledAttr}>
                             <label class='form-check-label small text-dark fw-light' for='chk_{p.MenuModuleID}_{p.ActionID}'>
                                 {p.ActionName}
                             </label>
                         </div>
                     </div>");
                     }
+
 
                     sb.Append("</div></div></div>");
                 }
@@ -437,5 +445,28 @@ namespace CoreOne.UI.Controllers
 
             return Content(sb.ToString(), "text/html");
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveExtraPermissions( [FromBody] List<ExtraPermission> permissions)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var content = new StringContent(JsonConvert.SerializeObject(permissions), Encoding.UTF8, "application/json");
+            var user = TokenHelper.UserFromToken(HttpContext);
+            // assuming userId = 1 for demo
+            var response = await client.PostAsync($"{_api.BaseUrlUserCreation}/SaveExtraPermission/{user.UserID}", content);
+            if (!response.IsSuccessStatusCode)
+            {
+                return Json("error");
+            }
+            else
+            {
+                var json = await response.Content.ReadAsStringAsync();
+                var res = JsonConvert.DeserializeObject<int>(json);
+                return Json(res);
+            }
+
+        }
+
     }
 }

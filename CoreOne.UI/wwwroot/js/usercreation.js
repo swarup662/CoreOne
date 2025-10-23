@@ -269,12 +269,19 @@ async function loadProfilePhoto(filePath) {
 
 
 
-
+let currentUserId = 0;
+let currentRoleId = 0;
+let isAddMode = false;
 function openExtraPermissionModal(userId,roleId) {
     isAddMode = false;
     currentRoleId = roleId;
-
-    $("#roleDropdown").val(roleId);
+    currentUserId = userId
+    $("#roleDropdown option").each(function () {
+        if ($(this).val() != roleId) {
+            $(this).remove(); // remove all options except the selected one
+        }
+    });
+    $("#roleDropdown").val(roleId);// ensure selected value
     $("#permissionsContainer").html("<p class='text-muted'>Loading...</p>");
     $("#permissionModal").modal("show");
     $("#selectAllGlobal").prop("checked", false);
@@ -326,4 +333,56 @@ function updateGlobalSelectAll() {
 async function extraPermission(UserID, RoleID) {
     openExtraPermissionModal(UserID,RoleID)
 
+}
+
+
+
+// Save
+function saveExtraPermissions() {
+     currentRoleId = $("#roleDropdown").val();
+    if (!currentRoleId) {
+        Swal.fire("⚠️ Oops!", "Role is showing in  modal. Please contact Admin!", "warning");
+        return;
+    }
+
+    let permissions = [];
+
+    // Only process checkboxes with the 'extra' class
+    $(".perm-checkbox.extra").each(function () {
+        permissions.push({
+            roleID: currentRoleId,
+             userID: currentUserId,
+            menuModuleID: $(this).data("menuid"),
+            actionID: $(this).data("actionid"),
+            hasPermission: $(this).is(":checked")
+        });
+    });
+
+    if (permissions.length === 0) {
+        Swal.fire("ℹ️ Nothing to save", "No changes found to save.", "info");
+        return;
+    }
+
+    $.ajax({
+        url: `/UserCreation/SaveExtraPermissions`,
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(permissions),
+        success: function (res) {
+            if (res > 0) {
+                Swal.fire({
+                    icon: "success",
+                    title: "✅ Saved!",
+                    text: "Permissions saved successfully!",
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    $("#permissionModal").modal("hide");
+                    location.reload();
+                });
+            } else {
+                Swal.fire("❌ Error", "Failed to save permissions.", "error");
+            }
+        }
+    });
 }

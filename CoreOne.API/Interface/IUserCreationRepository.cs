@@ -11,7 +11,8 @@ namespace CoreOne.API.Interfaces
         DataTable? GetMailtypes(int userId);
         int SaveUser(string recType, UserCreation user);
         UserCreation? GetUserById(int userId);
- 
+        Task<int> SaveExtraPermissionAsync(int CreatedBy ,IEnumerable<ExtraPermission> permissions);
+
 
 
 
