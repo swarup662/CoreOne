@@ -160,6 +160,101 @@ namespace CoreOne.UI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetActionsForDropdown(int moduleID)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                var url = _api.BaseUrlModuleSetup + "/GetActionsDropdown";
+
+                var resp = await client.GetAsync(url);
+                if (!resp.IsSuccessStatusCode)
+                    return StatusCode((int)resp.StatusCode, new { message = "Failed to load actions" });
+
+                var json = await resp.Content.ReadAsStringAsync();
+
+                // Deserialize into a list of objects
+                var actions = JsonConvert.DeserializeObject<List<ActionDropdownDto>>(json);
+
+                return Json(actions); // return proper JSON array
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetModuleActions(int moduleID)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                var url = _api.BaseUrlModuleSetup + $"/GetModuleActionsByModuleID?moduleID={moduleID}";
+
+                var resp = await client.GetAsync(url);
+                if (!resp.IsSuccessStatusCode)
+                    return StatusCode((int)resp.StatusCode, new { message = "Failed to load module actions" });
+
+                var json = await resp.Content.ReadAsStringAsync();
+
+                // Deserialize into a list of objects
+                var actions = JsonConvert.DeserializeObject<List<ActionDropdownDto>>(json);
+
+                return Json(actions); // array of { id, name }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveModuleActions([FromBody] SaveActionModel model)
+        {
+            if (model == null || model.Actions == null)
+                return Json(new { success = false, message = "Invalid data." });
+
+            var user = TokenHelper.UserFromToken(HttpContext);
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                var url = _api.BaseUrlModuleSetup + "/SaveModuleActions"; // API endpoint
+                var payload = new
+                {
+                    ModuleID = model.ModuleID,
+                    Actions = model.Actions,
+                    CreatedBy = user.UserID
+                };
+
+                var json = JsonConvert.SerializeObject(payload);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var resp = await client.PostAsync(url, content);
+                if (!resp.IsSuccessStatusCode)
+                {
+                    return Json(new { success = false, message = "Failed to save module actions." });
+                }
+
+                var response = await resp.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<dynamic>(response);
+
+                return Json(new { success = true, moduleId = (int)result.moduleId });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        // Model
+
 
 
 

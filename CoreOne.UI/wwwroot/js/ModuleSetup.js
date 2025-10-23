@@ -42,8 +42,8 @@ function openEditModal(menuId) {
                                         </td>
                                          <td class="d-flex gap-1 justify-content-start">
        
-            <a href="javascript:void(0);" class="btn btn-sm btn-primary setupModule" title="Setup"><i class="fe-settings"></i></a>
-        </td>
+            <a href="javascript:void(0);"  onclick="ActionSetup('${m.moduleID}')" style="background: #f75964;color: white;" class="btn btn-sm setupModule" title="Setup"><i class="fe-command"></i></a>
+            </td>
                                     </tr>
                                 `);
                     }

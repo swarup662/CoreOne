@@ -1,5 +1,6 @@
 ﻿using CoreOne.API.Interface;
 using CoreOne.API.Interfaces;
+using CoreOne.API.Repositories;
 using CoreOne.DOMAIN.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -107,6 +108,66 @@ namespace CoreOne.API.Controllers.V1
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet("GetActionsDropdown")]
+        public IActionResult GetActionsDropdown()
+        {
+            var dt = _menuModuleRepo.GetActionDropdown();
+
+            var actions = new List<object>();
+            foreach (DataRow row in dt.Rows)
+            {
+                actions.Add(new
+                {
+                    Id = row["ActionID"],
+                    Name = row["ActionName"]
+                });
+            }
+
+            return Ok(actions);
+        }
+
+
+        [HttpGet("GetModuleActionsByModuleID")]
+        public IActionResult GetModuleActionsByModuleID(int moduleID)
+        {
+            var dt = _menuModuleRepo.GetActionsByModuleID(moduleID);
+            var actions = new List<object>();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                actions.Add(new
+                {
+                    id = row["ActionID"],
+                    name = row["ActionName"]
+                });
+            }
+
+            return Ok(actions);
+        }
+
+
+
+
+
+
+        [HttpPost("SaveModuleActions")]
+        public IActionResult SaveModuleActions([FromBody] SaveActionModel model)
+        {
+            if (model == null || model.Actions == null)
+                return BadRequest(new { success = false, message = "Invalid request" });
+
+            try
+            {
+                _menuModuleRepo.SaveModuleActions(model.ModuleID, model.Actions, model.CreatedBy);
+                return Ok(new { success = true, moduleId = model.ModuleID });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+
 
 
 

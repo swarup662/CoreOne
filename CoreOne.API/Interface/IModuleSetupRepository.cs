@@ -10,5 +10,8 @@ namespace CoreOne.API.Interface
         int SaveMenuWithModules(MenuWithModulesSave model);
         MenuModuleEditModel GetMenuModuleById(int menuId);
         void DeleteMenu(int menuId);
+        DataTable GetActionDropdown();
+        DataTable GetActionsByModuleID(int moduleID);
+       void SaveModuleActions(int moduleID, List<ActionDto> actions, int createdBy);
     }
 }
