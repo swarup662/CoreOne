@@ -44,70 +44,66 @@
     }
 }
 
+<link href="~/css/rolecreation.css" rel="stylesheet" />
 
 
 
 
 
+<div class="container-fluid  p-2" style="background:rgba(255, 255, 255, 0.08);">
+    <div class="row" style="margin-top: -19px; margin-bottom: -6px;">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Master</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Dashboard</a></li>
 
-
-
-
-
-<div class="container-fluid">
-
-<div class="row">
-    <div class="col-12">
-        <div class="page-title-box">
-            <div class="page-title-right">
-                <ol class="breadcrumb m-0">
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">Role</a></li>
-                    <li class="breadcrumb-item"><a href="javascript: void(0);">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Role Master</li>
-                </ol>
+                    </ol>
+                </div>
+                <h4 class="page-title">Role Creation</h4>
             </div>
-            <h4 class="page-title">Role Master</h4>
         </div>
     </div>
-</div>
 
- <div class="card">
+
+    <div class="card" style="background:rgba(255, 255, 255, 0.08);border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
         <div class="card-body">
-            <div class="row justify-content-between">
-                <div class="col-auto">
-                    <button type="button" class="btn btn-blue waves-effect waves-light float-end"
+
+            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/RoleCreation/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
                     </button>
 
                 </div>
-                <div class="col-auto">
-                   
-                    <has-permission module-id="5" action-id="1">
-                
+                <div class="col-md-5">
+                </div>
 
-                        <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#roleModal"  >
+                <div class="col-md-4 ms-auto d-flex justify-content-end">
+                    
+
+                    <has-permission module-id="5" action-id="1">
+
+
+                        <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#roleModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                             <i class="mdi mdi-plus-circle"></i> Add Role
                         </button>
                     </has-permission>
-
-                </div><!-- end col-->
-            </div> <!-- end row -->
-        </div>
-    </div>
-
-<div class="card">
-    <div class="card-body">
-
-            <div class="row mb-3">
-            <!-- Search Box (live) -->
-            <div class="col-md-4">
-                <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." />
+                </div>
             </div>
 
-
-                <div class="col-sm-3">
-                    <select class="form-select my-1 my-lg-0" id="searchField">
+            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                
+            <div class="col-md-3">
+                    <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="searchField" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
                         @{
                             string[] searchableFields = new string[] { "RoleName", "RoleDescription", "ActiveFlag" };
                             string[] searchableNames = new string[] { "Role Name", "Role Description", "Status" };
@@ -119,12 +115,14 @@
                         }
                     </select>
                 </div>
+                <div class="col-md-2">
+                    <button id="btnSearch" class="btn icon-btn" style="display:none">
+                        <i class="mdi mdi-magnify"></i>
+                    </button>
 
-              
-               
-                <div class="col-sm-5" >
-                    <div class="d-flex justify-content-end">
-                        <select class="form-select my-1 my-lg-0 w-50" id="pageSize">
+                </div>
+                <div class="col-md-2 ms-auto d-flex justify-content-end">
+                    <select class="form-select" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
                         @{
                             int[] pageSizes = new int[] { 1, 10, 20, 50, 100 };
                             foreach (var size in pageSizes)
@@ -133,247 +131,272 @@
                             }
                         }
                     </select>
-                    </div>
                 </div>
-
-
-            <!-- Info (top) -->
-         
-        </div>
-
-        <table class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th style="color:#343a40">Sl No</th>
-
-                        <th>
-                            <a href="javascript:void(0)" onclick="sortTable('RoleName')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:#343a40;">
-                                <span>Role Name</span>
-                                <span>
-                                    @if (sortColumn == "RoleName")
-                                    {
-                                        if (sortDir == "ASC")
-                                        {
-                                            <i class="bi bi-arrow-up"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-arrow-down"></i>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
-                                    }
-                                </span>
-                            </a>
-                        </th>
-
-                        <th>
-                            <a href="javascript:void(0)" onclick="sortTable('RoleDescription')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:#343a40;">
-                                <span>Role Description</span>
-                                <span>
-                                    @if (sortColumn == "RoleDescription")
-                                    {
-                                        if (sortDir == "ASC")
-                                        {
-                                            <i class="bi bi-arrow-up"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-arrow-down"></i>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
-                                    }
-                                </span>
-                            </a>
-                        </th>
-
-                        <th>
-                            <a href="javascript:void(0)" onclick="sortTable('CreatedDate')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:#343a40;">
-                                <span>Created Date</span>
-                                <span>
-                                    @if (sortColumn == "CreatedDate")
-                                    {
-                                        if (sortDir == "ASC")
-                                        {
-                                            <i class="bi bi-arrow-up"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-arrow-down"></i>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
-                                    }
-                                </span>
-                            </a>
-                        </th>
-
-                        <th>
-                            <a href="javascript:void(0)" onclick="sortTable('ActiveFlag')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:#343a40;">
-                                <span>Status</span>
-                                <span>
-                                    @if (sortColumn == "ActiveFlag")
-                                    {
-                                        if (sortDir == "ASC")
-                                        {
-                                            <i class="bi bi-arrow-up"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-arrow-down"></i>
-                                        }
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-arrow-down-up text-muted"></i>
-                                    }
-                                </span>
-                            </a>
-                        </th>
-
-                        <th style="color:#343a40">Action</th>
-                    </tr>
-                </thead>
-
-
-            <tbody>
-                @{
-                    int count = ((pageNumber - 1) * pageSize) + 1;
-                }
-                @foreach (var r in roles)
-                {
-                    <tr>
-                        <td>@count</td>
-                        <td class="text-body fw-semibold">@r.RoleName</td>
-                        <td>@r.RoleDescription</td>
-                        <td>@(r.CreatedDate?.ToString("dd-MM-yyyy"))</td>
-                        <td>
-                            @if ((r.ActiveFlag ?? 0) == 1)
-                            {
-                                    <span class="badge bg-success">Active</span>
-                            }
-                            else
-                            {
-                                    <span class="badge bg-danger">Inactive</span>
-                            }
-                        </td>
-
-
-                        <td>
-                                <has-permission module-id="5" action-id="2">
-                               
-                                 <!-- Edit -->
-                                    <a href="javascript:;" class="btn btn-sm btn-primary" onclick="loadRole(@r.RoleID)">
-                                        <i class="mdi mdi-square-edit-outline"></i> Edit
-                                    </a>
-
-
-                                  </has-permission>
-                                <has-permission module-id="5" action-id="4">
-
-
-                                    <a href="javascript:;" class="btn btn-sm btn-warning" onclick="loadRole(@r.RoleID); $('#btnSaveRole').remove();">
-                                        <i class="mdi mdi-eye-circle-outline"></i> View
-                                    </a>
-
-                              
-                                  </has-permission>
-
-                                <has-permission module-id="5" action-id="3">
-                                    <!-- Delete form -->
-                                    
-                                        <button type="submit" class="btn btn-sm btn-danger" onclick="deleteRole(@r.RoleID)">
-                                            <i class="mdi mdi-delete"></i> Delete
-                                        </button>
-                                
-                                  </has-permission>
-
-                        </td>
-                    </tr>
-                    count++;
-                }
-                @if (!roles.Any())
-                {
-                <tr>
-                    <td colspan="6" class="text-center text-muted">No records found</td>
-                </tr>
-                }
-            </tbody>
-        </table>
-
-        <!-- Bottom info -->
-        <div class="d-flex justify-content-between align-items-center mt-2">
-            <div>
-                <small class="text-muted">
-                    Showing page <strong>@pageNumber</strong> of <strong>@totalPages</strong> — <strong>@totalRecords</strong> records
-                </small>
             </div>
 
-            <!-- Pagination window (max 5 pages) -->
-            <nav aria-label="Role pagination">
-                <ul class="pagination pagination-rounded mb-0">
-                    <!-- Prev -->
-                    <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
-                        <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber - 1)">« Prev</a>
-                    </li>
+            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <table class="table table-bordered table-hover table-xl mt-2">
+                    <thead>
+                        <tr style="background: #f3f7f9;color:black">
+                            <th style="color:black">Sl No</th>
 
-                    <!-- If startPage > 1 show first page and ellipsis -->
-                    @if (startPage > 1)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" href="javascript:void(0)" data-page="1">1</a>
-                        </li>
-                        @if (startPage > 2)
-                        {
-                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                            <th>
+                                <a href="javascript:void(0)" onclick="sortTable('RoleName')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:black">
+                                    <span>Role Name</span>
+                                    <span>
+                                        @if (sortColumn == "RoleName")
+                                        {
+                                            if (sortDir == "ASC")
+                                            {
+                                                <i class="bi bi-arrow-up"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-arrow-down"></i>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-arrow-down-up text-muted"></i>
+                                        }
+                                    </span>
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="javascript:void(0)" onclick="sortTable('RoleDescription')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:black">
+                                    <span>Role Description</span>
+                                    <span>
+                                        @if (sortColumn == "RoleDescription")
+                                        {
+                                            if (sortDir == "ASC")
+                                            {
+                                                <i class="bi bi-arrow-up"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-arrow-down"></i>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-arrow-down-up text-muted"></i>
+                                        }
+                                    </span>
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="javascript:void(0)" onclick="sortTable('CreatedDate')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:black">
+                                    <span>Created Date</span>
+                                    <span>
+                                        @if (sortColumn == "CreatedDate")
+                                        {
+                                            if (sortDir == "ASC")
+                                            {
+                                                <i class="bi bi-arrow-up"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-arrow-down"></i>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-arrow-down-up text-muted"></i>
+                                        }
+                                    </span>
+                                </a>
+                            </th>
+
+                            <th>
+                                <a href="javascript:void(0)" onclick="sortTable('ActiveFlag')" class="d-flex justify-content-between align-items-center text-decoration-none" style="color:black">
+                                    <span>Status</span>
+                                    <span>
+                                        @if (sortColumn == "ActiveFlag")
+                                        {
+                                            if (sortDir == "ASC")
+                                            {
+                                                <i class="bi bi-arrow-up"></i>
+                                            }
+                                            else
+                                            {
+                                                <i class="bi bi-arrow-down"></i>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-arrow-down-up text-muted"></i>
+                                        }
+                                    </span>
+                                </a>
+                            </th>
+
+                            <th style="color:#343a40">Action</th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                        @{
+                            int count = ((pageNumber - 1) * pageSize) + 1;
                         }
-                    }
-
-                    <!-- Window pages -->
-                    @for (int i = startPage; i <= endPage; i++)
-                    {
-                        <li class="page-item @(i == pageNumber ? "active" : "")">
-                            <a class="page-link" href="javascript:void(0)" data-page="@i">@i</a>
-                        </li>
-                    }
-
-                    <!-- If endPage < totalPages show ellipsis and last page -->
-                    @if (endPage < totalPages)
-                    {
-                        if (endPage < totalPages - 1)
+                        @foreach (var r in roles)
                         {
-                            <li class="page-item disabled"><span class="page-link">…</span></li>
-                        }
-                        <li class="page-item">
-                            <a class="page-link" href="javascript:void(0)" data-page="@totalPages">@totalPages</a>
-                        </li>
-                    }
+                            <tr>
+                                <td>@count</td>
+                                <td class="text-body fw-semibold">@r.RoleName</td>
+                                <td>@r.RoleDescription</td>
+                                <td>@(r.CreatedDate?.ToString("dd-MM-yyyy"))</td>
+                                <td>
+                                    @if ((r.ActiveFlag ?? 0) == 1)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Inactive</span>
+                                    }
+                                </td>
 
-                    <!-- Next -->
-                    <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
-                        <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber + 1)">Next »</a>
-                    </li>
-                </ul>
-            </nav>
+
+                                <td>
+                                    <has-permission module-id="5" action-id="2">
+
+                                        <!-- Edit -->       
+                                        <a href="javascript:;" class="action-icon" onclick="loadRole(@r.RoleID)">
+                                            <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="Edit" style="color:rebeccapurple"></i>
+                                        </a>
+                                    </has-permission>
+                                    <has-permission module-id="5" action-id="4">
+                                        <a href="javascript:;"
+                                           class="action-icon"
+                                           onclick="loadRole(@r.RoleID); $('#btnSaveRole').remove();;">
+                                            <i class="mdi mdi-eye-circle-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
+                                        </a>
+
+
+                                    </has-permission>
+
+                                    <has-permission module-id="5" action-id="3">
+                                        <!-- Delete form -->
+
+                                        
+                                        <a href="javascript:;"
+                                           class="action-icon"
+                                           onclick="deleteRole(@r.RoleID)">
+                                            <i class="mdi mdi-delete" data-toggle="tooltip" title="Delete" style="color:red"></i>
+                                        </a>
+
+
+                                    </has-permission>
+
+                                </td>
+                            </tr>
+                            count++;
+                        }
+                        @if (!roles.Any())
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No records found</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <div class="row">
+                  
+                        <!-- Bottom info -->
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <small class="text-muted">
+                                    Showing page <strong>@pageNumber</strong> of <strong>@totalPages</strong> — <strong>@totalRecords</strong> records
+                                </small>
+                            </div>
+
+                            <!-- Pagination window (max 5 pages) -->
+                            <nav aria-label="Role pagination">
+                                <ul class="pagination pagination-rounded mb-0">
+                                    <!-- Prev -->
+                                    <li class="page-item @(pageNumber == 1 ? "disabled" : "")">
+                                        <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber - 1)">« Prev</a>
+                                    </li>
+
+                                    <!-- If startPage > 1 show first page and ellipsis -->
+                                    @if (startPage > 1)
+                                    {
+                                        <li class="page-item">
+                                            <a class="page-link" href="javascript:void(0)" data-page="1">1</a>
+                                        </li>
+                                        @if (startPage > 2)
+                                        {
+                                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                                        }
+                                    }
+
+                                    <!-- Window pages -->
+                                    @for (int i = startPage; i <= endPage; i++)
+                                    {
+                                        <li class="page-item @(i == pageNumber ? "active" : "")">
+                                            <a class="page-link" href="javascript:void(0)" data-page="@i">@i</a>
+                                        </li>
+                                    }
+
+                                    <!-- If endPage < totalPages show ellipsis and last page -->
+                                    @if (endPage < totalPages)
+                                    {
+                                        if (endPage < totalPages - 1)
+                                        {
+                                            <li class="page-item disabled"><span class="page-link">…</span></li>
+                                        }
+                                        <li class="page-item">
+                                            <a class="page-link" href="javascript:void(0)" data-page="@totalPages">@totalPages</a>
+                                        </li>
+                                    }
+
+                                    <!-- Next -->
+                                    <li class="page-item @(pageNumber >= totalPages ? "disabled" : "")">
+                                        <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber + 1)">Next »</a>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    
+                </div>
+
+            </div>
+
+
+
         </div>
     </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 </div>
-
-
     <div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="roleModalLabel">Add Role</h5>
-                    <button type="button" class="btn-close" onclick="window.location.href='/RoleCreation/Index'" aria-label="Close"></button>
+                    <h5 class="modal-title" id="roleModalLabel">Add Role :: [New]</h5>
+                <button type="button"
+                        class="btn btn-light btn-close-circle shadow-sm"
+                        onclick="window.location.href='/RoleCreation/Index'">
+                    <i class="bi bi-x-lg"></i>
+                </button>
                 </div>
 
                 <div class="modal-body">
@@ -394,10 +417,20 @@
                     </div>
                 </div>
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary"  onclick="window.location.href='/RoleCreation/Index'">Cancel</button>
-                    <button type="button" id="btnSaveRole" class="btn btn-success">Save</button>
-                </div>
+               
+            <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
+                <button type="button"
+                        onclick="window.location.href='/RoleCreation/Index'"
+                        class="btn btn-warning btn-sm"
+                        data-bs-dismiss="modal">
+                    <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
+                </button>
+
+                <button type="button" id="btnSaveRole" class="btn btn-sm" style="background:forestgreen; color:white">
+                    <i class="mdi mdi-content-save-outline me-1"></i> Save
+                </button>
+            </div>
+
             </div>
         </div>
     </div>
@@ -408,7 +441,7 @@
 
 
 
-</div>
+
 
 
 <script src="~/js/rolecreation.js"></script>
