@@ -92,7 +92,7 @@ $("#RoleName, #RoleDescription").on("change input", function () {
 
 function loadRole(roleId) {
     // Update modal header and aria-labelledby for edit
-    $('#roleModalLabel').text('Edit Role');
+    $('#roleModalLabel').text('Update Role :: [Edit]');
     $('#roleModal').attr('aria-labelledby', 'roleModalLabel');
 
     $.ajax({

@@ -29,152 +29,8 @@
     }
     else { startPage = 1; endPage = totalPages; }
 }
-<style>
-    /* Table base */
-    .table {
-     
-        border-collapse: separate; /* needed for border-radius */
-        border-spacing: 0; /* remove extra spacing */
-        border-radius: 0.75rem; /* adjust radius as needed */
-        overflow: hidden; /* ensures corners are rounded */
-    }
 
-        /* Table header */
-        .table thead tr {
-            background: linear-gradient(135deg, #4facfe, #00f2fe);
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        /* Table body rows */
-        .table tbody tr {
-            background-color: #ffffff;
-            transition: all 0.3s ease;
-        }
-
-        /* Table cells */
-        .table th,
-        .table td {
-            border: 1px solid #d1d5db; /* light gray borders */
-            vertical-align: middle;
-            padding: 0.75rem 1rem;
-        }
-
-        /* Optional: round only top and bottom corners */
-        .table thead tr:first-child th:first-child {
-            border-top-left-radius: 0.75rem;
-        }
-
-        .table thead tr:first-child th:last-child {
-            border-top-right-radius: 0.75rem;
-        }
-
-        .table tbody tr:last-child td:first-child {
-            border-bottom-left-radius: 0.75rem;
-        }
-
-        .table tbody tr:last-child td:last-child {
-            border-bottom-right-radius: 0.75rem;
-        }
-</style>
-<style>
-    /* Accordion items spacing */
-    .accordion-item {
-        border: none;
-        margin-bottom: 0.5rem; /* space between accordion items */
-    }
-
-    /* Accordion headers: fully rounded, gradient, shadows */
-    .accordion-button {
-        font-size: 0.95rem;
-        border-radius: 10px; /* fully rounded */
-        background: linear-gradient(145deg, #c3dbff, #dde9f9);
-        color: #0d6efd;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        padding: 0.5rem 1rem;
-        box-shadow: 2px 2px 6px rgba(0,0,0,0.06), -2px -2px 6px rgba(255,255,255,0.7);
-        border: none;
-    }
-
-        /* Hover effect: light gradient + subtle lift */
-        .accordion-button:hover {
-            background: background: linear-gradient(145deg, #c3dbff, #dde9f9);
-            transform: translateY(-1px);
-            box-shadow: 3px 3px 8px rgba(0,0,0,0.08), -3px -3px 8px rgba(255,255,255,0.7);
-        }
-
-        /* Expanded header: blue gradient + white text */
-        .accordion-button:not(.collapsed) {
-            background: linear-gradient(145deg, #1d68d5, #00af6e);
-            color: #fff;
-            box-shadow: inset 0 0 5px rgba(0,0,0,0.15);
-        }
-
-    /* Accordion body: rounded bottom corners, shadow */
-    .accordion-body {
-        background-color: #fff;
-        border-radius: 0 0 10px 10px; /* only bottom corners rounded */
-        padding: 0.75rem !important;
-        box-shadow: inset 0 0 5px rgba(0,0,0,0.03);
-        border-top: none;
-    }
-
-    /* Inputs: compact and modern */
-    .form-control.form-control-sm {
-        border-radius: 6px;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-    }
-
-    /* Icon scroll container */
-    .icon-scroll-container {
-        overflow-x: auto;
-        white-space: nowrap;
-        padding: 6px;
-        border-radius: 8px;
-        background-color: #f5f7fa;
-        box-shadow: inset 0 0 3px rgba(0,0,0,0.05);
-        margin-top: 4px;
-    }
-
-    /* Icon items: circle, hover scale, shadow */
-    .icon-item {
-        flex: 0 0 auto;
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        border-radius: 50%;
-        background-color: #fff;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        line-height: 1;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-        margin-right: 4px;
-    }
-
-        .icon-item:hover {
-            background-color: #e6f0ff;
-            transform: scale(1.15);
-            box-shadow: 0 3px 6px rgba(0,0,0,0.12);
-        }
-
-        .icon-item.selected {
-            border: 2px solid #0d6efd;
-            background-color: #d0e4ff;
-            transform: scale(1.15);
-        }
-
-    /* Tables: compact */
-    .table-sm th, .table-sm td {
-        padding: 0.3rem 0.5rem;
-        font-size: 0.85rem;
-    }
-</style>
-
+<link href="~/css/modulesetup.css" rel="stylesheet" />
 
 
 <div class="container-fluid  p-2" style="background:rgba(255, 255, 255, 0.08);">
@@ -195,49 +51,22 @@
     </div>
 
 
-    <div class="card" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px;
-    border: 1px solid #b1d8ff;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    color: white;">
+    <div class="card" style="background:rgba(255, 255, 255, 0.08);border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+                 -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
     <div class="card-body">
 
-
-
-
-
-      
-
-            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px;
-    border: 1px solid #b1d8ff;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    color: white;">
+            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+                 -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
                 <div class="col-md-3">
                     <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/ModuleSetup/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
                     </button>
                 </div>
-                <div class="col-md-2">
-                    <button class="btn" style="display:none; background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
-                        <i class="mdi mdi-magnify"></i> Search
-                    </button>
+                <div class="col-md-5">
+                   
                 </div>
-                <div class="col-md-2">
-                    <button class="btn" style="display:none; background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
-                        <i class="mdi mdi-magnify"></i> Search
-                    </button>
-                </div>
-                <div class="col-md-1">
-                    <button class="btn" style="display:none; background:linear-gradient(135deg, #4ad7f8, #0487a5);color:white; border: 1px solid #4fc6e1;    border-radius: 11px;">
-                        <i class="mdi mdi-magnify"></i> Search
-                    </button>
-                </div>
+             
                 <div class="col-md-4 ms-auto d-flex justify-content-end">
                     <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                         <i class="mdi mdi-plus-circle"></i> Create Module SetUp
@@ -245,13 +74,8 @@
                 </div>
             </div>
 
-            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px;
-    border: 1px solid #b1d8ff;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    color: white;">
+            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+                 -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
                 <div class="col-md-3">
                     <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
                 </div>
@@ -272,25 +96,7 @@
                     <button id="btnSearch" class="btn icon-btn">
                         <i class="mdi mdi-magnify"></i>
                     </button>
-                    <style>
-                        .icon-btn {
-                            width: 40px;
-                            height: 40px;
-                            padding: 0;
-                            border-radius: 50%;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                            background: linear-gradient(135deg, #f7f7f7, #ededed);
-                            color: #98a6ad;
-                            border: 1px solid #adb5bd;
-                            cursor: pointer;
-                            font-size: 18px;
-                            transition: all 0.3s ease;
-                        }
-
-                            
-                    </style>
+              
                 </div>
                 <div class="col-md-2 ms-auto d-flex justify-content-end">
                     <select class="form-select" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
@@ -305,34 +111,8 @@
                 </div>
             </div>
 
-            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px;
-    border: 1px solid #b1d8ff;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-radius: 16px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-    color: white;">
-
-
-            <style>
-                .module-badge {
-                    display: inline-block;
-                    padding: 0.35em 0.75em;
-                    font-weight: 600;
-                    color: #fff;
-                    border: 2px solid #424e5a;
-                    background: linear-gradient(135deg, #005fbe, #1682ff);
-                    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-                    transition: transform 0.2s, box-shadow 0.2s;
-                }
-
-                    .module-badge:hover {
-                        transform: translateY(-2px);
-                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                    }
-
-            </style>
-
+            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+                 -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
             <table class="table table-bordered table-hover table-xl mt-2">
                 
                 
@@ -380,8 +160,17 @@
 
                                 <td>@(m.CreatedDate?.ToString("dd-MM-yyyy"))</td>
                                 <td>
-                                    <button class="btn btn-sm btn-primary" onclick="openEditModal(@m.MenuModuleID)">Edit</button>
-                                    <button class="btn btn-sm btn-danger" onclick="deleteMenu(@m.MenuModuleID)">Delete</button>
+                                  
+                                        <a href="javascript:;" class="action-icon" onclick="openEditModal(@m.MenuModuleID)">
+                                        <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="Edit" style="color:rebeccapurple"></i></a>
+
+                                        <a href="javascript:;"
+                                           class="action-icon"
+                                           onclick="openEditModal(@m.MenuModuleID); $('#btnSavemenu').hide();">
+                                            <i class="mdi mdi-eye-circle-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
+                                        </a>
+
+                                  
                                 </td>
                             </tr>
                             count++;
@@ -425,14 +214,21 @@
 </div>
 
 
-
 <div class="modal fade" id="moduleSetupModal" tabindex="-1" aria-labelledby="moduleModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow-sm rounded-3">
-            <div class="modal-header bg-primary text-white border-0 rounded-top py-2">
-                <h5 class="modal-title" id="moduleModalLabel">Create Menu & Modules</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header text-white border-0 rounded-top py-2" style="background: linear-gradient(135deg, #5ba1ff, #f2747499);">
+                <h5 class="modal-title" id="moduleModalLabel">Create Modules Setup :: New</h5>
+                <button type="button"
+                        class="btn btn-light btn-close-circle shadow-sm"
+                        onclick="window.location.href='/ModuleSetup/Index'">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+
+
             </div>
+
+            <div class="modal-body">
 
             <form id="menuModuleForm">
                 <div class="modal-body p-3 bg-light">
@@ -473,6 +269,7 @@
                                             <div class="icon-scroll-container">
                                                 <div class="icons-list-demo d-flex flex-nowrap" id="iconList">
                                                     <div class="icon-item mx-1" title="Home"><i class="fe-home" style="margin-left:11px"></i></div>
+                                                    <div class="icon-item mx-1" title="Shield"><i class="fe-shield" style="margin-left:11px"></i></div>
                                                     <div class="icon-item mx-1" title="Settings"><i class="fe-settings" style="margin-left:11px"></i></div>
                                                     <div class="icon-item mx-1" title="User"><i class="fe-user" style="margin-left:11px"></i></div>
                                                     <div class="icon-item mx-1" title="Bell"><i class="fe-bell" style="margin-left:11px"></i></div>
@@ -533,12 +330,24 @@
                     </div>
 
                 </div>
-
-                <div class="modal-footer border-0 pt-1">
-                    <button type="button" onclick="window.location.href='/ModuleSetup/Index'" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" id="btnSavemenu" class="btn btn-success btn-sm">Save</button>
-                </div>
             </form>
+
+            </div>
+
+                <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
+                    <button type="button"
+                            onclick="window.location.href='/ModuleSetup/Index'"
+                            class="btn btn-warning btn-sm"
+                            data-bs-dismiss="modal">
+                        <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
+                    </button>
+
+                    <button type="button" id="btnSavemenu" class="btn btn-sm" style="background:forestgreen; color:white">
+                        <i class="mdi mdi-content-save-outline me-1"></i> Save
+                    </button>
+                </div>
+
+            
         </div>
     </div>
 </div>
@@ -547,324 +356,16 @@
 
 
 
-
+<script src="~/js/ModuleSetup.js"></script>
 
 @section Scripts {
     
-
-
-
-
-
- 
-
-
-
     <script>
 
+        // Pagination and filtiring ---------------------------------------------------------------------
 
 
-
-
-        // Open edit modal
-        function openEditModal(menuId) {
-            fetch(`/ModuleSetup/GetMenuForEdit?id=${menuId}`)
-                .then(res => res.ok ? res.json() : Promise.reject("Failed to load menu"))
-                .then(data => {
-                    if (!data) throw new Error("No data returned");
-
-                    // Populate menu fields
-                    $("#hdnMenuModuleID").val(data.menuID);
-                    $("#MenuName").val(data.menuName);
-                    $("#MenuSeq").val(data.menuSeq);
-                    $("#MenuSymbol").val(data.menuSymbol);
-
-                    const tbody = $("#moduleTable tbody").empty();
-
-                    if (data.modules && data.modules.length > 0) {
-                        // Sort modules by sequence ascending
-                        const sortedModules = data.modules.sort((a, b) => a.sequence - b.sequence);
-
-                        sortedModules.forEach(m => {
-                            // Check for duplicate sequence in table
-                            const seqExists = $("#moduleTable tbody tr").filter(function () {
-                                return parseInt($(this).find(".moduleSeq input").val()) === m.sequence;
-                            }).length > 0;
-
-                            if (!seqExists) {
-                                tbody.append(`
-                                    <tr data-module-id="${m.moduleID}">
-                                        <td class="moduleId" style="display:none">${m.moduleID}</td>
-                                        <td class="moduleSeq">
-                                            <input type="number" class="form-control form-control-sm" value="${m.sequence}" />
-                                        </td>
-                                        <td class="moduleName">
-                                            <input type="text" class="form-control form-control-sm" value="${m.name}" />
-                                        </td>
-                                        <td class="moduleUrl">
-                                            <input type="text" class="form-control form-control-sm" value="${m.url}" />
-                                        </td>
-                                         <td class="d-flex gap-1 justify-content-start">
-       
-            <a href="javascript:void(0);" class="btn btn-sm btn-primary setupModule" title="Setup"><i class="fe-settings"></i></a>
-        </td>
-                                    </tr>
-                                `);
-                            }
-                        });
-                    }
-
-                    $("#moduleSetupModal").modal("show");
-                })
-                .catch(err => alert(err));
-        }
-
-        // Add module to table
-        $("#addModuleBtn").click(function () {
-            const name = $("#ModuleName").val().trim();
-            const url = $("#ModuleUrl").val().trim();
-            const seq = $("#ModuleSeq").val().trim();
-
-            // Validate empty fields
-            if (!name || !url || !seq) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: 'Please enter Module Name, URL, and Sequence.'
-                });
-                return;
-            }
-
-            // Check for duplicate sequence
-            const seqExists = $("#moduleTable tbody tr").filter(function () {
-                return parseInt($(this).find(".moduleSeq input").val()) === parseInt(seq);
-            }).length > 0;
-
-            if (seqExists) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validation Error',
-                    text: 'Sequence number already exists. Please use a unique sequence.'
-                });
-                return;
-            }
-
-            // Create new row with input fields
-            const row = `
-                <tr data-module-id="">
-                    <td class="moduleId" style="display:none"></td>
-                    <td class="moduleSeq"><input type="number" class="form-control form-control-sm" value="${seq}" /></td>
-                    <td class="moduleName"><input type="text" class="form-control form-control-sm" value="${name}" /></td>
-                    <td class="moduleUrl"><input type="text" class="form-control form-control-sm" value="${url}" /></td>
-              <td class="d-flex gap-1 justify-content-start">
-            <a href="javascript:void(0);" class="btn btn-sm btn-danger removeModule" title="Remove">
-                <i class="fe-trash"></i>
-            </a>
-            <a href="javascript:void(0);" class="btn btn-sm btn-primary setupModule" title="Setup">
-                <i class="fe-settings"></i>
-            </a>
-        </td>
-                </tr>`;
-
-            // Insert row in ascending sequence order
-            let inserted = false;
-            $("#moduleTable tbody tr").each(function () {
-                const currentSeq = parseInt($(this).find(".moduleSeq input").val());
-                if (parseInt(seq) < currentSeq) {
-                    $(this).before(row);
-                    inserted = true;
-                    return false;
-                }
-            });
-
-            if (!inserted) {
-                $("#moduleTable tbody").append(row);
-            }
-
-            // Clear input fields
-            $("#ModuleName, #ModuleUrl, #ModuleSeq").val('');
-        });
-
-        // Remove module button
-        $(document).on("click", ".removeModule", function () {
-            $(this).closest("tr").remove();
-        });
-
-
-
-
-
-                 // Map input IDs to model property names
-        const fieldMap = {
-            "MenuName": "Name",
-            "MenuSeq": "Sequence",
-            "MenuSymbol": "MenuSymbol"
-        };
-
-
-                // When user clicks an icon
-        $("#iconList .icon-item").click(function () {
-            // Get the icon name or identifier (for example, use class)
-            const iconClass = $(this).find("i").attr("class"); // e.g., "fe-home"
-
-            // Set the input value
-            $("#MenuSymbol").val(iconClass);
-
-            // Trigger validation for MenuSymbol
-            const menuId = $("#hdnMenuModuleID").val() || null;
-            validateMenuField("MenuSymbol", menuId);
-        });
-
-        // Validate Menu fields with server AND client empty check
-        function validateMenuField(fieldId, menuId = null) {
-            let $input = $("#" + fieldId);
-            let $errorSpan = $("#" + fieldId + "-error");
-            let value = $input.val().trim();
-
-            // Clear previous state
-            $input.removeClass("is-invalid is-valid");
-            $errorSpan.text('');
-
-            // Client-side empty check
-            if (!value) {
-                $input.addClass("is-invalid");
-                $errorSpan.text("This field is required.");
-                return $.Deferred().resolve().promise(); // Stop AJAX, already invalid
-            }
-
-            // Server-side validation
-            let payload = {};
-            payload[fieldId] = value;
-            if (menuId) payload["MenuModuleID"] = menuId;
-
-            return $.ajax({
-                url: '/ModuleSetup/ValidateMenuField',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(payload),
-                success: function (resp) {
-                    const modelField = fieldMap[fieldId];
-                    if (resp.errors && resp.errors[modelField]) {
-                        $input.addClass("is-invalid");
-                        $errorSpan.text(resp.errors[modelField][0]);
-                    } else {
-                        $input.addClass("is-valid");
-                    }
-                }
-            });
-        }
-
-        // Real-time validation
-        $("#MenuName, #MenuSeq, #MenuSymbol").on("input change", function () {
-            const menuId = $("#hdnMenuModuleID").val() || null;
-            validateMenuField(this.id, menuId);
-        });
-
-               // Save Menu + Modules
-        $("#btnSavemenu").click(async function () {
-            const menuId = $("#hdnMenuModuleID").val();
-
-            // Validate menu fields first
-                  // Validate menu fields first
-        await validateMenuField("MenuName", menuId);
-        await validateMenuField("MenuSeq", menuId);
-        await validateMenuField("MenuSymbol", menuId);
-
-        // Prevent save if validation fails
-        if ($("#MenuName").hasClass("is-invalid") ||
-            $("#MenuSeq").hasClass("is-invalid") ||
-            $("#MenuSymbol").hasClass("is-invalid")) {
-
-            
-            return; // stop execution
-        }
-
-        // Check if at least one module exists
-        const moduleCount = $("#moduleTable tbody tr").length;
-        if (moduleCount === 0) {
-            Swal.fire({
-                icon: 'error',
-                title: 'Validation Error',
-                text: 'Please add at least one module before saving.'
-            });
-            return; // stop execution
-        }
-
-        // Continue to build payload and save...
-
-
-            // Build payload
-            const menuWithModules = {
-                MenuModuleID: menuId ? parseInt(menuId) : null,
-                Name: $("#MenuName").val().trim(),
-                MenuSymbol: $("#MenuSymbol").val().trim(),
-                Sequence: parseInt($("#MenuSeq").val()),
-                RecType: menuId ? 'U' : 'I',
-                Modules: []
-            };
-
-                  // Collect modules (read from input fields)
-        $("#moduleTable tbody tr").each(function () {
-            const row = $(this);
-            const moduleId = row.data("module-id");
-
-            menuWithModules.Modules.push({
-                ModuleID: moduleId ? parseInt(moduleId) : null,
-                Name: row.find(".moduleName input").val().trim(),
-                Url: row.find(".moduleUrl input").val().trim(),
-                Sequence: parseInt(row.find(".moduleSeq input").val())
-            });
-        });
-
-
-            // Send save request
-            try {
-                const resp = await fetch("/ModuleSetup/SaveMenuWithModules", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(menuWithModules)
-                });
-
-                if (!resp.ok) {
-                    const errText = await resp.text();
-                    throw new Error(errText);
-                }
-
-                const result = await resp.json();
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Success!',
-                    text: 'Menu & Modules saved successfully.',
-                    timer: 2000,
-                    showConfirmButton: false
-                }).then(() => {
-                    $("#moduleSetupModal").modal("hide");
-                    location.reload();
-                });
-
-            } catch (err) {
-                console.error(err);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error!',
-                    text: 'Error saving menu/modules: ' + err.message
-                });
-            }
-        });
-
-
-
-
-
-
-
-
-
-    </script>
-    <script>
-
-
-        (function(){
+        (function () {
             const searchInput = document.getElementById('searchBox');
             const searchField = document.getElementById('searchField');
             const pageSizeSelect = document.getElementById('pageSize');
@@ -879,18 +380,18 @@
                 sortDir: "@sortDir"
             };
 
-            function buildUrl(params){
+            function buildUrl(params) {
                 const qs = new URLSearchParams();
                 qs.set('pageNumber', params.pageNumber ?? 1);
                 qs.set('pageSize', params.pageSize ?? current.pageSize);
-                if((params.search ?? current.search) !== '') qs.set('search', params.search ?? current.search);
+                if ((params.search ?? current.search) !== '') qs.set('search', params.search ?? current.search);
                 qs.set('searchCol', params.searchCol ?? current.searchCol);
                 qs.set('sortColumn', params.sortColumn ?? current.sortColumn);
                 qs.set('sortDir', params.sortDir ?? current.sortDir);
                 return '@Url.Action("Index", "ModuleSetup")' + '?' + qs.toString();
             }
 
-            function navigateTo(opts){ window.location.href = buildUrl(opts); }
+            function navigateTo(opts) { window.location.href = buildUrl(opts); }
 
             // Search button click
             btnSearch?.addEventListener('click', () => {
@@ -920,7 +421,7 @@
             document.querySelectorAll('.pagination a.page-link').forEach(el => {
                 el.addEventListener('click', ev => {
                     ev.preventDefault();
-                    const page = parseInt(el.dataset.page,10) || 1;
+                    const page = parseInt(el.dataset.page, 10) || 1;
                     navigateTo({
                         pageNumber: page,
                         search: searchInput.value,
@@ -933,7 +434,7 @@
             });
 
             // Sorting
-            window.sortTable = function(column){
+            window.sortTable = function (column) {
                 let newDir = current.sortColumn === column && current.sortDir === 'ASC' ? 'DESC' : 'ASC';
                 navigateTo({
                     pageNumber: 1,
@@ -961,6 +462,15 @@
                 });
             });
         });
-    </script>
+
+
+        // Pagination and filtiring ---------------------------------------------------------------------
+
+
+
+
+</script>
+
+
 
 }
