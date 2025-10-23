@@ -70,3 +70,7 @@
     .table tbody tr:last-child td:last-child {
         border-bottom-right-radius: 0.75rem;
     }
+
+.accordion-button {
+    background: linear-gradient(135deg, #b5d0f3, #c8c1ff);
+}
