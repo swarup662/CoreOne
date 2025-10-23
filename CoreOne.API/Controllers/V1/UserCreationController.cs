@@ -171,5 +171,15 @@ namespace CoreOne.API.Controllers.V1
             var result = await _userRepo.SaveExtraPermissionAsync(UserId, permissions);
             return Ok(result);
         }
+
+        [HttpGet("GetExtraPermissionByUserId/{UserId}/{CreatedBy}")]
+        public async Task<IActionResult> GetByRoleId(int UserId, int CreatedBy)
+        {
+            var data = await _userRepo.GetExtraPermissionByUserId(UserId, CreatedBy);
+            return Ok(data);
+        }
+
+
+
     }
 }

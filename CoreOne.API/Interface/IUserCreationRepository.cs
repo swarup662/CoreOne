@@ -12,6 +12,7 @@ namespace CoreOne.API.Interfaces
         int SaveUser(string recType, UserCreation user);
         UserCreation? GetUserById(int userId);
         Task<int> SaveExtraPermissionAsync(int CreatedBy ,IEnumerable<ExtraPermission> permissions);
+        Task<IEnumerable<ExtraPermission>> GetExtraPermissionByUserId(int UserId, int CreatedBy);
 
 
 

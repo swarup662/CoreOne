@@ -355,6 +355,7 @@ function saveExtraPermissions() {
             menuModuleID: $(this).data("menuid"),
             actionID: $(this).data("actionid"),
             hasPermission: $(this).is(":checked")
+         
         });
     });
 
@@ -386,3 +387,10 @@ function saveExtraPermissions() {
         }
     });
 }
+$(document).on("change", ".perm-checkbox", function () {
+    if ($(this).is(":checked")) {
+        $(this).attr("checked", "checked");
+    } else {
+        $(this).removeAttr("checked");
+    }
+});

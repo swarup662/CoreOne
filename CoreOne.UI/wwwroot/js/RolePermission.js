@@ -89,15 +89,39 @@ function fetchPermissions(roleId) {
 // Global select all
 $("#selectAllGlobal").on("change", function () {
     let isChecked = $(this).is(":checked");
-    $(".perm-checkbox, .select-all").prop("checked", isChecked);
+
+    // Set all child checkboxes
+    $(".perm-checkbox, .select-all").each(function () {
+        $(this).prop("checked", isChecked);
+
+        if (isChecked) {
+            $(this).attr("checked", "checked");   // add attribute when checked
+        } else {
+            $(this).removeAttr("checked");       // remove attribute when unchecked
+        }
+    });
 });
+
 
 // Update global checkbox based on child states
 function updateGlobalSelectAll() {
+    // Are all checkboxes checked?
     let allChecked = $(".perm-checkbox").length > 0 &&
         $(".perm-checkbox:checked").length === $(".perm-checkbox").length;
+
+    // Update the "Select All" checkbox property
     $("#selectAllGlobal").prop("checked", allChecked);
+
+    // Update each checkbox attribute to match its state
+    $(".perm-checkbox").each(function () {
+        if ($(this).is(":checked")) {
+            $(this).attr("checked", "checked");   // add attribute
+        } else {
+            $(this).removeAttr("checked");       // remove attribute
+        }
+    });
 }
+
 
 // Save
 function savePermissions() {
@@ -175,3 +199,10 @@ function deactivatePermission(roleId) {
         }
     });
 }
+$(document).on("change", ".perm-checkbox", function () {
+    if ($(this).is(":checked")) {
+        $(this).attr("checked", "checked");
+    } else {
+        $(this).removeAttr("checked");
+    }
+});
