@@ -255,6 +255,12 @@
                             <input type="text" asp-for="UserName" class="form-control form-control-lg" placeholder="Enter full name" />
                             <span asp-validation-for="UserName" class="text-danger small"></span>
                         </div>
+                           <div class="mb-3">
+                            <label for="PasswordHash" class="form-label fw-semibold">Password</label>
+                            <input type="text" asp-for="PasswordHash" class="form-control form-control-lg" placeholder="Enter Password" />
+                            <span asp-validation-for="PasswordHash" class="text-danger small"></span>
+                        </div>
+
 
                         <div class="mb-3">
                             <label for="MailTypeID" class="form-label fw-semibold">Mail Type</label>

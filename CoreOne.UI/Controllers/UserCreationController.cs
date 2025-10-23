@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Net.Http;
 using System.Text;
-
+using System;
+using System.Text.RegularExpressions;
 namespace CoreOne.UI.Controllers
 {
     public class UserCreationController : Controller
@@ -201,9 +202,38 @@ namespace CoreOne.UI.Controllers
 
         }
 
+        public  async Task< UserCreationEditDTO >ToEditDTO(UserCreation user)
+        {
+            return new UserCreationEditDTO
+            {
+                UserID = user.UserID,
+                UserName = user.UserName,
+                Email = user.Email,
+                MailTypeID = user.MailTypeID,
+                PhoneNumber = user.PhoneNumber,
+                RoleID = user.RoleID,
+                RoleName = user.RoleName,
+                GenderID = user.GenderID,
+                GenderName = user.GenderName,
+                PhotoPath = user.PhotoPath,
+                PhotoName = user.PhotoName,
+                ActiveFlag = user.ActiveFlag,
+                CreatedBy = user.CreatedBy,
+                CreatedDate = user.CreatedDate,
+                UpdatedBy = user.UpdatedBy,
+                UpdatedDate = user.UpdatedDate
+            };
+        }
+
         [HttpPost]
         public async Task<IActionResult> SaveUser([FromBody] UserCreation model)
         {
+            var editModel = new UserCreationEditDTO();
+            if (!(model.UserID > 0))
+            {
+                editModel = await ToEditDTO(model);
+            }
+           
             if (!ModelState.IsValid)
             {
                 var errors = ModelState
@@ -233,6 +263,11 @@ namespace CoreOne.UI.Controllers
                 model.CreatedBy = user.UserID;
 
                 var json = JsonConvert.SerializeObject(model);
+                if(!(model.UserID > 0))
+                {
+                    json = null;
+                    json = JsonConvert.SerializeObject(editModel);
+                }
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 var resp = await client.PostAsync(url, content);
 
@@ -269,6 +304,7 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public IActionResult ValidateField([FromBody] Dictionary<string, string> fieldData)
         {
+            
             var model = new UserCreation(); // Assuming your model class is named 'User'
 
             // Bind only the incoming single field dynamically
@@ -278,6 +314,9 @@ namespace CoreOne.UI.Controllers
                 {
                     case "UserName":
                         model.UserName = field.Value;
+                        break;
+                    case "PasswordHash":
+                        model.PasswordHash = field.Value;
                         break;
 
                     case "Email":
@@ -323,6 +362,65 @@ namespace CoreOne.UI.Controllers
             return Json(new { success = true });
         }
 
+        public IActionResult ValidatePasswordField([FromBody] Dictionary<string, string> fieldData)
+        {
+
+            var model = new UserCreationEditDTO(); // Assuming your model class is named 'User'
+
+            // Bind only the incoming single field dynamically
+            foreach (var field in fieldData)
+            {
+                switch (field.Key)
+                {
+                    case "UserName":
+                        model.UserName = field.Value;
+                        break;
+                    case "PasswordHash":
+                        model.PasswordHash = field.Value;
+                        break;
+
+                    case "Email":
+                        model.Email = field.Value;
+                        break;
+
+                    case "PhoneNumber":
+                        model.PhoneNumber = field.Value;
+                        break;
+
+                    case "RoleID":
+                        if (int.TryParse(field.Value, out int roleId))
+                            model.RoleID = roleId;
+                        break;
+
+                    case "GenderID":
+                        if (int.TryParse(field.Value, out int genderId))
+                            model.GenderID = genderId;
+                        break;
+
+                    case "MailTypeID":
+                        if (int.TryParse(field.Value, out int mailTypeId))
+                            model.MailTypeID = mailTypeId;
+                        break;
+                }
+            }
+
+            // Validate only that property
+            TryValidateModel(model);
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(ms => ms.Value.Errors.Any())
+                    .ToDictionary(
+                        kv => kv.Key,
+                        kv => kv.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                    );
+
+                return Json(new { errors });
+            }
+
+            return Json(new { success = true });
+        }
         [HttpPost]
         public async Task<IActionResult> DeactivateUser([FromBody] int userId)
         {

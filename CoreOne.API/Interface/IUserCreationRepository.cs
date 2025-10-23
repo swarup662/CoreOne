@@ -10,6 +10,8 @@ namespace CoreOne.API.Interfaces
         DataTable? GetGenders(int userId);
         DataTable? GetMailtypes(int userId);
         int SaveUser(string recType, UserCreation user);
+
+        int UpdateUser(string recType, UserCreationEditDTO user);
         UserCreation? GetUserById(int userId);
         Task<int> SaveExtraPermissionAsync(int CreatedBy ,IEnumerable<ExtraPermission> permissions);
         Task<IEnumerable<ExtraPermission>> GetExtraPermissionByUserId(int UserId, int CreatedBy);

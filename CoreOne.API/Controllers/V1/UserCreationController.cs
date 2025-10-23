@@ -127,12 +127,12 @@ namespace CoreOne.API.Controllers.V1
         }
 
         [HttpPost("UpdateUser")]
-        public IActionResult UpdateUser([FromBody] UserCreation user)
+        public IActionResult UpdateUser([FromBody] UserCreationEditDTO user)
         {
             if (user == null || user.UserID <= 0)
                 return BadRequest("Valid user data required.");
 
-            int result = _userRepo.SaveUser("UPDATE", user);
+            int result = _userRepo.UpdateUser("UPDATE", user);
 
             if (result > 0)
                 return Ok(new { UserID = result, Message = "User updated successfully." });
