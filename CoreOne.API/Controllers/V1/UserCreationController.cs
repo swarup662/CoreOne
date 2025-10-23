@@ -1,5 +1,6 @@
 ﻿using CoreOne.API.Interfaces;
 using CoreOne.DOMAIN.Models;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Data;
@@ -164,6 +165,11 @@ namespace CoreOne.API.Controllers.V1
 
             return Ok(user);
         }
-
+        [HttpPost("SaveExtraPermission/{UserId}")]
+        public async Task<IActionResult> SaveExtraPermissionAsync(int UserId, [FromBody] IEnumerable<ExtraPermission> permissions)
+        {
+            var result = await _userRepo.SaveExtraPermissionAsync(UserId, permissions);
+            return Ok(result);
+        }
     }
 }
