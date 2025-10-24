@@ -61,177 +61,295 @@
 </script>
 
 
-<div class="container-fluid">
-    <div class="row">
+
+<div class="container-fluid  p-2" style="background:rgba(255, 255, 255, 0.08);">
+
+
+
+    <div class="row" style="margin-top: -19px; margin-bottom: -6px;">
         <div class="col-12">
-            <div class="page-title-box d-flex justify-content-between align-items-center">
-                <h4 class="page-title fw-bold text-gradient">User Management</h4>
-                 <has-permission module-id="4" action-id="1">
-                <button class="btn btn-primary rounded-pill shadow-sm" id="btnAddUser"
-                        data-bs-toggle="modal" data-bs-target="#addUserModal">
-                    <i class="mdi mdi-plus-circle"></i> Add User
-                </button>
-                </has-permission>
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Authorization</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Dashboard</a></li>
+
+                    </ol>
+                </div>
+                <h4 class="page-title">User Creation</h4>
             </div>
         </div>
     </div>
 
 
 
-    <div class="card glass-card p-3 shadow-sm">
-        <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-                <thead class="table-light text-dark">
-                    <tr>
-                        <th class="text-center" style="width: 5%;">#</th>
-                        <th class="text-center" style="width: 10%;">Profile</th>
-                        <th class="text-start sortable" onclick="sortTable('UserName')">
-                            Name @Html.Raw(sortColumn == "UserName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
-                        </th>
-                        <th class="text-start sortable" onclick="sortTable('Email')">
-                            Email @Html.Raw(sortColumn == "Email" ? (sortDir == "ASC" ? "▲" : "▼") : "")
-                        </th>
-                        <th class="text-start">Phone</th>
-                        <th class="text-start sortable" onclick="sortTable('RoleName')">
-                            Role @Html.Raw(sortColumn == "RoleName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
-                        </th>
-                        <th class="text-start sortable" onclick="sortTable('GenderName')">
-                            Gender @Html.Raw(sortColumn == "GenderName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
-                        </th>
-                        <th class="text-center">Status</th>
-                        <th class="text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        int count = ((pageNumber - 1) * pageSize) + 1;
-                    }
-                    @if (users.Any())
-                    {
-                        foreach (var user in users)
-                        {
-                            <tr class="align-middle">
-                                <td class="text-center">@count</td>
-                                <td class="text-center">
-                                    <img id="userPhoto_@user.UserID"
-                                         src="/images/default-user.png"
-                                         alt="Profile"
-                                         class="rounded-circle"
-                                         style="width:50px; height:50px; object-fit:cover; border:1px solid #ddd;">
-                                </td>
-                                <td class="text-start fw-semibold">@user.UserName</td>
-                                <td class="text-start">@user.Email</td>
-                                <td class="text-start">@user.PhoneNumber</td>
-                                <td class="text-start">@user.RoleName</td>
-                                <td class="text-start">@user.GenderName</td>
-                                <td class="text-center">
-                                    @{
-                                        var status = user.ActiveFlag switch
-                                        {
-                                            1 => "Active",
-                                          
-                                            0 => "Deactivated",
-                                            _ => "Unknown"
-                                        };
-                                        var badgeClass = user.ActiveFlag == 1 ? "bg-success" :
-                                        user.ActiveFlag == 0 ? "bg-danger" :
-                                        "bg-secondary";
-                                    }
-                                    <span class="badge @badgeClass fw-semibold">@status</span>
-                           
-                                </td>
-                                <td class="text-center">
-                                    <div class="d-flex justify-content-center gap-1 flex-wrap">
-                                         <has-permission module-id="4" action-id="2">
-                                        <!-- Edit -->
-                                        <button class="btn btn-sm btn-outline-primary shadow-sm"
-                                                onclick="editUser(@user.UserID)"
-                                                title="Edit User">
-                                            <i class="mdi mdi-pencil-outline"></i>
-                                        </button>
-                                        </has-permission>
-                                         <has-permission module-id="4" action-id="4">
-                                        <!-- Edit -->
-                                        <button class="btn btn-sm btn-outline-primary shadow-sm"
-                                                onclick="viewUser(@user.UserID)"
-                                                title="View User">
-                                            <i class="bi bi-eye-fill me-1"></i>
-                                        </button>
-                                        </has-permission>
-                                        @if (user.ActiveFlag == 0)
-                                        {
-                                            <has-permission module-id="4" action-id="10">
-                                                <button class="btn btn-sm btn-outline-success shadow-sm"
-                                                        onclick="activateUser(@user.UserID)"
-                                                        title="Activate User">
-                                                    <i class="mdi mdi-lock-open-outline" ></i>
-                                                </button>
-                                            </has-permission>
-                                        }
-                                        else if (user.ActiveFlag == 1)
-                                        {
+    <div class="card" style="background:rgba(255, 255, 255, 0.08);border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+        <div class="card-body">
 
-                                        <!-- Delete -->
-                                         <has-permission module-id="4" action-id="9">
-                                        <button class="btn btn-sm btn-outline-danger shadow-sm"
-                                                    onclick="deactivateUser(@user.UserID)"
-                                                    title="Deactivate User">
-                                                <i class="mdi mdi-lock-outline" ></i>
-                                           </button>
-                                                                    </has-permission>
-                                        } 
-                                        <!-- Extra Permission -->
-                                         <has-permission module-id="4" action-id="7">
-                                        <button class="btn btn-sm btn-outline-info shadow-sm"
-                                                onclick="extraPermission(@user.UserID, @user.RoleID)"
-                                                title="Extra Permission">
-                                            <i class="mdi mdi-shield-account-outline"></i>
-                                        </button>
-                                        </has-permission>
-                                    </div>
-                                </td>
+            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
+                            onclick="window.location.href='/UserCreation/Index'">
+                        <i class="mdi mdi-refresh-circle"></i> Refresh
+                    </button>
+
+                </div>
+                <div class="col-md-5">
+                </div>
+
+                <div class="col-md-4 ms-auto d-flex justify-content-end">
+
+
+                    <has-permission module-id="4" action-id="1">
+
+
+                        <button type="button" class="btn btn-success float-end" id="btnAddUser" data-bs-toggle="modal" data-bs-target="#addUserModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
+                            <i class="mdi mdi-plus-circle"></i> Create User
+                        </button>
+                    </has-permission>
+
+                </div>
+            </div>
+
+            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+
+                <div class="col-md-4">
+                    <input type="text" id="search" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="searchCol" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
+                        <option value="UserName" selected> Name</option>
+                        <option value="Email">Email</option>
+                        <option value="PhoneNumber">Phone</option>
+                        <option value="GenderName">Gender</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" id="activeStatus" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
+                        <option value="">All Status</option>
+                        <option value="1">Active</option>
+                        <option value="2">Blocked</option>
+                        <option value="0">Deactivated</option>
+                    </select>
+
+                </div>
+                <!-- Page Size Dropdown (like Role) -->
+                <div class="col-md-2">
+
+                    <button id="btnSearch" class="btn btn-success rounded-pill ms-2">
+                        <i class="mdi mdi-magnify"></i> Search
+                    </button>
+
+
+                </div>
+                <div class="col-md-2 ms-auto d-flex justify-content-end">
+                    <select class="form-select" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
+                        @{
+                            int[] pageSizes = new int[] { 1, 10, 20, 50, 100 };
+                            foreach (var size in pageSizes)
+                            {
+                                <option value="@size" selected="@(size == pageSize)">@size</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-xl mt-2">
+                        <thead class="table-light text-dark">
+                            <tr>
+                                <th class="text-center" style="width: 5%;">#</th>
+                                <th class="text-center" style="width: 10%;">Profile</th>
+                                <th class="text-start sortable" onclick="sortTable('UserName')">
+                                    Name @Html.Raw(sortColumn == "UserName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                                </th>
+                                <th class="text-start sortable" onclick="sortTable('Email')">
+                                    Email @Html.Raw(sortColumn == "Email" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                                </th>
+                                <th class="text-start">Phone</th>
+                                <th class="text-start sortable" onclick="sortTable('RoleName')">
+                                    Role @Html.Raw(sortColumn == "RoleName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                                </th>
+                                <th class="text-start sortable" onclick="sortTable('GenderName')">
+                                    Gender @Html.Raw(sortColumn == "GenderName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
+                                </th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Actions</th>
                             </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int count = ((pageNumber - 1) * pageSize) + 1;
+                            }
+                            @if (users.Any())
+                            {
+                                foreach (var user in users)
+                                {
+                                    <tr class="align-middle">
+                                        <td class="text-center">@count</td>
+                                        <td class="text-center">
+                                            <img id="userPhoto_@user.UserID"
+                                                 src="/images/default-user.png"
+                                                 alt="Profile"
+                                                 class="rounded-circle"
+                                                 style="width:50px; height:50px; object-fit:cover; border:1px solid #ddd;">
+                                        </td>
+                                        <td class="text-start fw-semibold">@user.UserName</td>
+                                        <td class="text-start">@user.Email</td>
+                                        <td class="text-start">@user.PhoneNumber</td>
+                                        <td class="text-start">@user.RoleName</td>
+                                        <td class="text-start">@user.GenderName</td>
+                                        <td class="text-center">
+                                            @{
+                                                var status = user.ActiveFlag switch
+                                                {
+                                                    1 => "Active",
 
-                            <script>
-                                // Load user photo
-                                loadUserPhotoByFilePath(@Html.Raw(JsonConvert.SerializeObject(user.PhotoPath)), 'userPhoto_@user.UserID');
-                            </script>
+                                                    0 => "Deactivated",
+                                                    _ => "Unknown"
+                                                };
+                                                var badgeClass = user.ActiveFlag == 1 ? "bg-success" :
+                                                user.ActiveFlag == 0 ? "bg-danger" :
+                                                "bg-secondary";
+                                            }
+                                            <span class="badge @badgeClass fw-semibold">@status</span>
 
-                            count++;
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="9" class="text-center text-muted py-4">No users found</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                                <has-permission module-id="4" action-id="2">
+                                                    <!-- Edit -->
+                                                    <button class="btn btn-sm btn-outline-primary shadow-sm"
+                                                            onclick="editUser(@user.UserID)"
+                                                            title="Edit User">
+                                                        <i class="mdi mdi-pencil-outline"></i>
+                                                    </button>
+                                                </has-permission>
+                                                <has-permission module-id="4" action-id="4">
+                                                    <!-- Edit -->
+                                                    <button class="btn btn-sm btn-outline-primary shadow-sm"
+                                                            onclick="viewUser(@user.UserID)"
+                                                            title="View User">
+                                                        <i class="bi bi-eye-fill me-1"></i>
+                                                    </button>
+                                                </has-permission>
+                                                @if (user.ActiveFlag == 0)
+                                                {
+                                                    <has-permission module-id="4" action-id="10">
+                                                        <button class="btn btn-sm btn-outline-success shadow-sm"
+                                                                onclick="activateUser(@user.UserID)"
+                                                                title="Activate User">
+                                                            <i class="mdi mdi-lock-open-outline"></i>
+                                                        </button>
+                                                    </has-permission>
+                                                }
+                                                else if (user.ActiveFlag == 1)
+                                                {
 
-        <!-- Pagination -->
-        <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-            <div class="text-muted small">
-                Showing page <b>@pageNumber</b> of <b>@Math.Ceiling((double)totalRecords / pageSize)</b>
+                                                    <!-- Delete -->
+                                                    <has-permission module-id="4" action-id="9">
+                                                        <button class="btn btn-sm btn-outline-danger shadow-sm"
+                                                                onclick="deactivateUser(@user.UserID)"
+                                                                title="Deactivate User">
+                                                            <i class="mdi mdi-lock-outline"></i>
+                                                        </button>
+                                                    </has-permission>
+                                                }
+                                                <!-- Extra Permission -->
+                                                <has-permission module-id="4" action-id="7">
+                                                    <button class="btn btn-sm btn-outline-info shadow-sm"
+                                                            onclick="extraPermission(@user.UserID, @user.RoleID)"
+                                                            title="Extra Permission">
+                                                        <i class="mdi mdi-shield-account-outline"></i>
+                                                    </button>
+                                                </has-permission>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                    <script>
+                                        // Load user photo
+                                        loadUserPhotoByFilePath(@Html.Raw(JsonConvert.SerializeObject(user.PhotoPath)), 'userPhoto_@user.UserID');
+                                    </script>
+
+                                    count++;
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="9" class="text-center text-muted py-4">No users found</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="row">
+
+
+
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <div class="text-muted small">
+                            Showing page <b>@pageNumber</b> of <b>@Math.Ceiling((double)totalRecords / pageSize)</b>
+                        </div>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                @{
+                                    int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+                                    for (int i = 1; i <= totalPages; i++)
+                                    {
+                                        <li class="page-item @(i == pageNumber ? "active" : "")">
+                                            <a class="page-link" href="javascript:void(0)" onclick="changePage(@i)">@i</a>
+                                        </li>
+                                    }
+                                }
+                            </ul>
+                        </nav>
+                    </div>
+
+                </div>
+
             </div>
-            <nav>
-                <ul class="pagination pagination-sm mb-0">
-                    @{
-                        int totalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
-                        for (int i = 1; i <= totalPages; i++)
-                        {
-                            <li class="page-item @(i == pageNumber ? "active" : "")">
-                                <a class="page-link" href="javascript:void(0)" onclick="changePage(@i)">@i</a>
-                            </li>
-                        }
-                    }
-                </ul>
-            </nav>
+
+
+
         </div>
     </div>
+
+
+
+
+    
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- Add User Modal -->
 <div class="modal fade" id="addUserModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
