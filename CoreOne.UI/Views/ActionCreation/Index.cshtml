@@ -1,0 +1,167 @@
+﻿@using CoreOne.DOMAIN.Models
+
+@{
+    ViewData["Title"] = "Action Creation";
+
+
+}
+
+
+
+<link href="~/css/actioncreation.css" rel="stylesheet" />
+
+
+<div class="container-fluid  p-2" style="background:rgba(255, 255, 255, 0.08);">
+    <div class="row" style="margin-top: -19px; margin-bottom: -6px;">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Master</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Dashboard</a></li>
+
+                    </ol>
+                </div>
+                <h4 class="page-title">Action Creation</h4>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card" style="background:rgba(255, 255, 255, 0.08);border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+        <div class="card-body">
+
+            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <div class="col-md-3">
+                    <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
+                            onclick="window.location.href='/ActionCreation/Index'">
+                        <i class="mdi mdi-refresh-circle"></i> Refresh
+                    </button>
+
+                </div>
+
+                <div class="col-md-5">
+                </div>
+
+                <div class="col-md-4 ms-auto d-flex justify-content-end">
+
+
+                    <has-permission module-id="5" action-id="1">
+
+
+                        <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#roleModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
+                            <i class="mdi mdi-plus-circle"></i> Create Actions
+                        </button>
+                    </has-permission>
+                </div>
+            </div>
+
+
+            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+               
+  <table class="table table-bordered table-hover table-xl mt-2">
+    <thead class="table-primary">
+        <tr>
+            <th style="width:50px;">#</th>
+            <th>Action Name</th>
+            <th>Description</th>
+            <th style="width:100px;">Status</th>
+            <th style="width:150px;">Created Date</th>
+            <th style="width:120px;">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+                        @if (ViewBag.Actions != null && ViewBag.Actions.Count > 0)
+                        {
+                            int count = 0;
+                            foreach (var item in ViewBag.Actions)
+                            {
+                                count++;
+                        <tr>
+                            <td>@count</td>
+                            <td>@item.ActionName</td>
+                            <td>@item.Description</td>
+                            <td>
+                                        @if (item.ActiveFlag == 1)
+                                        {
+                                        <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                        <span class="badge bg-danger">Inactive</span>
+                                        }
+                            </td>
+                            <td>@item.CreatedDate</td>
+
+                            <td>
+                                <a href="javascript:;" class="action-icon" title="View">
+                                    <i class="mdi mdi-eye-circle-outline text-primary"></i>
+                                </a>
+                                <a href="javascript:;" class="action-icon" title="Edit">
+                                    <i class="mdi mdi-pencil text-warning"></i>
+                                </a>
+                                <a href="javascript:;" class="action-icon" title="Delete">
+                                    <i class="mdi mdi-delete text-danger"></i>
+                                </a>
+                            </td>
+                        </tr>
+                            }
+                        }
+                        else
+                        {
+                <tr>
+                    <td colspan="6" class="text-center text-danger">No Records Found</td>
+                </tr>
+                        }
+    </tbody>
+</table>
+
+
+           
+
+            </div>
+
+
+
+        </div>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@section Scripts {
+    <script src="~/js/actioncreation.js"></script>
+    
+}

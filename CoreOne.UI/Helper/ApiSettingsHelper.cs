@@ -12,6 +12,7 @@
 
         public string BaseUrlUserCreation { get; set; }
         public string BaseUrlModuleSetup { get; set; }
+        public string BaseUrlActionCreation { get; set; }
 
     }
 
