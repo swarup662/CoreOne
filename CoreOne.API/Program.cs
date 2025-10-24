@@ -24,6 +24,7 @@ builder.Services.AddScoped<IRoleCreationRepository, RoleCreationRepository>();
 builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 builder.Services.AddScoped<IUserCreationRepository, UserCreationRepository>();
 builder.Services.AddScoped<IModuleSetupRepository, ModuleSetupRepository>();
+builder.Services.AddScoped<IActionCreationRepository, ActionCreationRepository>();
 builder.Services.AddScoped<PermissionController>();
 
 // --- API Versioning ---

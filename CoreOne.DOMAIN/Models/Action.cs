@@ -27,4 +27,24 @@ namespace CoreOne.DOMAIN.Models
         public int MenuModuleID { get; set; }
         public int ActionID { get; set; }
     }
+
+
+
+
+
+
+
+    public class ActionCreationDto
+    {
+        public int ActionID { get; set; }
+        public string? ActionName { get; set; }
+        public string? Description { get; set; }
+        public int? ActiveFlag { get; set; }
+        public string CreatedDate { get; set; }
+    }
+
+
+
+
+
 }
