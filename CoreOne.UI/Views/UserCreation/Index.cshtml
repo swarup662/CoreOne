@@ -222,55 +222,65 @@
 
                                         </td>
                                         <td class="text-center">
-                                            <div class="d-flex justify-content-center gap-1 flex-wrap">
+                                            <div class="d-flex justify-content-center align-items-center gap-3">
+                                                <!-- Edit Icon -->
                                                 <has-permission module-id="4" action-id="2">
-                                                    <!-- Edit -->
-                                                    <button class="btn btn-sm btn-outline-primary shadow-sm"
-                                                            onclick="editUser(@user.UserID)"
-                                                            title="Edit User">
-                                                        <i class="mdi mdi-pencil-outline"></i>
-                                                    </button>
+                                                    <i class="mdi mdi-square-edit-outline cursor-pointer"
+                                                       style="font-size: 1.3rem;color:rebeccapurple"
+                                                       title="Edit User" 
+                                                       onclick="editUser(@user.UserID)"></i>
                                                 </has-permission>
-                                                <has-permission module-id="4" action-id="4">
-                                                    <!-- Edit -->
-                                                    <button class="btn btn-sm btn-outline-primary shadow-sm"
-                                                            onclick="viewUser(@user.UserID)"
-                                                            title="View User">
-                                                        <i class="bi bi-eye-fill me-1"></i>
-                                                    </button>
-                                                </has-permission>
-                                                @if (user.ActiveFlag == 0)
-                                                {
-                                                    <has-permission module-id="4" action-id="10">
-                                                        <button class="btn btn-sm btn-outline-success shadow-sm"
-                                                                onclick="activateUser(@user.UserID)"
-                                                                title="Activate User">
-                                                            <i class="mdi mdi-lock-open-outline"></i>
-                                                        </button>
-                                                    </has-permission>
-                                                }
-                                                else if (user.ActiveFlag == 1)
-                                                {
 
-                                                    <!-- Delete -->
-                                                    <has-permission module-id="4" action-id="9">
-                                                        <button class="btn btn-sm btn-outline-danger shadow-sm"
-                                                                onclick="deactivateUser(@user.UserID)"
-                                                                title="Deactivate User">
-                                                            <i class="mdi mdi-lock-outline"></i>
-                                                        </button>
-                                                    </has-permission>
-                                                }
-                                                <!-- Extra Permission -->
-                                                <has-permission module-id="4" action-id="7">
-                                                    <button class="btn btn-sm btn-outline-info shadow-sm"
-                                                            onclick="extraPermission(@user.UserID, @user.RoleID)"
-                                                            title="Extra Permission">
-                                                        <i class="mdi mdi-shield-account-outline"></i>
-                                                    </button>
+                                                <!-- View Icon -->
+                                                <has-permission module-id="4" action-id="4">
+                                                    <i class="bi bi-eye-fill text-primary cursor-pointer"
+                                                       style="font-size: 1.3rem;"
+                                                       title="View User"
+                                                       onclick="viewUser(@user.UserID)"></i>
                                                 </has-permission>
+
+                                                <!-- Dropdown Three-Dot Icon -->
+                                                <div class="dropdown">
+                                                    <i class="mdi mdi-dots-vertical text-secondary cursor-pointer"
+                                                       style="font-size: 1.5rem;"
+                                                       id="dropdownMenuButton@user.UserID"
+                                                       data-bs-toggle="dropdown"
+                                                       aria-expanded="false"
+                                                       title="More Actions"></i>
+                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton@user.UserID">
+                                                        @if (user.ActiveFlag == 0)
+                                                        {
+                                                            <has-permission module-id="4" action-id="10">
+                                                                <li>
+                                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="activateUser(@user.UserID)">
+                                                                        <i class="mdi mdi-lock-open-outline me-1"></i> Activate User
+                                                                    </a>
+                                                                </li>
+                                                            </has-permission>
+                                                        }
+                                                        else if (user.ActiveFlag == 1)
+                                                        {
+                                                            <has-permission module-id="4" action-id="9">
+                                                                <li>
+                                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="deactivateUser(@user.UserID)">
+                                                                        <i class="mdi mdi-lock-outline me-1"></i> Deactivate User
+                                                                    </a>
+                                                                </li>
+                                                            </has-permission>
+                                                        }
+                                                        <has-permission module-id="4" action-id="7">
+                                                            <li>
+                                                                <a class="dropdown-item" href="javascript:void(0);" onclick="extraPermission(@user.UserID, @user.RoleID)">
+                                                                    <i class="mdi mdi-shield-account-outline me-1"></i> Extra Permission
+                                                                </a>
+                                                            </li>
+                                                        </has-permission>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </td>
+
+
                                     </tr>
 
                                     <script>
