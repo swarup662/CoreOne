@@ -1,2 +1,149 @@
-﻿body {
+﻿/* Sleek circular close button */
+.btn-close-circle {
+    width: 36px; /* slightly smaller */
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d1d5db; /* subtle gray border */
+    background-color: #ffffff;
+    transition: all 0.2s ease-in-out;
+}
+
+    .btn-close-circle i {
+        font-size: 1rem; /* smaller icon for neatness */
+        color: #495057;
+    }
+
+    .btn-close-circle:hover {
+        background-color: #f0f0f0; /* subtle hover highlight */
+        transform: scale(1.05); /* tiny zoom */
+        box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+    }
+
+
+
+/* Table base */
+.table {
+    border-collapse: separate; /* needed for border-radius */
+    border-spacing: 0; /* remove extra spacing */
+    border-radius: 0.75rem; /* adjust radius as needed */
+    overflow: hidden; /* ensures corners are rounded */
+}
+
+    /* Table header */
+    .table thead tr {
+        background: linear-gradient(135deg, #4facfe, #00f2fe);
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    /* Table body rows */
+    .table tbody tr {
+        background-color: #ffffff;
+        transition: all 0.3s ease;
+    }
+
+    /* Table cells */
+    .table th,
+    .table td {
+        border: 1px solid #d1d5db; /* light gray borders */
+        vertical-align: middle;
+        padding: 12px;
+    }
+
+    /* Optional: round only top and bottom corners */
+    .table thead tr:first-child th:first-child {
+        border-top-left-radius: 0.75rem;
+    }
+
+    .table thead tr:first-child th:last-child {
+        border-top-right-radius: 0.75rem;
+    }
+
+    .table tbody tr:last-child td:first-child {
+        border-bottom-left-radius: 0.75rem;
+    }
+
+    .table tbody tr:last-child td:last-child {
+        border-bottom-right-radius: 0.75rem;
+    }
+
+
+
+
+
+
+
+
+
+.user-card {
+    min-height: 350px;
+    background: linear-gradient(145deg, rgba(49,58,111,0.82), rgba(20,25,45,0.95));
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding-top: 45px;
+    transition: all 0.3s ease-in-out;
+}
+
+    .user-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+    }
+
+/* Profile Photo Background Ring */
+.photo-wrapper {
+    position: relative;
+    width: 105px;
+    height: 105px;
+}
+
+.photo-bg {
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, #7a67ff, #4836d1);
+    border-radius: 50%;
+    filter: blur(2px);
+    position: absolute;
+    top: 0;
+    z-index: 1;
+}
+
+/* Actual Profile Image */
+.profile-img {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #fff;
+    position: relative;
+    z-index: 2;
+}
+
+.user-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.user-gender {
+    font-size: 0.82rem;
+    color: #d4d4d4;
+}
+
+.user-phone {
+    font-size: 0.85rem;
+    color: #eee;
+}
+
+.user-role {
+    background-color: #28c76f !important;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+}
+
+.text-pink {
+    color: #ff6bd6 !important;
 }

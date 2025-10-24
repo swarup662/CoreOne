@@ -29,7 +29,7 @@
     }
 
 </style>
-
+<link href="~/css/usercreation.css" rel="stylesheet" />
 <script>
     async function loadUserPhotoByFilePath(filePath, elementId) {
         // Use the same logic as loadProfilePhoto
@@ -89,10 +89,18 @@
 
             <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
-                <div class="col-md-3">
+                <div class="col-md-3 d-flex gap-2">
                     <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/UserCreation/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
+                    </button>
+                    <!-- VIEW TOGGLE BUTTONS ADDED -->
+                    <button id="btnGridView" class="btn btn-outline-light" onclick="toggleView('grid')">
+                        <i class="mdi mdi-view-grid"></i>
+                    </button>
+
+                    <button id="btnListView" class="btn btn-outline-light" onclick="toggleView('list')" style="display:none;">
+                        <i class="mdi mdi-format-list-bulleted"></i>
                     </button>
 
                 </div>
@@ -160,27 +168,29 @@
 
             <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-xl mt-2">
+
+                <div id="listViewContainer" class="row" style="display:block;">
+            <div class="table-responsive">
+                    <table class="table table-bordered table-hover table-sm small mt-2">
                         <thead class="table-light text-dark">
                             <tr>
-                                <th class="text-center" style="width: 5%;">#</th>
-                                <th class="text-center" style="width: 10%;">Profile</th>
-                                <th class="text-start sortable" onclick="sortTable('UserName')">
+                                <th class="justify-content-between align-items-center text-decoration-none" style="color:black">Sl No.</th>
+                                <th class="justify-content-between align-items-center text-decoration-none" style="color:black">Profile</th>
+                                <th class="justify-content-between align-items-center text-decoration-none" style="color:black" onclick="sortTable('UserName')">
                                     Name @Html.Raw(sortColumn == "UserName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
                                 </th>
                                 <th class="text-start sortable" onclick="sortTable('Email')">
                                     Email @Html.Raw(sortColumn == "Email" ? (sortDir == "ASC" ? "▲" : "▼") : "")
                                 </th>
-                                <th class="text-start">Phone</th>
-                                <th class="text-start sortable" onclick="sortTable('RoleName')">
+                                <th class="justify-content-between align-items-center text-decoration-none" style="color:black">Phone</th>
+                                <th class="justify-content-between align-items-center text-decoration-none" style="color:black" onclick="sortTable('RoleName')">
                                     Role @Html.Raw(sortColumn == "RoleName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
                                 </th>
-                                <th class="text-start sortable" onclick="sortTable('GenderName')">
+                                <th class="justify-content-between align-items-center text-decoration-none" style="color:black" onclick="sortTable('GenderName')">
                                     Gender @Html.Raw(sortColumn == "GenderName" ? (sortDir == "ASC" ? "▲" : "▼") : "")
                                 </th>
-                                <th class="text-center">Status</th>
-                                <th class="text-center">Actions</th>
+                                <th class="justify-content-between align-items-center text-decoration-none" style="color:black">Status</th>
+                                <th class="justify-content-between align-items-center text-decoration-none" style="color:black">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -222,7 +232,7 @@
 
                                         </td>
                                         <td class="text-center">
-                                            <div class="d-flex justify-content-center align-items-center gap-3">
+                                            <div class="d-flex justify-content-center align-items-center gap-2">
                                                 <!-- Edit Icon -->
                                                 <has-permission module-id="4" action-id="2">
                                                     <i class="mdi mdi-square-edit-outline cursor-pointer"
@@ -300,6 +310,149 @@
                         </tbody>
                     </table>
                 </div>
+                </div>
+
+
+
+
+                <div id="gridViewContainer" class="row" style="display:none;">
+                    @foreach (var user in users)
+                    {
+                        <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
+                            <div class="card user-card shadow-lg border-0 position-relative"
+                                 style="border-radius:18px; overflow:hidden; background: linear-gradient(145deg, #98a6ad, #013b74); color:white; min-height:300px;">
+
+                                <!-- Action Menu -->
+                                <div class="dropdown position-absolute top-0 end-0 p-2">
+                                    <i class="mdi mdi-dots-vertical cursor-pointer text-white"
+                                       style="font-size:1.2rem;" data-bs-toggle="dropdown"></i>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <!-- Edit -->
+                                        <has-permission module-id="4" action-id="2">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="editUser(@user.UserID)">
+                                                    <i class="mdi mdi-pencil-outline me-1"></i> Edit
+                                                </a>
+                                            </li>
+                                        </has-permission>
+
+                                        <!-- View -->
+                                        <has-permission module-id="4" action-id="4">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0)" onclick="viewUser(@user.UserID)">
+                                                    <i class="mdi mdi-eye-outline me-1"></i> View
+                                                </a>
+                                            </li>
+                                        </has-permission>
+
+                                        <!-- Activate / Deactivate -->
+                                        @if (user.ActiveFlag == 0)
+                                        {
+                                            <has-permission module-id="4" action-id="10">
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="activateUser(@user.UserID)">
+                                                        <i class="mdi mdi-lock-open-outline me-1"></i> Activate
+                                                    </a>
+                                                </li>
+                                            </has-permission>
+                                        }
+                                        else if (user.ActiveFlag == 1)
+                                        {
+                                            <has-permission module-id="4" action-id="9">
+                                                <li>
+                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="deactivateUser(@user.UserID)">
+                                                        <i class="mdi mdi-lock-outline me-1"></i> Deactivate
+                                                    </a>
+                                                </li>
+                                            </has-permission>
+                                        }
+
+                                        <!-- Extra Permission -->
+                                        <has-permission module-id="4" action-id="7">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0);" onclick="extraPermission(@user.UserID, @user.RoleID)">
+                                                    <i class="mdi mdi-shield-account-outline me-1"></i> Extra Permission
+                                                </a>
+                                            </li>
+                                        </has-permission>
+                                    </ul>
+                                </div>
+
+                                <!-- Card Content -->
+                                <div class="card-body text-center d-flex flex-column align-items-center justify-content-between">
+
+                                    <!-- Profile Photo With Gradient Background -->
+                                    <div class="photo-wrapper position-relative mb-3">
+                                        <div class="photo-bg rounded-circle"
+                                             style="width:110px; height:110px; background: linear-gradient(135deg,#6a11cb,#2575fc); position:absolute; top:0; left:50%; transform:translateX(-50%); z-index:1;"></div>
+                                        <img id="gridPhoto_@user.UserID"
+                                             src="/images/default-user.png"
+                                             class="profile-img rounded-circle border border-2 border-white shadow-sm"
+                                             style="width:110px; height:110px; object-fit:cover; position:relative; z-index:2;">
+                                    </div>
+
+                                    <!-- User Name -->
+                                    <h6 class="user-name mt-2 mb-1 text-truncate" style="max-width:160px;" title="@user.UserName">@user.UserName</h6>
+
+                                    <!-- Gender & Status -->
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <small class="user-gender">
+                                            @if (user.GenderName == "Male")
+                                            {
+                                                <i class="mdi mdi-gender-male text-info"></i> @user.GenderName
+                                            }
+                                            else if (user.GenderName == "Female")
+                                            {
+                                                <i class="mdi mdi-gender-female text-pink"></i> @user.GenderName
+                                            }
+                                            else
+                                            {
+                                                <i class="mdi mdi-gender-transgender text-purple"></i> @user.GenderName
+                                            }
+                                        </small>
+
+                                        <!-- Active / Non-Active Badge -->
+                                        @if (user.ActiveFlag == 1)
+                                        {
+                                            <span class="badge rounded-pill bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge rounded-pill bg-danger">Inactive</span>
+                                        }
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div class="user-phone mb-2">
+                                        <i class="mdi mdi-phone text-light"></i> <span>@user.PhoneNumber</span>
+                                    </div>
+
+                                    <!-- Role Badge -->
+                                    <span class="badge rounded-pill bg-primary mt-1">@user.RoleName</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            loadUserPhotoByFilePath(
+                            @Html.Raw(JsonConvert.SerializeObject(user.PhotoPath)),
+                                'gridPhoto_@user.UserID'
+                            );
+                        </script>
+                    }
+                </div>
+
+
+
+
+
+
+
+
+
+
+
 
                 <!-- Pagination -->
                 <div class="row">
@@ -548,6 +701,46 @@
 @section Scripts {
 
     <script>
+
+
+              document.addEventListener("DOMContentLoaded", function() {
+            // Get last saved view from localStorage
+            const savedView = localStorage.getItem("userView");
+
+            if(savedView === "grid") {
+                toggleView("grid");
+            } else {
+                toggleView("list"); // default
+            }
+        });
+
+        function toggleView(view) {
+            const grid = document.getElementById("gridViewContainer");
+            const list = document.getElementById("listViewContainer");
+            const btnGrid = document.getElementById("btnGridView");
+            const btnList = document.getElementById("btnListView");
+
+            if (view === "grid") {
+                grid.style.display = "flex";
+                list.style.display = "none";
+                btnGrid.style.display = "none";
+                btnList.style.display = "inline-block";
+            } else {
+                grid.style.display = "none";
+                list.style.display = "block";
+                btnGrid.style.display = "inline-block";
+                btnList.style.display = "none";
+            }
+
+            // Save user preference
+            localStorage.setItem("userView", view);
+        }
+
+
+
+
+
+
         (function () {
             // Current server-side values
             const current = {
