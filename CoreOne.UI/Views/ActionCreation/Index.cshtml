@@ -2,11 +2,9 @@
 
 @{
     ViewData["Title"] = "Action Creation";
-
+    Layout = "~/Views/Shared/_Layout.cshtml";
 
 }
-
-
 
 <link href="~/css/actioncreation.css" rel="stylesheet" />
 
@@ -60,12 +58,12 @@
 
 
             <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
-              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+              -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: #5f5c5c;">
                
-  <table class="table table-bordered table-hover table-xl mt-2">
+  <table class="table table-bordered table-hover table-xl mt-2" id="actionTable">
     <thead class="table-primary">
         <tr>
-            <th style="width:50px;">#</th>
+            <th style="width:50px;">Sl No.</th>
             <th>Action Name</th>
             <th>Description</th>
             <th style="width:100px;">Status</th>
@@ -149,19 +147,21 @@
 
 
 
+@section Scripts
+{
+    <link href="~/assets/libs/datatables.net-bs5/css/datatables.bootstrap5.min.css" rel="stylesheet" />
+    <link href="~/assets/libs/datatables.net-responsive-bs5/css/responsive.bootstrap5.min.css" rel="stylesheet" />
+    <script src="~/assets/libs/datatables.net/js/jquery.datatables.min.js"></script>
+  
+    <script>
+        $(document).ready(function () {
+            $("#actionTable").DataTable({
+                responsive: true,
+                pageLength: 10,
+                ordering: true
+            });
+        });
+    </script>
 
-
-
-
-
-
-
-
-
-
-
-
-@section Scripts {
     <script src="~/js/actioncreation.js"></script>
-    
 }

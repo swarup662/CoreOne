@@ -100,9 +100,7 @@ $("#addModuleBtn").click(function () {
             <a href="javascript:void(0);" class="btn btn-sm btn-danger removeModule" title="Remove">
                 <i class="fe-trash"></i>
             </a>
-            <a href="javascript:void(0);" class="btn btn-sm btn-primary setupModule" title="Setup">
-                <i class="fe-settings"></i>
-            </a>
+           
         </td>
                 </tr>`;
 
