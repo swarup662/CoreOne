@@ -169,77 +169,125 @@
 
 <!-- Upload Modal -->
 <div class="modal fade" id="fileUploadModal" tabindex="-1" style="z-index: 2050 !important;">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold">Upload File</h5>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content rounded-3 shadow-sm overflow-hidden">
+
+            <!-- Header -->
+            <div class="modal-header bg-white border-0">
+                <h5 class="modal-title fw-bold text-dark">
+                    <i class="bi bi-cloud-arrow-up me-2"></i> Upload File
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body">
+            <!-- Body -->
+            <div class="modal-body text-center p-4 bg-light">
+
+                <!-- Hidden form inputs -->
                 <form id="uploadForm" enctype="multipart/form-data">
                     <input type="hidden" id="uploadModule" />
                     <input type="hidden" id="currentTempId" />
-                    <!-- Replace only this block inside the upload modal -->
-                    <div class="mb-3 text-center">
-                        <label for="uploadFileInput" class="form-label fw-semibold mb-2 text-muted">
-                            Select a File to Upload
-                        </label>
 
-                        <!-- Custom Upload Box -->
-                        <div class="upload-box" id="uploadBox">
-                            <i class="bi bi-cloud-arrow-up upload-icon"></i>
-                            <p class="upload-text">Drag & Drop your file here<br><span>or click to browse</span></p>
-                            <input type="file" id="uploadFileInput" class="form-control visually-hidden" />
-                        </div>
-
-                        <div id="fileNameDisplay" class="text-secondary small mt-2"></div>
-
-                        <div class="invalid-feedback" id="uploadError"></div>
-                        <div class="valid-feedback">File looks good!</div>
+                    <!-- Upload Box -->
+                    <div class="upload-box border border-dashed rounded-3 p-3 mx-auto mb-3"
+                         id="uploadBox"
+                         style="max-width: 300px; background: #fff; cursor: pointer; transition: 0.2s;">
+                        <i class="bi bi-cloud-arrow-up upload-icon fs-1 text-primary mb-2"></i>
+                        <p class="upload-text text-muted small mb-0">
+                            Drag & Drop your file here<br>
+                            <span class="fw-semibold text-primary">or click to browse</span>
+                        </p>
+                        <input type="file" id="uploadFileInput" class="form-control visually-hidden" />
                     </div>
 
+                    <!-- File name / error -->
+                    <div id="fileNameDisplay" class="text-secondary small mt-2"></div>
+                    <div class="invalid-feedback d-block" id="uploadError"></div>
                 </form>
 
-                <div id="previewSection">
-                    <iframe id="filePreviewFrame"></iframe>
+                <div id="previewSection" class="text-center mt-3">
+                    <iframe id="filePreviewFrame" class="rounded shadow-sm border" style="width:100%; height:300px;"></iframe>
                 </div>
+
             </div>
 
-            <div class="modal-footer">
-                <button type="button" id="uploadBtn" class="btn btn-success">Upload</button>
-                <button type="button" id="zoomInBtn" class="btn btn-outline-secondary">+</button>
-                <button type="button" id="zoomOutBtn" class="btn btn-outline-secondary">-</button>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+            <!-- Footer -->
+            <div class="modal-footer justify-content-end border-0 bg-light">
+                <button type="button" id="uploadBtn" class="btn btn-primary fw-semibold px-4">
+                    <i class="bi bi-upload me-1"></i> Upload
+                </button>
+                <button type="button" class="btn btn-outline-secondary fw-semibold" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Close
+                </button>
             </div>
+
         </div>
     </div>
 </div>
 
+<!-- Styles for minimal look -->
+<style>
+    .upload-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .upload-box:hover {
+            background-color: #f0f4f8;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+        }
+
+    #filePreviewImg {
+        border: 1px solid #dee2e6;
+    }
+</style>
+
+
 <!-- View Modal -->
 <div class="modal fade" id="viewFileModal" tabindex="-1" aria-labelledby="viewFileModalLabel" aria-hidden="true" style="z-index: 2049 !important;">
     <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-light">
-                <h5 class="modal-title" id="viewFileModalLabel">File Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        <div class="modal-content rounded-4 shadow-lg overflow-hidden">
+
+            <!-- Header -->
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold" id="viewFileModalLabel">
+                    <i class="bi bi-file-earmark-image me-2"></i> File Preview
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body">
-                <div id="viewFileLoading">Loading preview...</div>
+            <!-- Body -->
+            <div class="modal-body bg-light text-center">
+                <div id="viewFileLoading" class="text-muted fw-semibold mb-3">Loading preview...</div>
 
-                <div id="viewFilePreviewSection">
-                    <iframe id="viewFileFrame" class="file-preview-frame"></iframe>
-                    <div id="viewFilePlaceholder"></div>
+                <div id="viewFilePreviewSection" class="position-relative">
+                    <iframe id="viewFileFrame" class="file-preview-frame rounded shadow-sm border"
+                            style="width:100%; height:400px;"></iframe>
+                    <div id="viewFilePlaceholder" class="position-absolute top-50 start-50 translate-middle text-muted">
+                        Preview not available
+                    </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <a id="downloadFileBtn" class="btn btn-success" target="_blank">Download</a>
-                <button type="button" id="zoomInBtnView" class="btn btn-outline-secondary">+</button>
-                <button type="button" id="zoomOutBtnView" class="btn btn-outline-secondary">-</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <!-- Footer -->
+            <div class="modal-footer border-0 bg-light justify-content-between">
+                <div class="btn-group">
+                    <button type="button" id="zoomInBtnView" class="btn btn-outline-secondary">+</button>
+                    <button type="button" id="zoomOutBtnView" class="btn btn-outline-secondary">-</button>
+                </div>
+                <div class="btn-group">
+                    <a id="downloadFileBtn" class="btn btn-success fw-semibold" target="_blank">
+                        <i class="bi bi-download me-1"></i> Download
+                    </a>
+                    <button type="button" class="btn btn-secondary fw-semibold" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Close
+                    </button>
+                </div>
             </div>
+
         </div>
     </div>
 </div>
