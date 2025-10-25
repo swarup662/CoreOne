@@ -45,7 +45,6 @@
 }
 
 
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -100,28 +99,39 @@
 
 
                     <li class="dropdown notification-list topbar-dropdown">
-                        <!-- User box -->
-                        <div class="d-flex align-items-center" style="
-            border: 1px solid #ffffff;
-            padding: 5px 12px;
-            border-radius: 25px;
-            background-color: rgba(255,255,255,0.1);
-            cursor: pointer;margin-top: 16px;
-        ">
-                            <!-- Icon -->
-                            <i class="mdi mdi-account-circle fs-4 me-2" style="color:#ffffff;"></i>
+                        <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                            <div class="d-flex align-items-center" style="height:100%;">
+                                <!-- Icon -->
+                               
 
-                            <!-- Username -->
-                            <span style="color:#ffffff; font-weight:600; font-size:14px;">
-                                @user.UserName
-                            </span>
+                                <!-- Username box -->
+                                <div style="
+    display: flex;
+    align-items: center;
+    border: 1px solid #898989;
+    padding: 4px 12px;
+    border-radius: 14px;
+    background-color: #343a40;
+    line-height: 1;margin-top:21px
+">
+                                    <!-- Icon -->
+                                    <i class="mdi mdi-account-circle" style="color:#ffffff; font-size:20px; margin-right:6px;"></i>
 
-                            <!-- Chevron -->
-                            <i class="mdi mdi-chevron-down ms-2" style="color:#ffffff; font-size:16px;"></i>
-                        </div>
+                                    <!-- Username -->
+                                    <span style="color:#ffffff; font-weight:600; font-size:14px; white-space:nowrap;">
+                                        @user.UserName
+                                    </span>
 
+                                    <!-- Dropdown Chevron -->
+                                    <i class="mdi mdi-chevron-down" style="color:#ffffff; font-size:18px; margin-left:6px;"></i>
+                                </div>
+
+
+
+                                <!-- Chevron -->
+                              
+                            </div>
                         </a>
-
 
                         <div class="dropdown-menu dropdown-menu-end profile-dropdown" style="">
                             <!-- item-->
