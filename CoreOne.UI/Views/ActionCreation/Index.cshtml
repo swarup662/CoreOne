@@ -1,4 +1,5 @@
 ﻿@using CoreOne.DOMAIN.Models
+@model CoreOne.DOMAIN.Models.Action
 
 @{
     ViewData["Title"] = "Action Creation";
@@ -49,7 +50,7 @@
                     <has-permission module-id="5" action-id="1">
 
 
-                        <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#roleModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
+                        <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#ActionModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                             <i class="mdi mdi-plus-circle"></i> Create Actions
                         </button>
                     </has-permission>
@@ -95,9 +96,11 @@
                             <td>@item.CreatedDate</td>
 
                             <td>
-                                <a href="javascript:;" class="action-icon" title="View">
-                                    <i class="mdi mdi-eye-circle-outline text-primary"></i>
-                                </a>
+                                        <a href="javascript:;"
+                                           class="action-icon"
+                                           onclick="loadRole(@item.ActionID);">
+                                            <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
+                                        </a>
                                 <a href="javascript:;" class="action-icon" title="Edit">
                                     <i class="mdi mdi-pencil text-warning"></i>
                                 </a>
@@ -132,6 +135,54 @@
 
 
 
+    <div class="modal fade" id="ActionModal" tabindex="-1" aria-labelledby="actionModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
+        aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="actionModalLabel">Add Action :: [New]</h5>
+                    <button type="button"
+                            class="btn btn-light btn-close-circle shadow-sm"
+                            onclick="window.location.href='/ActionCreation/Index'">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    @* Hidden field for RoleID *@
+                    <input type="hidden" asp-for="ActionID" id="ActionID" />
+
+                    <div class="mb-3">
+                        <label asp-for="ActionName" class="form-label"></label>
+                        <input asp-for="ActionName" class="form-control" id="ActionName" />
+                        <span asp-validation-for="ActionName" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label"></label>
+                        <textarea asp-for="Description" class="form-control" id="Description"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+
+                    </div>
+                </div>
+
+
+                <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
+                    <button type="button"
+                            onclick="window.location.href='/ActionCreation/Index'"
+                            class="btn btn-warning btn-sm"
+                            data-bs-dismiss="modal">
+                        <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
+                    </button>
+
+                    <button type="button" id="btnSaveRole" class="btn btn-sm" style="background:forestgreen; color:white">
+                        <i class="mdi mdi-content-save-outline me-1"></i> Save
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
 
 
 

@@ -56,7 +56,24 @@ namespace CoreOne.UI.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> GetActionById([FromBody] int actionId)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = _api.BaseUrlActionCreation + "/GetActionById";
 
+            var json = JsonConvert.SerializeObject(actionId); // plain integer JSON
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var resp = await client.PostAsync(url, content);
+            if (!resp.IsSuccessStatusCode)
+                return BadRequest();
+
+            var response = await resp.Content.ReadAsStringAsync();
+            var action = JsonConvert.DeserializeObject<ActionCreationDto>(response);
+
+            return Json(action);
+        }
 
 
 

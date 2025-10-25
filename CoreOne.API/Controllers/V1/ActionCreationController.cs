@@ -25,5 +25,30 @@ namespace CoreOne.API.Controllers.V1
             return Ok(data);
         }
 
+
+
+
+
+        [HttpPost("GetActionById")]
+        public IActionResult GetActionById([FromBody] int actionId)
+        {
+            if (actionId <= 0) return BadRequest("Invalid ActionId.");
+
+            var action = _actionRepo.GetActionById(actionId);
+
+            if (action == null)
+                return NotFound(new { Message = "Action not found." });
+
+            return Ok(action);
+        }
+
+
+
+
+
     }
+
+
+
+
 }

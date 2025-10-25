@@ -40,7 +40,8 @@ namespace CoreOne.DOMAIN.Models
         public string? ActionName { get; set; }
         public string? Description { get; set; }
         public int? ActiveFlag { get; set; }
-        public string CreatedDate { get; set; }
+        public int? CreatedBy { get; set; }
+        public string? CreatedDate { get; set; }
     }
 
 

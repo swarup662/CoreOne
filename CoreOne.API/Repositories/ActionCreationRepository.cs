@@ -38,5 +38,31 @@ namespace CoreOne.API.Repositories
             return result;
         }
 
+
+        public ActionCreationDto? GetActionById(int actionId)
+        {
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Action_CRUD", new Dictionary<string, object>
+            {
+                { "@RecType", "GETBYID" },
+                { "@ActionID", actionId }
+            });
+
+            if (dt.Rows.Count == 0) return null;
+
+            var row = dt.Rows[0];
+            return new ActionCreationDto
+            {
+                ActionID = Convert.ToInt32(row["ActionID"]),
+                ActionName = row["ActionName"]?.ToString() ?? string.Empty,
+                Description = row["Description"]?.ToString() ?? string.Empty,
+                CreatedBy = row["CreatedBy"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["CreatedBy"]),
+                CreatedDate = row["CreatedDate"]?.ToString() ?? string.Empty,
+                ActiveFlag = row["ActiveFlag"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["ActiveFlag"]),
+            };
+        }
+
+
+
+
     }
 }
