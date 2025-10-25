@@ -95,11 +95,11 @@
                         <i class="mdi mdi-refresh-circle"></i> Refresh
                     </button>
                     <!-- VIEW TOGGLE BUTTONS ADDED -->
-                    <button id="btnGridView" class="btn btn-outline-light" onclick="toggleView('grid')">
+                    <button id="btnGridView" class="btn btn-outline-light" onclick="toggleView('grid')" style="background: linear-gradient(145deg, rgb(152, 166, 173), rgb(255 254 254));  border-radius: 9px; border: 1px solid rgb(108, 117, 125);">
                         <i class="mdi mdi-view-grid"></i>
                     </button>
 
-                    <button id="btnListView" class="btn btn-outline-light" onclick="toggleView('list')" style="display:none;">
+                    <button id="btnListView" class="btn btn-outline-light" onclick="toggleView('list')" style="display:none; background: linear-gradient(145deg, rgb(152, 166, 173), rgb(255 254 254));  border-radius: 9px; border: 1px solid rgb(108, 117, 125);">
                         <i class="mdi mdi-format-list-bulleted"></i>
                     </button>
 
@@ -312,7 +312,15 @@
                 </div>
                 </div>
 
-
+                <style>
+                    .row-bg {
+                        border: 1px solid white;
+                        margin-top: -20px;
+                        border-radius: 15px;
+                        background: url('/assets/images/newok.jpg') no-repeat center center;
+                        background-size: cover;
+                    }
+                </style>
 
 
                 <div id="gridViewContainer" class="row" style="display:none;">
@@ -324,8 +332,8 @@
 
                                 <!-- Action Menu -->
                                 <div class="dropdown position-absolute top-0 end-0 p-2">
-                                    <i class="mdi mdi-dots-vertical cursor-pointer text-white"
-                                       style="font-size:1.2rem;" data-bs-toggle="dropdown"></i>
+                                    <i class="mdi mdi-dots-vertical cursor-pointer "
+                                       style="font-size:1.2rem;color: #343a40;" data-bs-toggle="dropdown"></i>
 
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <!-- Edit -->
@@ -379,58 +387,56 @@
                                     </ul>
                                 </div>
 
-                                <!-- Card Content -->
-                                <div class="card-body text-center d-flex flex-column align-items-center justify-content-between">
+                                <div class="card-body card-new text-center p-3 d-flex flex-column justify-content-between">
+                                    <div class="row p-2 row-bg">
 
-                                    <!-- Profile Photo With Gradient Background -->
-                                    <div class="photo-wrapper position-relative mb-3">
-                                        <div class="photo-bg rounded-circle"
-                                             style="width:110px; height:110px; background: linear-gradient(135deg,#6a11cb,#2575fc); position:absolute; top:0; left:50%; transform:translateX(-50%); z-index:1;"></div>
+                                    <div class="photo-wrapper mx-auto mb-2">
+                                        <div class="photo-bg"></div>
                                         <img id="gridPhoto_@user.UserID"
                                              src="/images/default-user.png"
-                                             class="profile-img rounded-circle border border-2 border-white shadow-sm"
-                                             style="width:110px; height:110px; object-fit:cover; position:relative; z-index:2;">
+                                             class="profile-img shadow">
+                                    </div>
                                     </div>
 
-                                    <!-- User Name -->
-                                    <h6 class="user-name mt-2 mb-1 text-truncate" style="max-width:160px;" title="@user.UserName">@user.UserName</h6>
+                                    <h5 class="user-name mb-1" title="@user.UserName">
+                                        @user.UserName
+                                    </h5>
 
-                                    <!-- Gender & Status -->
-                                    <div class="d-flex align-items-center gap-2 mb-1">
-                                        <small class="user-gender">
-                                            @if (user.GenderName == "Male")
-                                            {
-                                                <i class="mdi mdi-gender-male text-info"></i> @user.GenderName
-                                            }
-                                            else if (user.GenderName == "Female")
-                                            {
-                                                <i class="mdi mdi-gender-female text-pink"></i> @user.GenderName
-                                            }
-                                            else
-                                            {
-                                                <i class="mdi mdi-gender-transgender text-purple"></i> @user.GenderName
-                                            }
-                                        </small>
-
-                                        <!-- Active / Non-Active Badge -->
-                                        @if (user.ActiveFlag == 1)
+                                    <small class="user-gender d-flex align-items-center justify-content-center gap-1">
+                                        @if (user.GenderName == "Male")
                                         {
-                                            <span class="badge rounded-pill bg-success">Active</span>
+                                            <i class="mdi mdi-gender-male text-info"></i>
+                                        }
+                                        else if (user.GenderName == "Female")
+                                        {
+                                            <i class="mdi mdi-gender-female text-pink"></i>
                                         }
                                         else
                                         {
-                                            <span class="badge rounded-pill bg-danger">Inactive</span>
+                                            <i class="mdi mdi-gender-transgender text-warning"></i>
+                                        }
+                                        @user.GenderName
+                                    </small>
+
+                                    <div class="mt-2">
+                                        @if (user.ActiveFlag == 1)
+                                        {
+                                            <span class="badge rounded-pill bg-success px-3 py-1">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge rounded-pill bg-danger px-3 py-1">Inactive</span>
                                         }
                                     </div>
 
-                                    <!-- Phone -->
-                                    <div class="user-phone mb-2">
-                                        <i class="mdi mdi-phone text-light"></i> <span>@user.PhoneNumber</span>
+                                    <div class="user-phone mt-2">
+                                        <i class="mdi mdi-phone"></i> @user.PhoneNumber
                                     </div>
 
-                                    <!-- Role Badge -->
-                                    <span class="badge rounded-pill bg-primary mt-1">@user.RoleName</span>
+                                    <span class="role-badge mt-3">@user.RoleName</span>
+
                                 </div>
+
                             </div>
                         </div>
 
