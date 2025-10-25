@@ -98,15 +98,28 @@
                             <td>
                                         <a href="javascript:;"
                                            class="action-icon"
-                                           onclick="loadRole(@item.ActionID);">
-                                            <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
+                                           onclick="loadAction(@item.ActionID);">
+                                            <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="View" style="color:rebeccapurple"></i>
                                         </a>
-                                <a href="javascript:;" class="action-icon" title="Edit">
-                                    <i class="mdi mdi-pencil text-warning"></i>
-                                </a>
-                                <a href="javascript:;" class="action-icon" title="Delete">
-                                    <i class="mdi mdi-delete text-danger"></i>
-                                </a>
+
+
+                                        <a href="javascript:;"
+                                           class="action-icon"
+                                           onclick="loadAction(@item.ActionID); $('#btnSaveAction').remove();;">
+                                            <i class="mdi mdi-eye-circle-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
+                                        </a>
+
+
+                                        <a href="javascript:;"
+                                           class="action-icon"
+                                           onclick="deleteAction(@item.ActionID)">
+                                            <i class="mdi mdi-delete" data-toggle="tooltip" title="Delete" style="color:red"></i>
+                                        </a>
+
+                           
+                              
+
+
                             </td>
                         </tr>
                             }
@@ -175,7 +188,7 @@
                         <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
                     </button>
 
-                    <button type="button" id="btnSaveRole" class="btn btn-sm" style="background:forestgreen; color:white">
+                    <button type="button" id="btnSaveAction" class="btn btn-sm" style="background:forestgreen; color:white">
                         <i class="mdi mdi-content-save-outline me-1"></i> Save
                     </button>
                 </div>

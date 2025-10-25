@@ -1,4 +1,4 @@
-﻿function loadRole(actionId) {
+﻿function loadAction(actionId) {
     // Update modal header for edit
     $('#actionModalLabel').text('Update Action :: [Edit]');
     $('#ActionModal').attr('aria-labelledby', 'actionModalLabel');
