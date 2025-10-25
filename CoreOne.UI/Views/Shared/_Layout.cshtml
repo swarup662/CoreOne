@@ -100,12 +100,28 @@
 
 
                     <li class="dropdown notification-list topbar-dropdown">
-                        <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                            <i class="mdi mdi-account-circle fs-4"></i> <!-- Replaced img with icon -->
-                            <span class="pro-user-name ms-1">
-                                @user.UserName <i class="mdi mdi-chevron-down"></i>
+                        <!-- User box -->
+                        <div class="d-flex align-items-center" style="
+            border: 1px solid #ffffff;
+            padding: 5px 12px;
+            border-radius: 25px;
+            background-color: rgba(255,255,255,0.1);
+            cursor: pointer;margin-top: 16px;
+        ">
+                            <!-- Icon -->
+                            <i class="mdi mdi-account-circle fs-4 me-2" style="color:#ffffff;"></i>
+
+                            <!-- Username -->
+                            <span style="color:#ffffff; font-weight:600; font-size:14px;">
+                                @user.UserName
                             </span>
+
+                            <!-- Chevron -->
+                            <i class="mdi mdi-chevron-down ms-2" style="color:#ffffff; font-size:16px;"></i>
+                        </div>
+
                         </a>
+
 
                         <div class="dropdown-menu dropdown-menu-end profile-dropdown" style="">
                             <!-- item-->
@@ -203,13 +219,11 @@
                 <!-- LOGO -->
                 <div class="logo-box" style="background:#36404a;">
                     <a href="/Home/UserDashboard" class="logo logo-dark text-center">
-                        <span class="logo-sm">
-                            <img src="~/assets/images/FILEHUB.png" alt="" height="45">
-                            <!-- <span class="logo-lg-text-light">UBold</span> -->
+                        <span class="logo-sm" style="font-weight:bold; font-size:20px; color:#ffffff; letter-spacing:1px;">
+                            CoreOne
                         </span>
-                        <span class="logo-lg">
-                            <img src="~/assets/images/FILE HUB.png" alt="" height="45">
-                            <!-- <span class="logo-lg-text-light">U</span> -->
+                        <span class="logo-lg" style="font-weight:bold; font-size:28px; color:#ffffff; letter-spacing:2px;">
+                            CoreOne
                         </span>
                     </a>
 
