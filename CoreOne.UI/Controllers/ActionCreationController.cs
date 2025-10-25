@@ -166,6 +166,36 @@ namespace CoreOne.UI.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> DeleteAction([FromBody] int ActionID)
+        {
+            var user = TokenHelper.UserFromToken(HttpContext);
+            var client = _httpClientFactory.CreateClient();
+            var url = _api.BaseUrlActionCreation + "/DeleteAction";
+
+            var payload = new ActionCreationDto
+            {
+
+                ActionID = ActionID,
+
+                CreatedBy = user.UserID
+            };
+
+            var json = JsonConvert.SerializeObject(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var resp = await client.PostAsync(url, content);
+
+            if (resp.IsSuccessStatusCode)
+                return Json(new { success = true });
+            else
+                return Json(new { success = false });
+
+
+
+        }
+
+
 
 
     }

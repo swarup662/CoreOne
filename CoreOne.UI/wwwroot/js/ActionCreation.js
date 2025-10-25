@@ -165,3 +165,41 @@ function validateField(fieldId) {
 $("#ActionName, #Description").on("input change", function () {
     validateField(this.id).catch(() => { });
 });
+
+
+
+function deleteAction(actionId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: `You are about to delete Action`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url: '/ActionCreation/DeleteAction',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(actionId),
+                success: function (resp) {
+                    if (resp.success) {
+                        Swal.fire(
+                            'Deleted!',
+                            `Action has been deleted.`,
+                            'success'
+                        ).then(() => {
+                            location.reload(); // reload table
+                        });
+                    } else {
+                        Swal.fire('Error!', 'Could not delete Action.', 'error');
+                    }
+                },
+                error: function () {
+                    Swal.fire('Error!', 'Something went wrong.', 'error');
+                }
+            });
+        }
+    });
+}

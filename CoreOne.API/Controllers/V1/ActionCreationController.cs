@@ -70,7 +70,18 @@ namespace CoreOne.API.Controllers.V1
         }
 
 
-      
+        [HttpPost("DeleteAction")]
+        public IActionResult DeleteAction([FromBody] ActionCreationDto act)
+        {
+            if (act.ActionID <= 0) return BadRequest("Invalid RoleID.");
+
+            int result = _actionRepo.SaveAction("DELETE", act.ActionID, null, null, 0);
+
+            if (result > 0)
+                return Ok(new { ActionID = result, Message = "Action deleted successfully." });
+
+            return NotFound(new { ActionID = result, Message = "Action not found or already deleted." });
+        }
 
 
     }
