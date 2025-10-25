@@ -61,6 +61,19 @@ namespace CoreOne.API.Repositories
             };
         }
 
+        public int SaveAction(string recType, int? ActionID, string ActionName, string Description, int userId)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { "@RecType", recType },          // "INSERT" | "UPDATE" | "DELETE"
+                { "@ActionID", ActionID },            // NULL for insert
+                { "@ActionName", ActionName },        // required for insert/update
+                { "@Description", Description },
+                { "@UserID", userId }
+            };
+
+            return _dbHelper.ExecuteSP_ReturnInt("sp_Action_CRUD", parameters);
+        }
 
 
 

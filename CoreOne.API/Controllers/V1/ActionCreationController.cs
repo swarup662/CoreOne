@@ -44,6 +44,33 @@ namespace CoreOne.API.Controllers.V1
 
 
 
+        [HttpPost("AddAction")]
+        public IActionResult AddAction([FromBody] ActionCreationDto act)
+        {
+            if (act == null || string.IsNullOrWhiteSpace(act.ActionName))
+                return BadRequest("Action name is required.");
+
+            int newId = _actionRepo.SaveAction("INSERT", null, act.ActionName, act.Description, act.CreatedBy ?? 0);
+
+            return Ok(new { ActionID = newId, Message = "Action created successfully." });
+        }
+
+        [HttpPost("UpdateAction")]
+        public IActionResult UpdateAction([FromBody] ActionCreationDto act)
+        {
+            if (act == null || act.ActionID <= 0)
+                return BadRequest("Valid Action is required.");
+
+            int result = _actionRepo.SaveAction("UPDATE", act.ActionID, act.ActionName, act.Description, act.CreatedBy ?? 0);
+
+            if (result > 0)
+                return Ok(new { ActionID = result, Message = "Action updated successfully." });
+
+            return NotFound(new { ActionID = result, Message = "Action not found or not updated." });
+        }
+
+
+      
 
 
     }

@@ -6,6 +6,6 @@ namespace CoreOne.API.Interface
     {
         Task<List<ActionCreationDto>> GetActions();
         ActionCreationDto? GetActionById(int actionId);
-
+        int SaveAction(string recType, int? ActionID, string ActionName, string Description, int userId);
     }
 }
