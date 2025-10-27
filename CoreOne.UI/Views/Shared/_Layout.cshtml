@@ -74,7 +74,13 @@
     <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
 
     @await Html.PartialAsync("_FileUploadModal")
-   
+   <style>
+        .sidebar-main-menu .nav .menuitem-active a.active {
+            background: linear-gradient(to right, #dfefff, #e0eaff);
+            border-radius: 10px;
+            border: 2px solid #80bfff;
+        }
+   </style>
 </head>
 
 <!-- body start -->
@@ -294,7 +300,7 @@
             </div>
             
             <!-- Full text menu with modules -->
-            <div class="sidebar-main-menu " style="background: linear-gradient(to right, white, #adb5bd);  ">
+            <div class="sidebar-main-menu " style="background: linear-gradient(to right, white, #cbd1d8);  ">
                 <div id="two-col-menu" class="h-100" data-simplebar>
                     @{
                         bool isModuleFirst = true;
@@ -306,7 +312,12 @@
                         isModuleFirst = false;
                         <div class="twocolumn-menu-item @activeClass" id="@id">
                             <div class="title-box">
-                                <h5 class="menu-title">@parent.Key.ParentName</h5>
+                                <h5 class="menu-title" style=" background: linear-gradient(to right, #2b2b2b, #696868);font-size:13px;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;">
+                                    @parent.Key.ParentName
+                                </h5>
                                 <ul class="nav flex-column">
                                     @foreach (var item in parent.OrderBy(i => i.MenuSequence))
                                     {
