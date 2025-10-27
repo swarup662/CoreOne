@@ -77,9 +77,36 @@
    <style>
         .sidebar-main-menu .nav .menuitem-active a.active {
             background: linear-gradient(to right, #dfefff, #e0eaff);
-            border-radius: 10px;
-            border: 2px solid #80bfff;
+           
         }
+
+        .dropdown-menu.dropdown-menu-end.profile-dropdown.show {
+            border-radius: 12px;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, .25);
+            background: #fff;
+            backdrop-filter: blur(12px);
+        }
+
+        .dropdown-menu.show {
+            top: 146% !important;
+        }
+
+        .notification-list .profile-dropdown .notify-item {
+            padding: 7px 20px;
+        }
+
+        .dropdown-item {
+            color: black;
+            font-weight: 600;
+        }
+
+            .dropdown-item:hover {
+                color: white;
+                background-color: #424e5a;
+            }
+
    </style>
 </head>
 
@@ -300,7 +327,7 @@
             </div>
             
             <!-- Full text menu with modules -->
-            <div class="sidebar-main-menu " style="background: linear-gradient(to right, white, #cbd1d8);  ">
+            <div class="sidebar-main-menu " style="background: linear-gradient(to right, white, white);  ">
                 <div id="two-col-menu" class="h-100" data-simplebar>
                     @{
                         bool isModuleFirst = true;
