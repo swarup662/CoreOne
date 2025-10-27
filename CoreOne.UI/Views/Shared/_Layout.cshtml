@@ -28,6 +28,7 @@
         menuItems = await MenuController.UserMenu(Context);
         if (menuItems.Count == 0)
         {
+            TokenHelper.RemoveToken(Context);
             // Redirect to login if userId is null
             HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
         }

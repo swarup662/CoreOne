@@ -22,6 +22,13 @@ namespace CoreOne.UI.Helper
 
                 return null;
             }
+        public static void RemoveToken(HttpContext context)
+        {
+            if (context.Request.Cookies.ContainsKey("jwtToken"))
+            {
+                context.Response.Cookies.Delete("jwtToken");
+            }
+        }
 
         public static User? UserFromToken(HttpContext context)
         {

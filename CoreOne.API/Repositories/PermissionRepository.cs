@@ -21,22 +21,30 @@ namespace CoreOne.API.Repositories
         {
             var parameters = new Dictionary<string, object> { { "@UserID", userID } };
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserMenu", parameters);
+            if (dt.Rows.Count > 0)
+            {
+                return dt.AsEnumerable()
+                         .Select(row => new MenuItem
+                         {
+                             MenuID = row.Field<int>("MenuID"),
+                             MenuName = row.Field<string>("MenuName"),
+                             Url = row.Field<string>("Url"),
+                             MenuSequence = row.Field<int>("MenuSequence"),
+                             ParentID = row.Field<int?>("ParentID"),
+                             ParentName = row.Field<string>("ParentName"),
+                             ParentSequence = row.Field<int?>("ParentSequence"),
+                             MenuSymbol = row.Field<string>("MenuSymbol"),
+                         })
+                         .OrderBy(m => m.ParentSequence)
+                         .ThenBy(m => m.MenuSequence)
+                         .ToList();
+            }
+            else {
+                List<MenuItem> menu = new List<MenuItem>();
+                return menu;
+              }
 
-            return dt.AsEnumerable()
-                     .Select(row => new MenuItem
-                     {
-                         MenuID = row.Field<int>("MenuID"),
-                         MenuName = row.Field<string>("MenuName"),
-                         Url = row.Field<string>("Url"),
-                         MenuSequence = row.Field<int>("MenuSequence"),
-                         ParentID = row.Field<int?>("ParentID"),
-                         ParentName = row.Field<string>("ParentName"),
-                         ParentSequence = row.Field<int?>("ParentSequence"),
-                         MenuSymbol = row.Field<string>("MenuSymbol"),
-                     })
-                     .OrderBy(m => m.ParentSequence)
-                     .ThenBy(m => m.MenuSequence)
-                     .ToList();
+
         }
 
 
