@@ -123,6 +123,38 @@ namespace CoreOne.API.Repositories
             };
         }
 
+
+
+        public UserCreation? GetUserMyAccount(int userId)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                {"@UserID", userId}
+            };
+
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserById", parameters);
+            if (dt.Rows.Count == 0) return null;
+
+            var row = dt.Rows[0];
+            return new UserCreation
+            {
+                UserID = Convert.ToInt32(row["UserID"]),
+                UserName = row["UserName"]?.ToString(),
+                Email = row["Email"]?.ToString(),
+                PhoneNumber = row["PhoneNumber"]?.ToString(),
+                RoleID = row["RoleID"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["RoleID"]),
+                ActiveFlag = row["ActiveFlag"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["ActiveFlag"]),
+                RoleName = row["RoleName"]?.ToString(),
+                MailTypeID = row["MailTypeID"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["MailTypeID"]),
+                GenderID = row["GenderID"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["GenderID"]),
+                GenderName = row["GenderName"]?.ToString(),
+                PhotoPath = row["PhotoPath"]?.ToString(),
+                PhotoName = row["PhotoName"]?.ToString(),
+                CreatedDate = row["CreatedDate"] == DBNull.Value ? null : (DateTime?)Convert.ToDateTime(row["CreatedDate"]),
+                UpdatedDate = row["UpdatedDate"] == DBNull.Value ? null : (DateTime?)Convert.ToDateTime(row["UpdatedDate"])
+            };
+        }
+
         public DataTable? GetRoles(int userId)
         {
             var parameters = new Dictionary<string, object>

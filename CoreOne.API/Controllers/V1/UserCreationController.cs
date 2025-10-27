@@ -165,6 +165,21 @@ namespace CoreOne.API.Controllers.V1
 
             return Ok(user);
         }
+
+        [HttpPost("GetUserMyAccount")]
+        public IActionResult GetUserMyAccount([FromBody] int userId)
+        {
+            if (userId <= 0) return BadRequest("Invalid UserID.");
+
+            var user = _userRepo.GetUserMyAccount(userId);
+
+            if (user == null)
+                return NotFound(new { Message = "User not found." });
+
+            return Ok(user);
+        }
+
+
         [HttpPost("SaveExtraPermission/{UserId}")]
         public async Task<IActionResult> SaveExtraPermissionAsync(int UserId, [FromBody] IEnumerable<ExtraPermission> permissions)
         {
