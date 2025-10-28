@@ -236,43 +236,47 @@
                                                 </has-permission>
 
                                                 <!-- Dropdown Three-Dot Icon -->
-                                                <div class="dropdown">
-                                                    <i class="mdi mdi-dots-vertical text-secondary cursor-pointer"
-                                                       style="font-size: 1.5rem;"
-                                                       id="dropdownMenuButton@user.UserID"
-                                                       data-bs-toggle="dropdown"
-                                                       aria-expanded="false"
-                                                       title="More Actions"></i>
-                                                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton@user.UserID">
-                                                        @if (user.ActiveFlag == 0)
-                                                        {
-                                                            <has-permission module-id="4" action-id="10">
+                                                    <div class="dropdown action-dropdown position-relative">
+                                                        <i class="mdi mdi-dots-vertical text-secondary cursor-pointer"
+                                                           style="font-size: 1.5rem;"
+                                                           id="dropdownMenuButton@user.UserID"
+                                                           data-bs-toggle="dropdown"
+                                                           aria-expanded="false"
+                                                           title="More Actions"></i>
+
+
+                                                        <ul class="dropdown-menu dropdown-menu-end custom-dropdown"
+                                                            aria-labelledby="dropdownMenuButton@user.UserID">
+                                                            @if (user.ActiveFlag == 0)
+                                                            {
+                                                                <has-permission module-id="4" action-id="10">
+                                                                    <li>
+                                                                        <a class="dropdown-item" href="javascript:void(0);" onclick="activateUser(@user.UserID)">
+                                                                            <i class="mdi mdi-lock-open-outline me-1"></i> Activate User
+                                                                        </a>
+                                                                    </li>
+                                                                </has-permission>
+                                                            }
+                                                            else if (user.ActiveFlag == 1)
+                                                            {
+                                                                <has-permission module-id="4" action-id="9">
+                                                                    <li>
+                                                                        <a class="dropdown-item" href="javascript:void(0);" onclick="deactivateUser(@user.UserID)">
+                                                                            <i class="mdi mdi-lock-outline me-1"></i> Deactivate User
+                                                                        </a>
+                                                                    </li>
+                                                                </has-permission>
+                                                            }
+                                                            <has-permission module-id="4" action-id="7">
                                                                 <li>
-                                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="activateUser(@user.UserID)">
-                                                                        <i class="mdi mdi-lock-open-outline me-1"></i> Activate User
+                                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="extraPermission(@user.UserID, @user.RoleID)">
+                                                                        <i class="mdi mdi-shield-account-outline me-1"></i> Extra Permission
                                                                     </a>
                                                                 </li>
                                                             </has-permission>
-                                                        }
-                                                        else if (user.ActiveFlag == 1)
-                                                        {
-                                                            <has-permission module-id="4" action-id="9">
-                                                                <li>
-                                                                    <a class="dropdown-item" href="javascript:void(0);" onclick="deactivateUser(@user.UserID)">
-                                                                        <i class="mdi mdi-lock-outline me-1"></i> Deactivate User
-                                                                    </a>
-                                                                </li>
-                                                            </has-permission>
-                                                        }
-                                                        <has-permission module-id="4" action-id="7">
-                                                            <li>
-                                                                <a class="dropdown-item" href="javascript:void(0);" onclick="extraPermission(@user.UserID, @user.RoleID)">
-                                                                    <i class="mdi mdi-shield-account-outline me-1"></i> Extra Permission
-                                                                </a>
-                                                            </li>
-                                                        </has-permission>
-                                                    </ul>
-                                                </div>
+                                                        </ul>
+                                                    </div>
+
                                             </div>
                                         </td>
 
@@ -306,6 +310,47 @@
                         background: linear-gradient(145deg, #f75964, #06498c);
                         background-size: cover;
                     }
+                    /* Make dropdown appear above table and not be cut off */
+                    .action-dropdown {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        position: relative;
+                    }
+
+                  
+
+                    .custom-dropdown {
+                        z-index: 9999 !important; /* ensure it's above all elements */
+                        transform: translate3d(0, 0, 0); /* force GPU render for smoother display */
+                        background: rgba(30, 30, 30, 0.95);
+                        border: 1px solid rgba(255, 255, 255, 0.15);
+                        backdrop-filter: blur(10px);
+                     
+                        border-radius: 10px;
+                        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+                    }
+                        /* Optional – enhance dropdown item styling */
+                        .custom-dropdown .dropdown-item {
+                            color: #e4e4e4;
+                            transition: background 0.2s ease;
+                        }
+
+                            .custom-dropdown .dropdown-item:hover {
+                                background: rgba(255, 255, 255, 0.1);
+                                color: #fff;
+                            }
+
+                    /* Ensure dropdown is not clipped by parent containers */
+                    .table-responsive,
+                    .table,
+                    td,
+                    tr {
+                        overflow: visible !important;
+                    }
+
+                   
+
                 </style>
 
 
@@ -319,7 +364,7 @@
                                 <!-- Action Menu -->
                                 <div class="dropdown position-absolute top-0 end-0 p-1">
                                     <i class="mdi mdi-dots-vertical cursor-pointer"
-                                       style="font-size:1rem;color: white;" data-bs-toggle="dropdown"></i>
+                                       style="font-size:18px;color: white;" data-bs-toggle="dropdown"></i>
 
                                     <ul class="dropdown-menu dropdown-menu-end">
                                         <!-- Edit -->
