@@ -201,22 +201,20 @@
                                         <td class="text-start">@user.PhoneNumber</td>
                                         <td class="text-start">@user.RoleName</td>
                                         <td class="text-start">@user.GenderName</td>
-                                        <td class="text-center">
-                                            @{
-                                                var status = user.ActiveFlag switch
-                                                {
-                                                    1 => "Active",
+                                            <td class="text-center">
+                                                @{
+                                                    var iconClass = user.ActiveFlag switch
+                                                    {
+                                                        1 => "bi-person-check-fill text-success",
+                                                        0 => "bi-person-x-fill text-danger",
+                                                        _ => "bi-question-circle text-secondary"
+                                                    };
+                                                }
 
-                                                    0 => "Deactivated",
-                                                    _ => "Unknown"
-                                                };
-                                                var badgeClass = user.ActiveFlag == 1 ? "bg-success" :
-                                                user.ActiveFlag == 0 ? "bg-danger" :
-                                                "bg-secondary";
-                                            }
-                                            <span class="badge @badgeClass fw-semibold">@status</span>
+                                                <i class="bi @iconClass fs-1"></i>
+                                            </td>
 
-                                        </td>
+
                                         <td class="text-center">
                                             <div class="d-flex justify-content-center align-items-center gap-2">
                                                 <!-- Edit Icon -->
