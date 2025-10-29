@@ -33,7 +33,9 @@
 
             <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
-                <div class="col-md-3">
+                <div class="row justify-content-between">
+
+                    <div class="col-auto">
                     <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/ActionCreation/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
@@ -41,10 +43,9 @@
 
                 </div>
 
-                <div class="col-md-5">
-                </div>
 
-                <div class="col-md-4 ms-auto d-flex justify-content-end">
+
+                    <div class="col-auto">
 
 
                     <has-permission module-id="5" action-id="1">
@@ -55,10 +56,11 @@
                         </button>
                     </has-permission>
                 </div>
+                </div>
             </div>
 
 
-            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+            <div class=" table-responsive row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: #5f5c5c;">
                
   <table class="table table-bordered table-hover table-xl mt-2" id="actionTable">
