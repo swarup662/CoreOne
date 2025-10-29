@@ -1,57 +1,121 @@
-﻿
-@using CoreOne.DOMAIN.Models
+﻿@using CoreOne.DOMAIN.Models
 @using CoreOne.UI.Controllers
 @using CoreOne.UI.Helper
 @inject MenuLayoutController MenuController
 @inject IHttpContextAccessor HttpContextAccessor
-@{
 
+@{
     var userId = TokenHelper.GetUserIdFromToken(HttpContextAccessor.HttpContext);
-    bool TokenExpiry = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
+    bool tokenValid = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
     var menuItems = new List<MenuItem>();
     User user = new User();
-    if (!userId.HasValue || !TokenExpiry)
+
+    // ✅ 1. Check authentication
+    if (!userId.HasValue || !tokenValid)
     {
-        TempData["message"] = "Please Login again";
+        TempData["message"] = "Please login again";
         TempData["messagetype"] = "error";
-        // Redirect to login if userId is null
-        HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
-        // Don't return; let the layout render a minimal page
+
+        // Safe redirect and stop rendering
+        Context.Response.Redirect("/Account/Login");
+        return;
     }
-    else
+
+    // ✅ 2. Load user info
+    var tokenUser = TokenHelper.UserFromToken(Context);
+    if (tokenUser is not null)
     {
-        var TokenUser = TokenHelper.UserFromToken(Context);
-        // Load menu
-        if (TokenUser is not null)
-        {
-            user = TokenUser;
-        }
-        menuItems = await MenuController.UserMenu(Context);
-        if (menuItems.Count == 0)
-        {
-            // Redirect to login if userId is null
-            HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
-        }
-
-
-
+        user = tokenUser;
     }
-    // Group menu items by Parent
-    // Group items by ParentID (i.e., top-level menu sections)
+
+    // ✅ 3. Load menu
+    menuItems = await MenuController.UserMenu(Context);
+
+    if (menuItems == null || menuItems.Count == 0)
+    {
+        Context.Response.Redirect("/Account/Login");
+        return;
+    }
+
+    // ✅ 4. Group menu items
     var groupedMenu = menuItems
         .GroupBy(m => new { m.ParentID, m.ParentName, m.ParentSequence, m.MenuSymbol })
         .OrderBy(g => g.Key.ParentSequence ?? 0)
         .ToList();
-
 }
+<style>
+    /* 🔄 Preloader Styles */
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(13, 20, 35, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
 
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
 
+    .loader {
+        text-align: center;
+    }
 
+        .loader .spin {
+            font-size: 48px;
+            color: #89a4cd;
+            animation: spin 2s linear infinite;
+        }
+
+    .loading-text {
+        color: #ffffffcc;
+        margin-top: 10px;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+</style>
+<style>
+    .toast-container-fixed {
+        position: fixed;
+        top: 150px; /* 👈 increase this value to move even lower (e.g., 200px, 250px) */
+        right: 5px;
+        z-index: 1080;
+    }
+
+</style>
+
+<!-- 🔄 Preloader -->
+<div id="preloader">
+    <div class="loader">
+        <i class="fas fa-globe logo-icon spin"></i>
+        <div class="loading-text">Loading...</div>
+    </div>
+</div>
+<script>
+    // Preloader hide on page load
+    window.addEventListener('load', function () {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            preloader.classList.add('hidden');
+            setTimeout(() => preloader.remove(), 600); // removes after fade-out
+        }
+    });
+</script>
+
+<!-- ✅ Page Header -->
 <div class="page-title-box">
     <div class="page-title-right">
         <form class="d-flex align-items-center mb-3">
             <div class="input-group input-group-sm">
-                <input type="hidden" class="form-control border-0 shadow flatpickr-input" id="dash-daterange" value="2025-10-27"><input class="form-control border-0 shadow input active" placeholder="" tabindex="0" type="text" readonly="readonly">
+                <input type="hidden" class="form-control border-0 shadow flatpickr-input" id="dash-daterange" value="2025-10-27">
+                <input class="form-control border-0 shadow input active" placeholder="" tabindex="0" type="text" readonly="readonly">
                 <span class="input-group-text bg-primary border-primary text-white">
                     <i class="mdi mdi-calendar-range"></i>
                 </span>
@@ -60,7 +124,7 @@
                 <i class="mdi mdi-autorenew"></i>
             </a>
 
-            <a href="javascript: void(0);" class="btn btn-primary btn-sm ms-1">
+            <a href="javascript:void(0);" class="btn btn-primary btn-sm ms-1">
                 <i class="mdi mdi-filter-variant"></i>
             </a>
         </form>
@@ -69,46 +133,26 @@
 </div>
 
 
-
-
+<!-- ✅ JS for date input -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const today = new Date().toISOString().split("T")[0];
-
         document.getElementById("dash-daterange").value = today;
         document.querySelector(".input-group input[type='text']").value = today;
     });
 </script>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@* Transparent Toast Container (top-right) *@
+<!-- ✅ Toast Notifications -->
 @{
     var message = TempData["message"];
-
 }
 
 @if (message != null)
 {
     var messagetype = TempData["messagetype"];
-    string messageType = "";
-    if (messagetype is not null)
-    {
-        messageType = messagetype.ToString();
-    }
+    string messageType = messagetype?.ToString() ?? "";
+
     if (string.Equals(messageType, "error", StringComparison.OrdinalIgnoreCase))
     {
         <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
@@ -125,7 +169,8 @@
     }
     else if (string.Equals(messageType, "success", StringComparison.OrdinalIgnoreCase))
     {
-        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0" style="z-index: 1080; padding: 7rem 1rem 1rem 1rem;">
+        <div aria-live="polite" aria-atomic="true"
+                  class="toast-container-fixed p-3">
             <div class="toast show border border-success rounded shadow-sm"
                  style="background-color: rgba(40, 167, 69, 0.15);"
                  role="alert" aria-live="assertive" aria-atomic="true">
@@ -134,18 +179,17 @@
                         <i class="bi bi-check-circle-fill me-2 fs-5"></i>
                         @message
                     </div>
-                    <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    <button type="button" class="btn-close me-2 m-auto"
+                            data-bs-dismiss="toast" aria-label="Close"></button>
                 </div>
             </div>
         </div>
+
     }
     else
     {
-        // Fallback: Warning when messageType is null or unrecognized
-        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 mt-5 me-3" style="z-index: 1080;">
-            <div class="toast show border border-warning rounded shadow-sm"
-                 style="background-color: rgba(255, 193, 7, 0.15);"
-                 role="alert" aria-live="assertive" aria-atomic="true">
+        <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+            <div class="toast show border border-warning rounded shadow-sm" style="background-color: rgba(255, 193, 7, 0.15);" role="alert" aria-live="assertive" aria-atomic="true">
                 <div class="d-flex">
                     <div class="toast-body text-warning d-flex align-items-center">
                         <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
@@ -158,9 +202,6 @@
     }
 }
 
-
-
-
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
@@ -169,7 +210,7 @@
             var toastElList = [].slice.call(document.querySelectorAll('.toast'));
             toastElList.forEach(function (toastEl) {
                 var toast = new bootstrap.Toast(toastEl, {
-                    delay: 2000  //  seconds
+                    delay: 2000  // 2 seconds
                 });
                 toast.show();
 

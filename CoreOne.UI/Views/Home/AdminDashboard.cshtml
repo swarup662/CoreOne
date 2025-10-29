@@ -3,47 +3,43 @@
 @using CoreOne.UI.Helper
 @inject MenuLayoutController MenuController
 @inject IHttpContextAccessor HttpContextAccessor
-@{
 
+@{
     var userId = TokenHelper.GetUserIdFromToken(HttpContextAccessor.HttpContext);
-    bool TokenExpiry = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
+    bool tokenValid = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
     var menuItems = new List<MenuItem>();
     User user = new User();
-    if (!userId.HasValue || !TokenExpiry)
+
+    // ✅ Token check
+    if (!userId.HasValue || !tokenValid)
     {
-        TempData["message"] = "Please Login again";
+        TempData["message"] = "Please login again";
         TempData["messagetype"] = "error";
-        // Redirect to login if userId is null
         HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
-        // Don't return; let the layout render a minimal page
+        return; // ⛔ Stop rendering further HTML
     }
-    else
+
+    // ✅ Load user info
+    var tokenUser = TokenHelper.UserFromToken(Context);
+    if (tokenUser is not null)
     {
-        var TokenUser = TokenHelper.UserFromToken(Context);
-        // Load menu
-        if (TokenUser is not null)
-        {
-            user = TokenUser;
-        }
-        menuItems = await MenuController.UserMenu(Context);
-        if (menuItems.Count == 0)
-        {
-            // Redirect to login if userId is null
-            HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
-        }
-
-
-
+        user = tokenUser;
     }
-    // Group menu items by Parent
-    // Group items by ParentID (i.e., top-level menu sections)
+
+    // ✅ Load menu
+    menuItems = await MenuController.UserMenu(Context);
+    if (menuItems == null || menuItems.Count == 0)
+    {
+        HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
+        return;
+    }
+
+    // ✅ Group menu items
     var groupedMenu = menuItems
         .GroupBy(m => new { m.ParentID, m.ParentName, m.ParentSequence, m.MenuSymbol })
         .OrderBy(g => g.Key.ParentSequence ?? 0)
         .ToList();
-
 }
-
 
 
 <div class="page-title-box">
@@ -67,7 +63,52 @@
     <h4 class="page-title">Welcome ! @user.UserName</h4>
 </div>
 
+<style>
+    /* 🔄 Preloader Styles */
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(13, 20, 35, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
 
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+    .loader {
+        text-align: center;
+    }
+
+        .loader .spin {
+            font-size: 48px;
+            color: #89a4cd;
+            animation: spin 2s linear infinite;
+        }
+
+    .loading-text {
+        color: #ffffffcc;
+        margin-top: 10px;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+</style>
+
+<!-- 🔄 Preloader -->
+<div id="preloader">
+    <div class="loader">
+        <i class="fas fa-globe logo-icon spin"></i>
+        <div class="loading-text">Loading...</div>
+    </div>
+</div>
 
 
 <script>
@@ -76,5 +117,15 @@
 
         document.getElementById("dash-daterange").value = today;
         document.querySelector(".input-group input[type='text']").value = today;
+    });
+</script>
+<script>
+    // Preloader hide on page load
+    window.addEventListener('load', function () {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            preloader.classList.add('hidden');
+            setTimeout(() => preloader.remove(), 600); // removes after fade-out
+        }
     });
 </script>
