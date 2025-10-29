@@ -1,4 +1,7 @@
 ﻿@model CoreOne.DOMAIN.Models.UserCreation
+@using System.IO
+@using System
+
 @{
     string genderIcon = Model.GenderName?.ToLower() switch
     {
@@ -8,59 +11,300 @@
     };
 
     string statusBadge = Model.ActiveFlag == 1
-        ? "<span class='badge bg-success'>Active</span>"
-        : "<span class='badge bg-danger'>Inactive</span>";
+        ? "<span class='badge bg-success rounded-pill px-3 py-1 shadow-sm'>Active</span>"
+        : "<span class='badge bg-danger rounded-pill px-3 py-1 shadow-sm'>Inactive</span>";
 
-    string profileImage = Url.Content("~/" + Model.PhotoPath?.Replace("wwwroot\\", "").Replace("\\", "/"));
+    // 🧠 Hide image path using Base64 blob
+    string imageBase64 = "";
+    string defaultImage = Url.Content("~/images/default-profile.png");
+
+    try
+    {
+        if (!string.IsNullOrEmpty(Model.PhotoPath))
+        {
+            var sanitizedPath = Model.PhotoPath
+                .Replace("wwwroot\\", "")
+                .Replace("\\", "/")
+                .TrimStart('/');
+
+            var fullPath = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", sanitizedPath);
+
+            if (System.IO.File.Exists(fullPath))
+            {
+                var bytes = System.IO.File.ReadAllBytes(fullPath);
+                imageBase64 = $"data:image/jpeg;base64,{Convert.ToBase64String(bytes)}";
+            }
+        }
+    }
+    catch
+    {
+        imageBase64 = "";
+    }
+
+    if (string.IsNullOrEmpty(imageBase64))
+    {
+        imageBase64 = defaultImage;
+    }
 }
-<link href="~/css/myaccount.css" rel="stylesheet" />
 
 
-<div class="profile-wrapper mx-auto">
+<style>
+    /* 🌈 Overall Wrapper */
+    .profile-wrapper {
+        max-width: 950px;
+        margin: 30px auto;
+        padding: 0 1rem;
+        font-family: "Inter", sans-serif;
+    }
 
-    <!-- ✅ Modern Banner Header -->
+    /* 🌅 Gradient Banner */
+    .profile-header {
+        height: 200px;
+        border-radius: 24px;
+        background: linear-gradient(135deg, #4f8bff, #77b4ff, #a7d8ff);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .profile-header::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top left, rgba(255,255,255,0.3) 0%, transparent 70%);
+            transform: rotate(15deg);
+        }
+
+    /* 🪞 Profile Card */
+    .profile-card {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 22px;
+        padding: 2.5rem 2rem;
+        margin-top: -100px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: flex-start;
+        gap: 2rem;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+    }
+
+        /* Left Section */
+        .profile-card .left {
+            flex: 1 1 260px;
+            max-width: 300px;
+            text-align: center;
+            border-right: 1px dashed #d7dce5;
+        }
+
+    .profile-image {
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 5px solid #fff;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+        margin-bottom: 12px;
+    }
+
+    .profile-card h4 {
+        font-size: 1.45rem;
+        color: #1a2942;
+        margin-bottom: 6px;
+        font-weight: 700;
+    }
+
+    .profile-card p {
+        font-size: 0.95rem;
+        color: #64708a;
+    }
+
+    /* Right Section */
+    .profile-card .right {
+        flex: 2 1 400px;
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+    }
+
+    /* 🧩 Detail Card */
+    .detail-card {
+        background: #f8faff;
+        border: 1px solid #e4e9f5;
+        border-radius: 14px;
+        padding: 14px 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        transition: all 0.25s ease;
+    }
+
+        .detail-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            background: linear-gradient(145deg, #f9fbff, #eef3ff);
+        }
+
+        .detail-card label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            color: #324974;
+        }
+
+            .detail-card label i {
+                font-size: 1.1rem;
+                color: #4f8bff;
+            }
+
+        .detail-card span {
+            font-weight: 600;
+            color: #1e2746;
+        }
+
+    /* ✨ Badge Hover */
+    .badge {
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        transition: transform 0.2s ease;
+    }
+
+        .badge:hover {
+            transform: scale(1.05);
+        }
+
+    /* 📱 Responsive */
+    @@media (max-width: 992px) {
+        .profile-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+            .profile-card .left {
+                border-right: none;
+                border-bottom: 1px dashed #e3e6ef;
+                padding-bottom: 1rem;
+            }
+    }
+
+    @@media (max-width: 576px) {
+        .profile-header {
+            height: 130px;
+        }
+
+        .profile-card {
+            margin-top: -70px;
+            padding: 1.5rem 1rem;
+        }
+
+        .profile-image {
+            width: 110px;
+            height: 110px;
+        }
+
+        .detail-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 6px;
+        }
+    }
+</style>
+
+<style>
+    /* 🔄 Preloader Styles */
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(13, 20, 35, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+    .loader {
+        text-align: center;
+    }
+
+        .loader .spin {
+            font-size: 48px;
+            color: #89a4cd;
+            animation: spin 2s linear infinite;
+        }
+
+    .loading-text {
+        color: #ffffffcc;
+        margin-top: 10px;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+</style>
+
+<!-- 🔄 Preloader -->
+<div id="preloader">
+    <div class="loader">
+        <i class="fas fa-globe logo-icon spin"></i>
+        <div class="loading-text">Loading...</div>
+    </div>
+</div>
+<div class="profile-wrapper">
     <div class="profile-header"></div>
 
-    <div class="profile-card row g-4 align-items-start" style="    margin-left: 10px;
-    margin-right: 10px;">
-
-        <!-- ✅ Profile Image -->
-        <div class="col-md-4 text-center">
-            <img src="@profileImage" class="profile-image"
+    <div class="profile-card">
+        <!-- Left -->
+        <div class="left">
+            <img src="@imageBase64"
+                 class="profile-image"
+                 alt="Profile Image"
                  onerror="this.src='/images/default-profile.png';" />
-            <h4 class="mt-3 fw-bold">@Model.UserName</h4>
+            <h4>@Model.UserName</h4>
             @Html.Raw(statusBadge)
-            <p class="mt-2 mb-0 text-muted">
-                <i class="mdi mdi-shield-account"></i> @Model.RoleName
-            </p>
+            <p class="mt-2"><i class="mdi mdi-shield-account"></i> @Model.RoleName</p>
         </div>
 
-        <!-- ✅ Details Section -->
-        <div class="col-md-8">
-
+        <!-- Right -->
+        <div class="right">
             <div class="detail-card">
                 <label><i class="mdi mdi-email"></i> Email</label>
                 <span>@Model.Email</span>
             </div>
-
             <div class="detail-card">
                 <label><i class="mdi mdi-phone"></i> Phone</label>
                 <span>@Model.PhoneNumber</span>
             </div>
-
             <div class="detail-card">
                 <label><i class="@genderIcon"></i> Gender</label>
                 <span>@Model.GenderName</span>
             </div>
-
             <div class="detail-card">
                 <label><i class="mdi mdi-calendar"></i> Created On</label>
                 <span>@Model.CreatedDate?.ToString("dd-MMM-yyyy")</span>
             </div>
-
         </div>
-
     </div>
 </div>
-
-
+<script>
+    // Preloader hide on page load
+    window.addEventListener('load', function () {
+        const preloader = document.getElementById('preloader');
+        if (preloader) {
+            preloader.classList.add('hidden');
+            setTimeout(() => preloader.remove(), 600); // removes after fade-out
+        }
+    });
+</script>

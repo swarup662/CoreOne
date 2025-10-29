@@ -238,5 +238,44 @@
 
 
 
+/* ✅ Wrapper ensures proper spacing and positioning */
+.custom-table-wrapper {
+    display: block;
+    width: 100%;
+    position: relative;
+}
 
+/* ✅ The responsive area — enables scrollbars when table exceeds screen */
+.custom-table-responsive {
+    width: 100%;
+    overflow-x: auto !important; /* show horizontal scroll when needed */
+    overflow-y: auto !important; /* show vertical scroll when needed */
+    position: relative;
+    max-height: 80vh; /* optional: limit height, makes vertical scroll inside */
+    scrollbar-color: #888 #f1f1f1;
+    scrollbar-width: thin;
+}
 
+/* ✅ Keep proper table behavior */
+.custom-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto; /* preserve normal table layout */
+    min-width: 800px; /* ensures wide tables scroll instead of shrinking */
+}
+
+    /* ✅ Standard cell styling */
+    .custom-table th,
+    .custom-table td {
+        vertical-align: middle;
+        white-space: nowrap; /* prevents wrapping inside cells */
+        padding: 0.55rem 0.75rem;
+        border: 1px solid #dee2e6;
+    }
+
+/* ✅ Make dropdowns appear over scrollable container */
+.custom-table-responsive .dropdown-menu {
+    position: absolute !important;
+    z-index: 1050 !important;
+    transform: translate3d(0, 0, 0);
+}

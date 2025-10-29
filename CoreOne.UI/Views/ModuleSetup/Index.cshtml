@@ -32,7 +32,52 @@
 
 <link href="~/css/modulesetup.css" rel="stylesheet" />
 
+<style>
+    /* 🔄 Preloader Styles */
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(13, 20, 35, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
 
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+    .loader {
+        text-align: center;
+    }
+
+        .loader .spin {
+            font-size: 48px;
+            color: #89a4cd;
+            animation: spin 2s linear infinite;
+        }
+
+    .loading-text {
+        color: #ffffffcc;
+        margin-top: 10px;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+</style>
+
+<!-- 🔄 Preloader -->
+<div id="preloader">
+    <div class="loader">
+        <i class="fas fa-globe logo-icon spin"></i>
+        <div class="loading-text">Loading...</div>
+    </div>
+</div>
 <div class="container-fluid  p-2" style="background:rgba(255, 255, 255, 0.08);">
 
     <div class="row" style="margin-top: -19px; margin-bottom: -6px;">
@@ -57,30 +102,33 @@
 
             <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
                  -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
-                <div class="col-md-3">
+                <div class="row justify-content-between">
+
+                    <div class="col-auto">
                     <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/ModuleSetup/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
                     </button>
                 </div>
-                <div class="col-md-5">
-                   
-                </div>
-             
-                <div class="col-md-4 ms-auto d-flex justify-content-end">
+
+
+
+                    <div class="col-auto">
                     <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                         <i class="mdi mdi-plus-circle"></i> Create Module SetUp
                     </button>
                 </div>
+                </div>
+
             </div>
 
             <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
                  -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
                 <div class="col-md-3">
-                    <input type="search" id="searchBox" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
+                    <input type="search" id="searchBox" value="@search" class="form-control my-1 my-lg-0" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" id="searchField" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
+                    <select class="form-select my-1 my-lg-0" id="searchField" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
                         @{
                             string[] searchableFields = { "MenuName", "ModuleName" };
                             string[] searchableNames = { "Menu", "Modules" };
@@ -93,13 +141,13 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button id="btnSearch" class="btn icon-btn">
+                    <button id="btnSearch" class="btn icon-btn my-1 my-lg-0">
                         <i class="mdi mdi-magnify"></i>
                     </button>
               
                 </div>
                 <div class="col-md-2 ms-auto d-flex justify-content-end">
-                    <select class="form-select" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
+                    <select class="form-select my-1 my-lg-0" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
                         @{
                             int[] pageSizes = { 1, 10, 20, 50, 100 };
                             foreach (var size in pageSizes)
@@ -111,7 +159,7 @@
                 </div>
             </div>
 
-            <div class="row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+            <div class="table-responsive row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
                  -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
             <table class="table table-bordered table-hover table-xl mt-2">
                 
@@ -509,8 +557,17 @@
 
 
 
-</script> 
-
+</script>
+    <script>
+        // Preloader hide on page load
+        window.addEventListener('load', function () {
+            const preloader = document.getElementById('preloader');
+            if (preloader) {
+                preloader.classList.add('hidden');
+                setTimeout(() => preloader.remove(), 600); // removes after fade-out
+            }
+        });
+    </script>
     <script src="~/js/ModuleSetup.js"></script>
 
 }
