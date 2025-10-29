@@ -16,6 +16,53 @@
 
 
 <link href="~/css/usercreation.css" rel="stylesheet" />
+<style>
+    .row-bg {
+        border: 1px solid white;
+        margin-top: -20px;
+        border-radius: 15px;
+        background: linear-gradient(145deg, #f75964, #06498c);
+        background-size: cover;
+    }
+    /* Make dropdown appear above table and not be cut off */
+    .action-dropdown {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+
+
+    .custom-dropdown {
+        z-index: 9999 !important; /* ensure it's above all elements */
+        transform: translate3d(0, 0, 0); /* force GPU render for smoother display */
+        background: rgba(30, 30, 30, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    }
+        /* Optional – enhance dropdown item styling */
+        .custom-dropdown .dropdown-item {
+            color: #e4e4e4;
+            transition: background 0.2s ease;
+        }
+
+            .custom-dropdown .dropdown-item:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+            }
+
+    /* Ensure dropdown is not clipped by parent containers */
+    .table-responsive,
+    .table,
+    td,
+    tr {
+        overflow: visible !important;
+    }
+
+</style>
 <script>
     async function loadUserPhotoByFilePath(filePath, elementId) {
         // Use the same logic as loadProfilePhoto
@@ -75,7 +122,10 @@
 
             <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
-                <div class="col-md-3 d-flex gap-2">
+
+                <div class="row justify-content-between">
+
+                    <div class="col-auto">
                     <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
                             onclick="window.location.href='/UserCreation/Index'">
                         <i class="mdi mdi-refresh-circle"></i> Refresh
@@ -90,10 +140,10 @@
                     </button>
 
                 </div>
-                <div class="col-md-5">
-                </div>
 
-                <div class="col-md-4 ms-auto d-flex justify-content-end">
+
+
+                    <div class="col-auto">
 
 
                     <has-permission module-id="4" action-id="1">
@@ -105,16 +155,17 @@
                     </has-permission>
 
                 </div>
+                </div>
             </div>
 
             <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
               -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
 
                 <div class="col-md-4">
-                    <input type="text" id="search" value="@search" class="form-control" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
+                    <input type="text" id="search" value="@search" class="form-control my-1 my-lg-0" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" id="searchCol" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
+                    <select class="form-select my-1 my-lg-0" id="searchCol" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
                         <option value="UserName" selected> Name</option>
                         <option value="Email">Email</option>
                         <option value="PhoneNumber">Phone</option>
@@ -122,7 +173,7 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" id="activeStatus" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
+                    <select class="form-select my-1 my-lg-0" id="activeStatus" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
                         <option value="">All Status</option>
                         <option value="1">Active</option>
                         <option value="2">Blocked</option>
@@ -133,14 +184,14 @@
                 <!-- Page Size Dropdown (like Role) -->
                 <div class="col-md-2">
 
-                    <button id="btnSearch" class="btn rounded-pill ms-2" style="background: #98a6ad;color: white;">
+                    <button id="btnSearch" class="btn rounded-pill ms-2 my-1 my-lg-0" style="background: #98a6ad;color: white;">
                         <i class="mdi mdi-magnify"></i> Search
                     </button>
 
 
                 </div>
                 <div class="col-md-2 ms-auto d-flex justify-content-end">
-                    <select class="form-select" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
+                    <select class="form-select my-1 my-lg-0" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
                         @{
                             int[] pageSizes = new int[] { 1, 10, 20, 50, 100 };
                             foreach (var size in pageSizes)
@@ -156,8 +207,8 @@
               -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
 
                 <div id="listViewContainer" class="row" style="display:block;">
-            <div class="table-responsive">
-                    <table class="table table-bordered table-hover table-sm small mt-2">
+                    <div class="custom-table-responsive">
+                        <table class="table custom-table table-hover table-sm small mt-2">
                         <thead class="table-light text-dark">
                             <tr>
                                 <th class="justify-content-between align-items-center text-decoration-none" style="color:black">Sl No.</th>
@@ -188,20 +239,20 @@
                                 foreach (var user in users)
                                 {
                                     <tr class="align-middle">
-                                        <td class="text-center">@count</td>
-                                        <td class="text-center">
+                                            <td data-label="Sl No." class="text-center">@count</td>
+                                            <td data-label="Profile" class="text-center">
                                             <img id="userPhoto_@user.UserID"
                                                  src="/images/default-user.png"
                                                  alt="Profile"
                                                  class="rounded-circle"
                                                  style="width:50px; height:50px; object-fit:cover; border:1px solid #ddd;">
                                         </td>
-                                        <td class="text-start fw-semibold">@user.UserName</td>
-                                        <td class="text-start">@user.Email</td>
-                                        <td class="text-start">@user.PhoneNumber</td>
-                                        <td class="text-start">@user.RoleName</td>
-                                        <td class="text-start">@user.GenderName</td>
-                                            <td class="text-center">
+                                            <td data-label="Name" class="text-start fw-semibold">@user.UserName</td>
+                                        <td  data-label="Email" class="text-start">@user.Email</td>
+                                            <td data-label="Phone" class="text-start">@user.PhoneNumber</td>
+                                            <td data-label="Role" class="text-start">@user.RoleName</td>
+                                            <td data-label="Gender" class="text-start">@user.GenderName</td>
+                                            <td data-label="Status" class="text-center">
                                                 @{
                                                     var iconClass = user.ActiveFlag switch
                                                     {
@@ -215,7 +266,7 @@
                                             </td>
 
 
-                                        <td class="text-center">
+                                            <td data-label="Actions"  class="text-center">
                                             <div class="d-flex justify-content-center align-items-center gap-2">
                                                 <!-- Edit Icon -->
                                                 <has-permission module-id="4" action-id="2">
@@ -298,65 +349,18 @@
                         </tbody>
                     </table>
                 </div>
+                
+
                 </div>
 
-                <style>
-                    .row-bg {
-                        border: 1px solid white;
-                        margin-top: -20px;
-                        border-radius: 15px;
-                        background: linear-gradient(145deg, #f75964, #06498c);
-                        background-size: cover;
-                    }
-                    /* Make dropdown appear above table and not be cut off */
-                    .action-dropdown {
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        position: relative;
-                    }
-
-                  
-
-                    .custom-dropdown {
-                        z-index: 9999 !important; /* ensure it's above all elements */
-                        transform: translate3d(0, 0, 0); /* force GPU render for smoother display */
-                        background: rgba(30, 30, 30, 0.95);
-                        border: 1px solid rgba(255, 255, 255, 0.15);
-                        backdrop-filter: blur(10px);
-                     
-                        border-radius: 10px;
-                        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-                    }
-                        /* Optional – enhance dropdown item styling */
-                        .custom-dropdown .dropdown-item {
-                            color: #e4e4e4;
-                            transition: background 0.2s ease;
-                        }
-
-                            .custom-dropdown .dropdown-item:hover {
-                                background: rgba(255, 255, 255, 0.1);
-                                color: #fff;
-                            }
-
-                    /* Ensure dropdown is not clipped by parent containers */
-                    .table-responsive,
-                    .table,
-                    td,
-                    tr {
-                        overflow: visible !important;
-                    }
-
-                   
-
-                </style>
+        
 
 
                 <div id="gridViewContainer" class="row" style="display:none;">
                     @foreach (var user in users)
                     {
                         <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
-                            <div class="user-card shadow-lg border-0 position-relative"
+                            <div class="user-card mb-2 shadow-lg border-0 position-relative"
                                  style="border-radius:18px; overflow:hidden; background:linear-gradient(145deg, #36404a, #043362); color:white; min-height:240px;">
 
                                 <!-- Action Menu -->
