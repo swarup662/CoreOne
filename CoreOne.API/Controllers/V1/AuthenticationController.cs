@@ -67,7 +67,45 @@ namespace CoreOne.API.Controllers.V1
             return Ok(result);
         }
 
+
+
+
+
+
+        #region chage-forgot-password
+        [HttpPost("ForgotPassword")]
+        public IActionResult ForgotPassword([FromBody] string email)
+        {
+            var result = _authRepository.ForgotPassword(email);
+            return Ok(result);
+        }
+
+        [HttpGet("ValidateResetToken")]
+        public IActionResult ValidateResetToken(string token)
+        {
+            var result = _authRepository.ValidateResetToken(token);
+            return Ok(result);
+        }
+
+        [HttpPost("ResetPassword")]
+        public IActionResult ResetPassword([FromBody] ResetPasswordRequest req)
+        {
+            var result = _authRepository.ResetPassword(req.UserID, req.NewPassword, req.Token);
+            return Ok(result);
+        }
+
+        [HttpPost("ChangePassword")]
+        public IActionResult ChangePassword([FromBody] ChangePasswordRequest req)
+        {
+            var result = _authRepository.ChangePassword(req.UserID, req.CurrentPassword, req.NewPassword);
+            return Ok(result);
+        }
+
+        #endregion
+
     }
+
+
 
     public class LoginRequest
     {

@@ -1,12 +1,13 @@
+using CoreOne.API.Helpers;
+using CoreOne.API.Infrastructure.Data;
+using CoreOne.API.Infrastructure.Services;
+using CoreOne.API.Interface;
+using CoreOne.API.Interfaces;
 using CoreOne.API.Middleware;
 using CoreOne.API.Repositories;
-using CoreOne.API.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
-using CoreOne.API.Interface;
-using CoreOne.API.Infrastructure.Data;
-using CoreOne.API.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ builder.Services.AddScoped<IUserCreationRepository, UserCreationRepository>();
 builder.Services.AddScoped<IModuleSetupRepository, ModuleSetupRepository>();
 builder.Services.AddScoped<IActionCreationRepository, ActionCreationRepository>();
 builder.Services.AddScoped<PermissionController>();
+builder.Services.AddScoped<IEmailHelper, EmailHelper>();
+
 
 // --- API Versioning ---
 builder.Services.AddApiVersioning(options =>

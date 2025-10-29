@@ -1,8 +1,9 @@
-﻿using CoreOne.UI.Helper;
+﻿using CoreOne.DOMAIN.Models;
+using CoreOne.UI.Helper;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
-using CoreOne.DOMAIN.Models;
+using static System.Net.WebRequestMethods;
 namespace CoreOne.UI.Controllers
 {
     public class AccountController : Controller
@@ -120,6 +121,61 @@ namespace CoreOne.UI.Controllers
             TempData["message"] = null;
             return Ok();
         }
+
+
+        #region change-forgot-password
+
+        public IActionResult ForgotPassword() => View();
+        public IActionResult ResetPassword(string token) => View(model: token);
+        public IActionResult ChangePassword() => View();
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword([FromBody] string email)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = $"{_apiSettings.BaseUrlAuthentication}ForgotPassword";
+            var content = new StringContent(JsonConvert.SerializeObject(email), Encoding.UTF8, "application/json");
+            var res = await client.PostAsync(url, content);
+            var body = await res.Content.ReadAsStringAsync();
+            return Content(body, "application/json");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ValidateResetToken(string token)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = $"{_apiSettings.BaseUrlAuthentication}/ValidateResetToken?token={token}";
+            var res = await client.GetAsync(url);
+            var body = await res.Content.ReadAsStringAsync();
+            return Content(body, "application/json");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
+        {
+            var user = TokenHelper.UserFromToken(HttpContext);
+            req.UserID = user.UserID;
+            var client = _httpClientFactory.CreateClient();
+            var url = $"{_apiSettings.BaseUrlAuthentication}/ResetPassword";
+            var content = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8, "application/json");
+            var res = await client.PostAsync(url, content);
+            var body = await res.Content.ReadAsStringAsync();
+            return Content(body, "application/json");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
+            
+        {
+            var user = TokenHelper.UserFromToken(HttpContext);
+            req.UserID = user.UserID;
+            var client = _httpClientFactory.CreateClient();
+            var url = $"{_apiSettings.BaseUrlAuthentication}/ChangePassword";
+            var content = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8, "application/json");
+            var res = await client.PostAsync(url, content);
+            var body = await res.Content.ReadAsStringAsync();
+            return Content(body, "application/json");
+        }
+        #endregion
 
     }
 }

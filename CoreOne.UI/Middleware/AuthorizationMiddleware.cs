@@ -32,8 +32,12 @@ namespace CoreOne.UI.Middleware
                 await _next(context);
                 return;
             }
-           
 
+            if (string.IsNullOrEmpty(token) || path.Contains("/Account/ForgotPassword") || path.Contains(" / api/FileUpload/viewPost"))
+            {
+                await _next(context);
+                return;
+            }
             // Skip static files & documents dynamically (any extension)
             if (Path.HasExtension(path))
             {
