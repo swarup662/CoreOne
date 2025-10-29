@@ -129,14 +129,16 @@ namespace CoreOne.UI.Controllers
         public IActionResult ResetPassword(string token) => View(model: token);
         public IActionResult ChangePassword() => View();
         [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> ForgotPassword([FromBody] string email)
         {
             var client = _httpClientFactory.CreateClient();
-            var url = $"{_apiSettings.BaseUrlAuthentication}ForgotPassword";
+            var url = $"{_apiSettings.BaseUrlAuthentication}/ForgotPassword";
             var content = new StringContent(JsonConvert.SerializeObject(email), Encoding.UTF8, "application/json");
             var res = await client.PostAsync(url, content);
             var body = await res.Content.ReadAsStringAsync();
-            return Content(body, "application/json");
+            var result = JsonConvert.DeserializeObject<PasswordValidationResponse>(body);
+            return Json(result);
         }
 
         [HttpGet]
@@ -145,36 +147,44 @@ namespace CoreOne.UI.Controllers
             var client = _httpClientFactory.CreateClient();
             var url = $"{_apiSettings.BaseUrlAuthentication}/ValidateResetToken?token={token}";
             var res = await client.GetAsync(url);
-            var body = await res.Content.ReadAsStringAsync();
-            return Content(body, "application/json");
+
+            if (!res.IsSuccessStatusCode)
+                return Json(new PasswordValidationResponse { Success = false, Message = "API call failed" });
+
+            var json = await res.Content.ReadAsStringAsync();
+            var result = JsonConvert.DeserializeObject<PasswordValidationResponse>(json);
+            return Json(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req)
         {
-            var user = TokenHelper.UserFromToken(HttpContext);
-            req.UserID = user.UserID;
+         
+
             var client = _httpClientFactory.CreateClient();
             var url = $"{_apiSettings.BaseUrlAuthentication}/ResetPassword";
             var content = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8, "application/json");
             var res = await client.PostAsync(url, content);
             var body = await res.Content.ReadAsStringAsync();
-            return Content(body, "application/json");
+            var result = JsonConvert.DeserializeObject<PasswordValidationResponse>(body);
+            return Json(result);
         }
 
         [HttpPost]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
-            
         {
             var user = TokenHelper.UserFromToken(HttpContext);
             req.UserID = user.UserID;
+
             var client = _httpClientFactory.CreateClient();
             var url = $"{_apiSettings.BaseUrlAuthentication}/ChangePassword";
             var content = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8, "application/json");
             var res = await client.PostAsync(url, content);
             var body = await res.Content.ReadAsStringAsync();
-            return Content(body, "application/json");
+            var result = JsonConvert.DeserializeObject<PasswordValidationResponse>(body);
+            return Json(result);
         }
+
         #endregion
 
     }

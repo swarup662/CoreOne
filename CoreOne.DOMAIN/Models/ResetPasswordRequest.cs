@@ -9,4 +9,13 @@ namespace CoreOne.DOMAIN.Models
     public class ResetPasswordRequest { public int? UserID { get; set; } public string NewPassword { get; set; } public string Token { get; set; } }
     public class ChangePasswordRequest { public int? UserID { get; set; } public string CurrentPassword { get; set; } public string NewPassword { get; set; } }
 
+
+    public class PasswordValidationResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; }
+        public int UserID { get; set; }
+        public DateTime? ExpiresAt { get; set; }
+    }
+
 }
