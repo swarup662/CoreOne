@@ -27,17 +27,14 @@ namespace CoreOne.UI.Middleware
             var path = context.Request.Path.Value?.ToLower();
 
             // Skip login page
-            if (string.IsNullOrEmpty(token) || path.Contains("/account/login") ||  path.Contains("/api/FileUpload/viewPost"))
+            if (string.IsNullOrEmpty(token) || path.Contains("/account/login") ||  path.Contains("/api/FileUpload/viewPost") || path.Contains("/account/forgotpassword")
+                || path.Contains("/account/resetpassword") )
             {
                 await _next(context);
                 return;
             }
 
-            if (string.IsNullOrEmpty(token) || path.Contains("/Account/ForgotPassword") || path.Contains(" / api/FileUpload/viewPost"))
-            {
-                await _next(context);
-                return;
-            }
+          
             // Skip static files & documents dynamically (any extension)
             if (Path.HasExtension(path))
             {

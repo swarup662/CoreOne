@@ -12,10 +12,10 @@ namespace CoreOne.API.Interfaces
 
 
 
-        (bool Success, string Message) ChangePassword(int? userId, string currentPwd, string newPwd);
-        (bool Success, string Message) ForgotPassword(string email);
-        (bool Success, string Message, int UserID) ValidateResetToken(string token);
-        (bool Success, string Message) ResetPassword(int? userId, string newPwd, string token);
+        PasswordValidationResponse ChangePassword(int? userId, string currentPwd, string newPwd);
+        PasswordValidationResponse ForgotPassword(string email);
+        PasswordValidationResponse ValidateResetToken(string token);
+        PasswordValidationResponse ResetPassword(int? userId, string newPwd, string token);
 
     }
 }

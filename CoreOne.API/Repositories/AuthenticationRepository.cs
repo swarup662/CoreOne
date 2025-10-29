@@ -153,91 +153,113 @@ namespace CoreOne.API.Repositories
 
         #region Forgot-Change-Password
 
-        public (bool Success, string Message) ChangePassword(int? userId, string currentPwd, string newPwd)
+        public PasswordValidationResponse ChangePassword(int? userId, string currentPwd, string newPwd)
         {
-            // Fetch user
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_GetUserByIdChangePassword]", new() { { "@UserID", userId } });
-            if (dt.Rows.Count == 0) return (false, "User not found");
+            if (dt.Rows.Count == 0)
+                return new PasswordValidationResponse { Success = false, Message = "User not found" };
 
             string storedHash = dt.Rows[0]["PasswordHash"].ToString();
+
             if (!PasswordHelper.VerifyPassword(currentPwd, storedHash))
-                return (false, "Invalid current password");
+                return new PasswordValidationResponse { Success = false, Message = "Invalid current password" };
+
+            if (PasswordHelper.VerifyPassword(newPwd, storedHash))
+                return new PasswordValidationResponse { Success = false, Message = "New password cannot be same as old one" };
 
             string newHash = PasswordHelper.HashPassword(newPwd);
 
-            // Prevent reusing same password
-            if (PasswordHelper.VerifyPassword(newPwd, storedHash))
-                return (false, "New password cannot be same as old one");
-
             var p = new Dictionary<string, object>
-    {
-        { "@UserID", userId },
-        { "@CurrentPassword", storedHash },
-        { "@NewPassword", newHash }
-    };
+        {
+            { "@UserID", userId },
+            { "@CurrentPassword", storedHash },
+            { "@NewPassword", newHash }
+        };
+
             int res = _dbHelper.ExecuteSP_ReturnInt("sp_ChangePassword", p);
 
-            return res == 1 ? (true, "Password changed successfully") : (false, "Error changing password");
+            return new PasswordValidationResponse
+            {
+                Success = res == 1,
+                Message = res == 1 ? "Password changed successfully" : "Error changing password"
+            };
         }
 
-        public (bool Success, string Message) ForgotPassword(string email)
+        // 🔹 Forgot Password
+        public PasswordValidationResponse ForgotPassword(string email)
         {
-            // Generate token and get MailTypeID from SP
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GeneratePasswordResetToken", new() { { "@Email", email } });
-            if (dt.Rows.Count == 0) return (false, "Email not registered");
+
+            if (dt.Rows.Count == 0)
+                return new PasswordValidationResponse { Success = false, Message = "Email not found" };
 
             string token = dt.Rows[0]["Token"].ToString();
             int mailType = Convert.ToInt32(dt.Rows[0]["MailTypeID"]);
 
-            // Map MailTypeID → provider name
             string provider = mailType switch
             {
                 1 => "Gmail",
                 2 => "Yahoo",
                 3 => "Outlook",
-                _ => "Gmail" // default fallback
+                _ => "Gmail"
             };
 
-            // Build reset link
             string uiBase = _config["BaseUrlUI"];
-            string link = $"{uiBase}/Account/ResetPassword?token={token}";
+            string link = $"{uiBase}Account/ResetPassword?token={token}";
             string subject = "Password Reset (valid for 10 minutes)";
             string body = $@"
-        <p>Hello,</p>
-        <p>You requested a password reset. Click the link below to reset your password:</p>
-        <p><a href='{link}' target='_blank'>Reset Password</a></p>
-        <p>This link will expire in <strong>10 minutes</strong>.</p>
-        <p>Thanks,<br/>CoreOne Support Team</p>
-    ";
+            <p>Hello,</p>
+            <p>You requested a password reset. Click below:</p>
+            <p><a href='{link}' target='_blank'>Reset Password</a></p>
+            <p>This link will expire in <strong>10 minutes</strong>.</p>
+            <p>Thanks,<br/>CoreOne Support Team</p>";
 
-            // Send email asynchronously
             _ = _email.SendEmailAsync(provider, email, subject, body);
-            return (true, "Password reset link sent to your email.");
+
+            return new PasswordValidationResponse
+            {
+                Success = true,
+                Message = "Password reset link sent to your email."
+            };
         }
 
-        public (bool Success, string Message, int UserID) ValidateResetToken(string token)
+        // 🔹 Validate Reset Token
+        public PasswordValidationResponse ValidateResetToken(string token)
         {
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_ValidateResetToken", new() { { "@Token", token } });
-            if (dt.Rows.Count == 0) return (false, "Invalid or expired token", 0);
 
-            int userId = Convert.ToInt32(dt.Rows[0]["UserID"]);
-            return (true, "Valid token", userId);
+            if (dt.Rows.Count == 0)
+                return new PasswordValidationResponse { Success = false, Message = "Invalid or expired token" };
+
+            return new PasswordValidationResponse
+            {
+                Success = true,
+                Message = "Valid token",
+                UserID = Convert.ToInt32(dt.Rows[0]["UserID"]),
+                ExpiresAt = Convert.ToDateTime(dt.Rows[0]["ExpiresAt"])
+            };
         }
 
-        public (bool Success, string Message) ResetPassword(int? userId, string newPwd, string token)
+        // 🔹 Reset Password
+        public PasswordValidationResponse ResetPassword(int? userId, string newPwd, string token)
         {
             string hash = PasswordHelper.HashPassword(newPwd);
+
             var p = new Dictionary<string, object>
-    {
-        { "@UserID", userId },
-        { "@NewPassword", hash },
-        { "@Token", token }
-    };
+        {
+            { "@UserID", userId },
+            { "@NewPassword", hash },
+            { "@Token", token }
+        };
 
             int res = _dbHelper.ExecuteSP_ReturnInt("sp_ResetPassword", p);
-            return res == 1 ? (true, "Password reset successful") : (false, "Invalid or expired token");
-        }
 
+            return new PasswordValidationResponse
+            {
+                Success = res == 1,
+                Message = res == 1 ? "Password reset successful" : "Invalid or expired token"
+            };
+        }
         #endregion
 
 

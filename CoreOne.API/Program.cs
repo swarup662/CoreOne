@@ -29,6 +29,8 @@ builder.Services.AddScoped<IActionCreationRepository, ActionCreationRepository>(
 builder.Services.AddScoped<PermissionController>();
 builder.Services.AddScoped<IEmailHelper, EmailHelper>();
 
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // --- API Versioning ---
 builder.Services.AddApiVersioning(options =>
