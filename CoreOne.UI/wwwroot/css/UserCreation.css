@@ -238,94 +238,44 @@
 
 
 
-
-
-/* 🌟 Base: create flexible responsive table */
-.custom-table-responsive {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    position: relative;
+/* ✅ Wrapper ensures proper spacing and positioning */
+.custom-table-wrapper {
     display: block;
-    border-radius: 12px;
+    width: 100%;
+    position: relative;
 }
 
-/* 🌟 Table styling */
+/* ✅ The responsive area — enables scrollbars when table exceeds screen */
+.custom-table-responsive {
+    width: 100%;
+    overflow-x: auto !important; /* show horizontal scroll when needed */
+    overflow-y: auto !important; /* show vertical scroll when needed */
+    position: relative;
+    max-height: 80vh; /* optional: limit height, makes vertical scroll inside */
+    scrollbar-color: #888 #f1f1f1;
+    scrollbar-width: thin;
+}
+
+/* ✅ Keep proper table behavior */
 .custom-table {
     width: 100%;
     border-collapse: collapse;
-    background: rgba(255, 255, 255, 0.98);
-    border-radius: 12px;
-    overflow: hidden;
+    table-layout: auto; /* preserve normal table layout */
+    min-width: 800px; /* ensures wide tables scroll instead of shrinking */
 }
 
-    /* 🌟 Make cells flex gracefully */
+    /* ✅ Standard cell styling */
     .custom-table th,
     .custom-table td {
-        white-space: nowrap;
-        padding: 0.5rem 0.75rem;
         vertical-align: middle;
+        white-space: nowrap; /* prevents wrapping inside cells */
+        padding: 0.55rem 0.75rem;
+        border: 1px solid #dee2e6;
     }
 
-    /* 🌟 Allow dropdowns & icons to overflow correctly */
-    .custom-table-responsive,
-    .custom-table,
-    .custom-table td,
-    .custom-table tr {
-        overflow: visible !important;
-    }
-
-/* 🌟 Responsive flex-like behavior */
-@media (max-width: 992px) {
-    .custom-table thead {
-        display: none;
-    }
-
-    .custom-table tr {
-        display: block;
-        margin-bottom: 1rem;
-        background: rgba(255, 255, 255, 0.9);
-        border-radius: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        padding: 0.75rem;
-    }
-
-    .custom-table td {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        text-align: right;
-        padding: 0.4rem 0.6rem;
-        font-size: 0.9rem;
-        border-bottom: 1px dashed #ccc;
-    }
-
-        .custom-table td:last-child {
-            border-bottom: none;
-        }
-
-        .custom-table td::before {
-            content: attr(data-label);
-            font-weight: 600;
-            text-transform: capitalize;
-            color: #333;
-            text-align: left;
-        }
-}
-
-/* 🌟 Better dropdown styling for mobile */
-@media (max-width: 768px) {
-    .action-dropdown {
-        justify-content: flex-end;
-    }
-
-    .custom-dropdown {
-        position: fixed !important;
-        right: 10px !important;
-        left: auto !important;
-        top: auto !important;
-        bottom: 10px !important;
-        z-index: 20000;
-        width: 200px;
-    }
+/* ✅ Make dropdowns appear over scrollable container */
+.custom-table-responsive .dropdown-menu {
+    position: absolute !important;
+    z-index: 1050 !important;
+    transform: translate3d(0, 0, 0);
 }
