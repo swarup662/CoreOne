@@ -1,112 +1,133 @@
-﻿.profile-wrapper {
-    max-width: 980px;
-    margin: 14px auto;
-    position: relative;
-    animation: fadeIn .7s ease-in-out;
-}
-
-.profile-header {
-    height: 180px;
-    background: linear-gradient(135deg, #4f8bff, #8ab7ff, #d3e3ff);
-    border-radius: 20px;
-    box-shadow: 0px 4px 20px rgba(79,139,255,0.3);
-}
-
+﻿/* ✅ Main Flex Layout */
 .profile-card {
-    background: #ffffff;
-    border-radius: 24px;
-    padding: 45px 50px;
-    margin-top: -120px;
-    box-shadow: 0 6px 45px rgba(0,0,0,0.12);
-    border: 2px solid #cedeef
-}
-
-/* ✅ Profile Image */
-.profile-image {
-    width: 170px;
-    height: 170px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 6px solid white;
-    box-shadow: 0px 6px 28px rgba(0, 0, 0, 0.18);
-    transition: transform .25s ease;
-}
-
-    .profile-image:hover {
-        transform: scale(1.07);
-    }
-
-/* ✅ Name & subtitle */
-.profile-card h4 {
-    font-size: 1.6rem;
-    color: #243259;
-}
-
-.profile-card p {
-    font-size: .95rem;
-    letter-spacing: .3px;
-}
-
-/* ✅ Detail Card */
-.detail-card {
-    background: #ffffff;
-    border-radius: 15px;
-    padding: 18px 22px;
-    margin-bottom: 14px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: inset 0 0 20px rgba(240,240,255,0.8), 0px 2px 10px rgba(0,0,0,0.05);
-    border: 1px solid #e1e7ef;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+    align-items: flex-start;
 }
 
-    .detail-card label {
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #425885;
-        display: flex;
-        align-items: center;
-        gap: 8px;
+    /* Common layout structure */
+    .profile-card > .col-md-4,
+    .profile-card > .col-md-8 {
+        flex: 1 1 320px;
+        max-width: 100%;
     }
 
-    .detail-card span {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #1c2740;
+/* ✅ Fully Responsive for Phones (Android, iPhone) */
+@media (max-width: 768px) {
+    .profile-wrapper {
+        padding: 0 10px;
     }
 
-/* ✅ Status badge alignment */
-.badge {
-    font-size: .78rem;
-    margin-top: 8px;
-    padding: 8px 14px;
-    border-radius: 20px;
-    font-weight: 600;
-}
-
-/* ✅ Animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(18px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* ✅ Responsive Fix */
-@media(max-width: 768px) {
     .profile-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         text-align: center;
-        padding: 35px 30px;
+        background: #fff;
+        border-radius: 20px;
+        padding: 28px 20px;
+        margin-top: -100px;
+        box-shadow: 0 6px 30px rgba(0,0,0,0.1);
+        gap: 1.2rem;
+    }
+
+    /* ✅ Profile Image centered and responsive */
+    .profile-image {
+        width: 130px;
+        height: 130px;
+        border: 5px solid #fff;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.15);
+        margin-bottom: 10px;
+    }
+
+    /* ✅ User name and status stacked properly */
+    .profile-card h4 {
+        font-size: 1.4rem;
+        margin-top: 8px;
+        margin-bottom: 0;
+        color: #243259;
+    }
+
+    .badge {
+        margin-top: 6px;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+    }
+
+    /* ✅ Role text */
+    .profile-card p {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+        color: #6b7b93;
+    }
+
+    /* ✅ Detail cards stacked and full width */
+    .detail-card {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 6px;
+        padding: 14px 16px;
+        background: #fafbff;
+        border: 1px solid #e3e8f0;
+        border-radius: 15px;
+        box-shadow: inset 0 0 8px rgba(240,240,255,0.6);
+    }
+
+        .detail-card label {
+            font-size: 0.9rem;
+            color: #425885;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .detail-card span {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1c2740;
+        }
+
+    /* ✅ Adjust banner for phone */
+    .profile-header {
+        height: 140px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #4f8bff, #8ab7ff);
+        margin: 0 6px 0 6px;
+    }
+}
+
+/* ✅ Extra Small Devices (below 420px width) */
+@media (max-width: 420px) {
+    .profile-card {
+        padding: 22px 14px;
+        gap: 1rem;
+    }
+
+    .profile-image {
+        width: 110px;
+        height: 110px;
     }
 
     .detail-card {
-        flex-direction: column;
-        gap: 5px;
-        text-align: center;
+        padding: 12px 14px;
+    }
+
+    .profile-card h4 {
+        font-size: 1.2rem;
+    }
+
+    .detail-card label,
+    .detail-card span {
+        font-size: 0.88rem;
     }
 }
