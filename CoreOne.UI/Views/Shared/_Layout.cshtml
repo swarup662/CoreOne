@@ -22,7 +22,8 @@
     {
         var TokenUser = TokenHelper.UserFromToken(Context);
         // Load menu
-        if(TokenUser is not null){
+        if (TokenUser is not null)
+        {
             user = TokenUser;
         }
         menuItems = await MenuController.UserMenu(Context);
@@ -32,8 +33,8 @@
             // Redirect to login if userId is null
             HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
         }
-       
-      
+
+
 
     }
     // Group menu items by Parent
@@ -75,10 +76,9 @@
     <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
 
     @await Html.PartialAsync("_FileUploadModal")
-   <style>
+    <style>
         .sidebar-main-menu .nav .menuitem-active a.active {
             background: linear-gradient(to right, #dfefff, #e0eaff);
-           
         }
 
         .dropdown-menu.dropdown-menu-end.profile-dropdown.show {
@@ -108,7 +108,7 @@
                 background-color: #424e5a;
             }
 
-   </style>
+    </style>
 </head>
 
 <!-- body start -->
@@ -136,8 +136,6 @@
                         <a class="nav-link dropdown-toggle nav-user me-0 waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
                             <div class="d-flex align-items-center" style="height:100%;">
                                 <!-- Icon -->
-                               
-
                                 <!-- Username box -->
                                 <div style="
     display: flex;
@@ -163,7 +161,7 @@
 
 
                                 <!-- Chevron -->
-                              
+
                             </div>
                         </a>
 
@@ -180,7 +178,7 @@
                             </a>
 
 
-                            
+
 
                             <!-- item-->
                             <a href="javascript:void(0);" class="dropdown-item notify-item">
@@ -195,7 +193,7 @@
                                 <i class="fe-log-out"></i>
                                 <span>Logout</span>
                             </a>
-                           
+
 
                             <script>
                                 async function logoutUser() {
@@ -261,11 +259,26 @@
 
                 </ul>
 
-                <!-- LOGO -->
+                <style>
+                    .logo-sm .bi-globe2 {
+                        color: white;      
+                        transition: all 0.3s ease;
+                        font-size:29px;
+                    }
+
+                        .logo-sm .bi-globe2:hover {
+                            color: white;
+                            text-shadow: 0 0 12px rgba(137, 164, 205, 0.8);
+                            transform: scale(1.1);
+                        }
+
+                </style>
+
                 <div class="logo-box" style="background:#36404a;">
-                    <a href="/Home/UserDashboard" class="logo logo-dark text-center">
-                        <span class="logo-sm" style="font-weight:bold; font-size:20px; color:#ffffff; letter-spacing:1px;background: linear-gradient(to right, white, #3283f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; white-space: nowrap;">
-                            CoreOne
+                    <a href="index.html" class="logo logo-dark text-center">
+                        <span class="logo-sm">
+
+                            <i class="bi bi-globe2"></i>
                         </span>
                         <span class="logo-lg" style="font-weight:bold; font-size:28px; color:#ffffff; letter-spacing:2px;    background: linear-gradient(to right, white, #3283f6);
     -webkit-background-clip: text;
@@ -275,6 +288,18 @@
                         </span>
                     </a>
 
+                    <a href="index.html" class="logo logo-light text-center">
+                        <span class="logo-sm">
+                            <i class="bi bi-globe2 fs-3 text-primary"></i>
+                            <!-- <span class="logo-lg-text-light">UBold</span> -->
+                        </span>
+                        <span class="logo-lg" style="font-weight:bold; font-size:28px; color:#ffffff; letter-spacing:2px;    background: linear-gradient(to right, white, #3283f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    white-space: nowrap;">
+                            CoreOne
+                        </span>
+                    </a>
                 </div>
 
                 <ul class="list-unstyled topnav-menu topnav-menu-left m-0">
@@ -304,84 +329,94 @@
         </div>
         <!-- end Topbar -->
         <!-- ========== Left Sidebar Start ========== -->
-        <div class="sidebar-content">
-            <!-- Left icon-only menu -->
-            <div class="sidebar-icon-menu h-100" data-simplebar>
-                <a href="/Home/UserDashboard/" class="logo">
-                    <span>
-                        <img src="~/assets/images/logo-sm-light.png" alt="logo" height="28">
-                    </span>
-                </a>
-                @{
-                    bool isFirst = true;
-                }
-                <nav class="nav flex-column" id="two-col-sidenav-main">
-                    @foreach (var parent in groupedMenu)
-                    {
-                        var activeClass = isFirst ? "nav-link active" : "nav-link";
-                        isFirst = false; // Only true for the first item
-                        var id = "parent-" + parent.Key.ParentID;
-                        <a class="@activeClass" href="#@id" title="@parent.Key.ParentName" style="display: flex;justify-content: center;  align-items: center;">
-                            <i class="@parent.Key.MenuSymbol" style="font-size: 24px; color:white"></i>
+
+        <div class="left-side-menu">
+
+            <div class="h-100 menuitem-active">
+
+                <div class="sidebar-content show">
+                    <!-- Left icon-only menu -->
+                    <div class="sidebar-icon-menu h-100" data-simplebar>
+                        <a href="/Home/UserDashboard/" class="logo">
+                            <span>
+                                <i class="bi bi-globe2" style="color: #ffffff;font-size: 40px;"></i>
+                            </span>
                         </a>
-                    }
-                </nav>
-            </div>
-            
-            <!-- Full text menu with modules -->
-            <div class="sidebar-main-menu " style="background: linear-gradient(to right, white, white);  ">
-                <div id="two-col-menu" class="h-100" data-simplebar>
-                    @{
-                        bool isModuleFirst = true;
-                    }
-                    @foreach (var parent in groupedMenu)
-                    {
-                        var id = "parent-" + parent.Key.ParentID;
-                        var activeClass = isModuleFirst ? "d-block" : "";
-                        isModuleFirst = false;
-                        <div class="twocolumn-menu-item @activeClass" id="@id">
-                            <div class="title-box">
-                                <h5 class="menu-title" style=" background: linear-gradient(to right, #2b2b2b, #696868);font-size:13px;
+                        @{
+                            bool isFirst = true;
+                        }
+                        <nav class="nav flex-column" id="two-col-sidenav-main">
+                            @foreach (var parent in groupedMenu)
+                            {
+                                var activeClass = isFirst ? "nav-link active" : "nav-link";
+                                isFirst = false; // Only true for the first item
+                                var id = "parent-" + parent.Key.ParentID;
+                                <a class="@activeClass" href="#@id" title="@parent.Key.ParentName" style="display: flex;justify-content: center;  align-items: center;">
+                                    <i class="@parent.Key.MenuSymbol" style="font-size: 24px; color:white"></i>
+                                </a>
+                            }
+                        </nav>
+                    </div>
+
+
+
+
+                    <!-- Full text menu with modules -->
+                    <div class="sidebar-main-menu " style="background: linear-gradient(to right, white, white);  ">
+                        <div id="two-col-menu" class="h-100" data-simplebar>
+                            @{
+                                bool isModuleFirst = true;
+                            }
+                            @foreach (var parent in groupedMenu)
+                            {
+                                var id = "parent-" + parent.Key.ParentID;
+                                var activeClass = isModuleFirst ? "d-block" : "";
+                                isModuleFirst = false;
+                                <div class="twocolumn-menu-item @activeClass" id="@id">
+                                    <div class="title-box">
+                                        <h5 class="menu-title" style=" background: linear-gradient(to right, #2b2b2b, #696868);font-size:13px;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     white-space: nowrap;">
-                                    @parent.Key.ParentName
-                                </h5>
-                                <ul class="nav flex-column">
-                                    @foreach (var item in parent.OrderBy(i => i.MenuSequence))
-                                    {
-                                        if (item.Url?.StartsWith("#") == true)
-                                        {
-                                            // Collapse Section
-                                            var collapseId = item.Url.TrimStart('#');
-                                            <li class="nav-item">
-                                                <a href="#@collapseId" data-bs-toggle="collapse" class="nav-link">
-                                                    <span> @item.MenuName </span>
-                                                    <span class="menu-arrow"></span>
-                                                </a>
-                                                <div class="collapse" id="@collapseId">
-                                                    <ul class="nav-second-level">
-                                                        @* Find children of this submenu item (optional 3rd level) *@
-                                                        @foreach (var subItem in menuItems.Where(m => m.ParentID == item.MenuID))
-                                                        {
-                                                            <li><a href="@subItem.Url">@subItem.MenuName</a></li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            </li>
-                                        }
-                                        else
-                                        {
-                                            // Regular nav item
-                                            <li class="nav-item">
-                                                <a class="nav-link" href="@item.Url">@item.MenuName</a>
-                                            </li>
-                                        }
-                                    }
-                                </ul>
-                            </div>
+                                            @parent.Key.ParentName
+                                        </h5>
+                                        <ul class="nav flex-column">
+                                            @foreach (var item in parent.OrderBy(i => i.MenuSequence))
+                                            {
+                                                if (item.Url?.StartsWith("#") == true)
+                                                {
+                                                    // Collapse Section
+                                                    var collapseId = item.Url.TrimStart('#');
+                                                    <li class="nav-item">
+                                                        <a href="#@collapseId" data-bs-toggle="collapse" class="nav-link">
+                                                            <span> @item.MenuName </span>
+                                                            <span class="menu-arrow"></span>
+                                                        </a>
+                                                        <div class="collapse" id="@collapseId">
+                                                            <ul class="nav-second-level">
+                                                                @* Find children of this submenu item (optional 3rd level) *@
+                                                                @foreach (var subItem in menuItems.Where(m => m.ParentID == item.MenuID))
+                                                                {
+                                                                    <li><a href="@subItem.Url">@subItem.MenuName</a></li>
+                                                                }
+                                                            </ul>
+                                                        </div>
+                                                    </li>
+                                                }
+                                                else
+                                                {
+                                                // Regular nav item
+                                                    <li class="nav-item">
+                                                        <a class="nav-link" href="@item.Url">@item.MenuName</a>
+                                                    </li>
+                                                }
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
+                            }
                         </div>
-                    }
+                    </div>
                 </div>
             </div>
         </div>
@@ -394,9 +429,9 @@
         <div class="content-page">
             <div class="content">
 
-             
-                    @RenderBody()
-                   
+
+                @RenderBody()
+
 
 
             </div> <!-- content -->
@@ -434,7 +469,7 @@
 
             <!-- Nav tabs -->
             <ul class="nav nav-tabs nav-bordered nav-justified" role="tablist">
-              
+
                 <li class="nav-item">
                     <a class="nav-link py-2 active" data-bs-toggle="tab" href="#settings-tab" role="tab">
                         <i class="mdi mdi-cog-outline d-block font-22 my-1"></i>
@@ -444,7 +479,7 @@
 
             <!-- Tab panes -->
             <div class="tab-content pt-0">
-            
+
                 <div class="tab-pane active" id="settings-tab" role="tabpanel">
                     <h6 class="fw-medium px-3 m-0 py-2 font-13 text-uppercase bg-light">
                         <span class="d-block py-1">Theme Settings</span>
@@ -518,7 +553,7 @@
                         </div>
 
 
-                      
+
 
                     </div>
 
@@ -531,7 +566,7 @@
     <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
 
-@*  <script>
+    @*  <script>
              const toggleBtn = document.querySelector('.button-menu-mobile');
         const sidebar = document.getElementById('sidebar-new');
 
@@ -541,7 +576,7 @@
             if (document.body.classList.contains('sidebar-enabled')) {
                   sidebar.style.display = 'block';
                 sidebar.style.zIndex = '9999'; // set on top
-                
+
             } else {
                 sidebar.style.zIndex = ''; 
                  sidebar.style.display = 'none'; // remove z-index
@@ -566,7 +601,7 @@
     <script src="~/assets/js/app.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 
-@*     <script src="~/js/file-upload.js"></script> *@
+    @*     <script src="~/js/file-upload.js"></script> *@
 
 </body>
 </html>
