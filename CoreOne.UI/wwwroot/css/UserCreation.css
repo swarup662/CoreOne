@@ -237,45 +237,66 @@
 }
 
 
+/* --- Fix dropdown visibility inside scrollable tables --- */
 
-/* ✅ Wrapper ensures proper spacing and positioning */
-.custom-table-wrapper {
-    display: block;
-    width: 100%;
-    position: relative;
-}
-
-/* ✅ The responsive area — enables scrollbars when table exceeds screen */
+/* ✅ Make the scroll container allow dropdowns to overflow */
 .custom-table-responsive {
     width: 100%;
-    overflow-x: auto !important; /* show horizontal scroll when needed */
-    overflow-y: auto !important; /* show vertical scroll when needed */
+    overflow-x: auto !important;
+    overflow-y: visible !important; /* allow dropdowns to extend outside */
     position: relative;
-    max-height: 80vh; /* optional: limit height, makes vertical scroll inside */
-    scrollbar-color: #888 #f1f1f1;
-    scrollbar-width: thin;
 }
 
-/* ✅ Keep proper table behavior */
+    /* ✅ Ensure dropdown buttons align correctly */
+    .custom-table-responsive .dropdown {
+        position: relative;
+        display: inline-flex; /* aligns icons properly */
+        justify-content: center;
+        align-items: center;
+        overflow: visible !important;
+        z-index: 100;
+    }
+
+    /* ✅ Make dropdown menus float correctly and fully visible */
+    .custom-table-responsive .dropdown-menu {
+        position: absolute !important;
+        top: 100% !important;
+        right: 0 !important;
+        left: auto !important;
+        margin-top: 4px !important;
+        transform: none !important;
+        z-index: 3000 !important;
+        min-width: max-content;
+        max-height: 300px;
+        overflow-y: auto;
+        border-radius: 10px;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.25);
+        background: #343a40;
+        margin:20px;
+        backdrop-filter: blur(12px);
+    }
+
+        /* ✅ Auto open upward if near bottom of viewport */
+        .custom-table-responsive .dropdown-menu[data-popper-placement^="top"],
+        .custom-table-responsive .dropdown-menu.dropup {
+            top: auto !important;
+            bottom: 100% !important;
+            margin-bottom: 4px !important;
+        }
+
+/* ✅ Ensure table layout and scrolling stay normal */
 .custom-table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: auto; /* preserve normal table layout */
-    min-width: 800px; /* ensures wide tables scroll instead of shrinking */
+    table-layout: auto;
+    min-width: 800px;
 }
 
-    /* ✅ Standard cell styling */
     .custom-table th,
     .custom-table td {
         vertical-align: middle;
-        white-space: nowrap; /* prevents wrapping inside cells */
+        white-space: nowrap;
         padding: 0.55rem 0.75rem;
         border: 1px solid #dee2e6;
     }
 
-/* ✅ Make dropdowns appear over scrollable container */
-.custom-table-responsive .dropdown-menu {
-    position: absolute !important;
-    z-index: 1050 !important;
-    transform: translate3d(0, 0, 0);
-}
