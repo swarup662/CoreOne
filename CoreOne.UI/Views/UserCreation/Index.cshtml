@@ -631,7 +631,7 @@
 
                 <div class="mb-3">
                     <label class="form-label">Title</label>
-                    <input type="text" class="form-control" id="notifyTitle" placeholder="Enter notification title..." value="Reminder" />
+                    <input type="text" class="form-control" id="notifyTitle" placeholder="Enter notification title..."  />
                 </div>
 
                 <div class="mb-3">
@@ -885,7 +885,7 @@
 
 @section Scripts {
     <script>
-        // 🟢 Open the modal and set user + optional notification data
+        // 🟢 Open modal and populate data
         function openNotificationModal(userId, notificationId = 0, title = '', message = '', start = '', end = '') {
             $('#notifyUserId').val(userId);
             $('#notifyNotificationId').val(notificationId);
@@ -898,6 +898,27 @@
             $('#notificationModal').modal('show');
         }
 
+        // 🟢 Validate end date > start date in real-time
+        $(document).on('change', '#notifyStart, #notifyEnd', function () {
+            const start = $('#notifyStart').val();
+            const end = $('#notifyEnd').val();
+
+            if (start && end) {
+                const startDate = new Date(start);
+                const endDate = new Date(end);
+
+                if (endDate <= startDate) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Invalid Date Range',
+                        text: 'End date/time must be later than the start date/time.',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    $('#notifyEnd').val(''); // clear invalid end date
+                }
+            }
+        });
+
         // 🟢 Save notification (insert or update)
         async function sendNotification() {
             const userId = $('#notifyUserId').val();
@@ -907,6 +928,7 @@
             const startDateTime = $('#notifyStart').val();
             const endDateTime = $('#notifyEnd').val();
 
+            // 🟡 Validate required fields
             if (!title || !message) {
                 Swal.fire({
                     icon: 'warning',
@@ -917,7 +939,30 @@
                 return;
             }
 
-            // ✅ Confirm before saving
+            if (!startDateTime || !endDateTime) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Dates',
+                    text: 'Please select both start and end date/time.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const start = new Date(startDateTime);
+            const end = new Date(endDateTime);
+
+            if (end <= start) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Dates',
+                    text: 'End date/time must be later than the start date/time.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            // 🟢 Confirm before sending
             const confirmResult = await Swal.fire({
                 title: 'Send Notification?',
                 text: "Do you want to send this notification now?",
@@ -929,9 +974,7 @@
                 cancelButtonColor: '#d33'
             });
 
-            if (!confirmResult.isConfirmed) {
-                return; // User clicked "Cancel"
-            }
+            if (!confirmResult.isConfirmed) return;
 
             const payload = {
                 NotificationID: parseInt(notificationId),
@@ -941,9 +984,9 @@
                 Type: 'Info',
                 IsRead: 0,
                 IsActive: 1,
-                StartDateTime: startDateTime || null,
-                EndDateTime: endDateTime || null,
-                CreatedBy: 1,   // You can replace this with the logged-in user ID
+                StartDateTime: startDateTime,
+                EndDateTime: endDateTime,
+                CreatedBy: 1,
                 UpdatedBy: 1
             };
 
@@ -963,6 +1006,9 @@
                         text: result.message || 'Notification sent successfully.',
                         timer: 2000,
                         showConfirmButton: false
+                    }).then(() => {
+                        // 🟢 Redirect to Index after success
+                        window.location.href = '/UserCreation/Index';
                     });
 
                     $('#notificationModal').modal('hide');
@@ -985,6 +1031,7 @@
             }
         }
     </script>
+
 
 
     <script>
