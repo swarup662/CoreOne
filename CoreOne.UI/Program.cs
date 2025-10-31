@@ -28,6 +28,8 @@ builder.Services.AddHttpContextAccessor(); // ✅ Needed for token access
 builder.Services.AddHttpClient();
 
 builder.Services.AddScoped<PermissionHelper>();
+builder.Services.AddScoped<NotificationHelper>();
+
 builder.Services.AddScoped<ActionPermissionHtmlProcessorUiHelper>();
 builder.Services.AddRazorPages()
     .AddRazorRuntimeCompilation();

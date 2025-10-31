@@ -4,7 +4,13 @@
 @inject MenuLayoutController MenuController
 @inject IHttpContextAccessor HttpContextAccessor
 
+@inject NotificationHelper NotificationHelper
+
+
 @{
+
+  
+
 
     var userId = TokenHelper.GetUserIdFromToken(HttpContextAccessor.HttpContext);
     bool TokenExpiry = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
@@ -44,6 +50,17 @@
         .OrderBy(g => g.Key.ParentSequence ?? 0)
         .ToList();
 
+
+    var notifications = new List<UserNotification>();
+    var userIdForNoti = TokenHelper.GetUserIdFromToken(HttpContextAccessor.HttpContext);
+
+    if (userIdForNoti.HasValue)
+    {
+        notifications = await NotificationHelper.GetUserNotificationsAsync(userIdForNoti.Value);
+    }
+
+    var unreadCount = notifications.Count(n => n.IsRead == 0);
+
 }
 
 
@@ -76,6 +93,13 @@
     <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
 
     @await Html.PartialAsync("_FileUploadModal")
+    <style>
+        .notify-item:hover {
+            background-color: #f8f9fa !important; /* light gray hover */
+            transform: translateX(3px);
+        }
+    </style>
+
     <style>
         .sidebar-main-menu .nav .menuitem-active a.active {
             background: linear-gradient(to right, #dfefff, #e0eaff);
@@ -130,6 +154,72 @@
                             <i class="fe-maximize noti-icon"></i>
                         </a>
                     </li>
+
+
+                    <li class="dropdown notification-list topbar-dropdown">
+                        <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                            <i class="fe-bell noti-icon"></i>
+                            @if (unreadCount > 0)
+                            {
+                                <span class="badge bg-danger rounded-circle noti-icon-badge">@unreadCount</span>
+                            }
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-end dropdown-lg">
+                            <div class="dropdown-item noti-title">
+                                <h5 class="m-0">
+                                    <span class="float-end">
+                                        <a href="javascript:void(0);" class="text-dark" onclick="clearNotifications()">
+                                            <small>Clear All</small>
+                                        </a>
+                                    </span>
+                                    Notifications
+                                </h5>
+                            </div>
+
+                            <div class="noti-scroll" data-simplebar style="max-height: 300px;">
+                                @if (notifications.Count == 0)
+                                {
+                                    <div class="dropdown-item text-center text-muted">
+                                        No notifications
+                                    </div>
+                                }
+                                else
+                                {
+                                    @foreach (var note in notifications)
+                                    {
+                                        <a href="javascript:void(0);" class="dropdown-item notify-item"
+                                           class="dropdown-item notify-item @(note.IsRead == 0 ? "active" : "")"
+                                           onclick="markAsRead(@note.NotificationID)">
+                                            <div class="notify-icon bg-primary">
+                                                <i class="mdi mdi-bell-outline"></i>
+                                            </div>
+                                            <p class ="notify-details"> @note.Title</p>
+                                            <p class="text-muted mb-0 user-msg"
+                                            ><small>@note.Message</small>
+                                           </p>
+                                            <p class="text-muted mb-0 user-msg">
+                                                <small style="color: #505c67;">@note.CreatedDateTime.ToString("dd MMM yyyy HH:mm")</small>
+                                            </p>
+
+
+                                           
+                                        </a>
+                                    }
+                                }
+                            </div>
+
+                            <a href="javascript:void(0);"
+                               class="dropdown-item text-center text-primary notify-item notify-all"
+                               data-bs-toggle="modal"
+                               data-bs-target="#viewAllNotificationsModal">
+                                View all <i class="fe-arrow-right"></i>
+                            </a>
+
+
+                        </div>
+                    </li>
+                
 
 
                     <li class="dropdown notification-list topbar-dropdown">
@@ -426,8 +516,101 @@
         <!-- Start Page Content here -->
         <!-- ============================================================== -->
 
+        <style>
+            /* Smooth hover effect for each notification */
+            .notification-item {
+                transition: all 0.25s ease;
+                border-left: 3px solid transparent;
+            }
+
+                .notification-item:hover {
+                    background-color: #f1f3f5 !important;
+                    border-left: 3px solid #4e73df;
+                    transform: translateX(4px);
+                }
+
+            /* Modal header gradient */
+            .bg-gradient-primary {
+                background: linear-gradient(90deg, #4e73df, #1cc88a);
+            }
+
+            /* Custom scrollbar */
+            .list-group-flush::-webkit-scrollbar {
+                width: 8px;
+            }
+
+            .list-group-flush::-webkit-scrollbar-thumb {
+                background-color: rgba(0, 0, 0, 0.2);
+                border-radius: 10px;
+            }
+
+                .list-group-flush::-webkit-scrollbar-thumb:hover {
+                    background-color: rgba(0, 0, 0, 0.4);
+                }
+
+            /* Badge tweak */
+            
+        </style>
+
+        <!-- =================== All Notifications Modal =================== -->
+        <div class="modal fade" id="viewAllNotificationsModal" tabindex="-1" aria-labelledby="viewAllNotificationsLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+
+                    <!-- Header -->
+                    <div class="modal-header bg-gradient-primary text-white py-3">
+                        <h5 class="modal-title fw-semibold d-flex align-items-center" id="viewAllNotificationsLabel">
+                            <i class="fe-bell me-2 fs-5"></i> All Notifications
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="modal-body p-0 bg-light">
+                        <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+
+                            @if (notifications.Count == 0)
+                            {
+                                <div class="list-group-item text-center text-muted py-4">
+                                    <i class="fe-bell-off fs-4 mb-2 d-block"></i>
+                                    No notifications found.
+                                </div>
+                            }
+                            else
+                            {
+                                @foreach (var note in notifications)
+                                {
+                                    <a href="javascript:void(0);"
+                                       class="list-group-item list-group-item-action border-0 border-bottom d-flex justify-content-between align-items-start notification-item @(note.IsRead == 0 ? "bg-white" : "bg-light")"
+                                       onclick="markAsRead(@note.NotificationID)">
+                                        <div class="me-3">
+                                            <div class="fw-bold text-dark">@note.Title</div>
+                                            <small class="text-muted d-block">@note.Message</small>
+                                            <small class="text-muted"><i class="fe-clock me-1"></i>@note.CreatedDateTime.ToString("dd MMM yyyy HH:mm")</small>
+                                        </div>
+                                        <span class="badge @(note.IsRead == 0 ? "bg-danger" : "bg-secondary") rounded-pill align-self-center">
+                                            @(note.IsRead == 0 ? "New" : "Read")
+                                        </span>
+                                    </a>
+                                }
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="modal-footer bg-light border-0">
+                        <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">
+                            <i class="fe-x me-1"></i> Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="content-page">
             <div class="content">
+                <!-- ================== VIEW ALL NOTIFICATIONS MODAL ================== -->
 
 
                 @RenderBody()
@@ -602,6 +785,29 @@
     @await RenderSectionAsync("Scripts", required: false)
 
     @*     <script src="~/js/file-upload.js"></script> *@
+    <script>
+        async function markAsRead(id) {
+            try {
+                await fetch('/Notification/MarkAsRead', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(id)
+                });
+                location.reload();
+            } catch (err) {
+                console.error('Error marking notification as read:', err);
+            }
+        }
+
+        async function clearNotifications() {
+            try {
+                await fetch('/Notification/ClearAll', { method: 'POST' });
+                location.reload();
+            } catch (err) {
+                console.error('Error clearing notifications:', err);
+            }
+        }
+    </script>
 
 </body>
 </html>

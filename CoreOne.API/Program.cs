@@ -26,6 +26,7 @@ builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>(
 builder.Services.AddScoped<IUserCreationRepository, UserCreationRepository>();
 builder.Services.AddScoped<IModuleSetupRepository, ModuleSetupRepository>();
 builder.Services.AddScoped<IActionCreationRepository, ActionCreationRepository>();
+builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
 builder.Services.AddScoped<PermissionController>();
 builder.Services.AddScoped<IEmailHelper, EmailHelper>();
 
