@@ -94,10 +94,18 @@
 
     @await Html.PartialAsync("_FileUploadModal")
     <style>
-        .notify-item:hover {
+        .notify-item1:hover {
             background-color: #f8f9fa !important; /* light gray hover */
             transform: translateX(3px);
         }
+
+       .notify-item1{
+      
+            margin-top: 6PX;
+            border-radius: 9px;
+            background: #f3f8fd;
+        }
+      
     </style>
 
     <style>
@@ -132,6 +140,15 @@
                 background-color: #424e5a;
             }
 
+        #noti-title:hover {
+            color: #ffb400; /* light golden highlight */
+            transform: scale(1.03); /* subtle zoom effect */
+        }
+
+        .notification-list .noti-title {
+            background-color: #3c95ee;
+            padding: 15px 20px;
+
     </style>
 </head>
 
@@ -158,19 +175,19 @@
 
                     <li class="dropdown notification-list topbar-dropdown">
                         <a class="nav-link dropdown-toggle waves-effect waves-light" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="false" aria-expanded="false">
-                            <i class="fe-bell noti-icon"></i>
+                            <i class="fe-bell noti-icon" style="font-size:21px"></i>
                             @if (unreadCount > 0)
                             {
-                                <span class="badge bg-danger rounded-circle noti-icon-badge">@unreadCount</span>
+                                <span class="badge badgen bg-danger rounded-circle noti-icon-badge" style="padding: 3px 5px;">@unreadCount</span>
                             }
                         </a>
 
                         <div class="dropdown-menu dropdown-menu-end dropdown-lg">
-                            <div class="dropdown-item noti-title">
-                                <h5 class="m-0">
+                            <div class="dropdown-item noti-title noti-title1">
+                                <h5 class="m-0" style="color: white">
                                     <span class="float-end">
                                         <a href="javascript:void(0);" class="text-dark" onclick="clearNotifications()">
-                                            <small>Clear All</small>
+                                            <small style="color:white">Clear All</small>
                                         </a>
                                     </span>
                                     Notifications
@@ -188,8 +205,8 @@
                                 {
                                     @foreach (var note in notifications)
                                     {
-                                        <a href="javascript:void(0);" class="dropdown-item notify-item"
-                                           class="dropdown-item notify-item @(note.IsRead == 0 ? "active" : "")"
+                                        <a href="javascript:void(0);" class="dropdown-item notify-item notify-item1"
+                                           class="dropdown-item notify-item notify-item1 @(note.IsRead == 0 ? "active" : "")"
                                            onclick="markAsRead(@note.NotificationID)">
                                             <div class="notify-icon bg-primary">
                                                 <i class="mdi mdi-bell-outline"></i>
@@ -210,7 +227,7 @@
                             </div>
 
                             <a href="javascript:void(0);"
-                               class="dropdown-item text-center text-primary notify-item notify-all"
+                               class="dropdown-item text-center text-primary notify-all"
                                data-bs-toggle="modal"
                                data-bs-target="#viewAllNotificationsModal">
                                 View all <i class="fe-arrow-right"></i>
@@ -257,7 +274,7 @@
 
                         <div class="dropdown-menu dropdown-menu-end profile-dropdown" style="">
                             <!-- item-->
-                            <div class="dropdown-header noti-title">
+                            <div class="dropdown-header noti-title" style="background:white">
                                 <h6 class="text-overflow m-0">Welcome ! @user.UserName</h6>
                             </div>
 
