@@ -17,6 +17,7 @@ namespace CoreOne.API.Interfaces
         Task<IEnumerable<ExtraPermission>> GetExtraPermissionByUserId(int UserId, int CreatedBy);
         int ActivateDeactivateUser(string recType, UserCreationDTO user);
         UserCreation? GetUserMyAccount(int userId);
+    
 
 
 

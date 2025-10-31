@@ -28,24 +28,6 @@ namespace CoreOne.API.Repositories
             return ds.Tables[0];
         }
 
-        public int AddNotification(UserNotification model)
-        {
-            var parameters = new Dictionary<string, object>
-            {
-                {"@NotificationID", model.NotificationID},
-                {"@UserID", model.UserID},
-                {"@Title", model.Title},
-                {"@Message", model.Message},
-                {"@Type", model.Type},
-                {"@IsRead", model.IsRead},
-                {"@IsActive", model.IsActive},
-                {"@StartDateTime", model.StartDateTime},
-                {"@EndDateTime", model.EndDateTime},
-                {"@CreatedBy", model.CreatedBy}
-            };
-
-            return _dbHelper.ExecuteSP_ReturnInt("sp_AddUserNotification", parameters);
-        }
 
         public int MarkAsRead(int notificationId)
         {
@@ -56,6 +38,27 @@ namespace CoreOne.API.Repositories
 
             return _dbHelper.ExecuteSP_ReturnInt("sp_MarkNotificationAsRead", parameters);
         }
+        public int SaveUserNotification(UserNotification model)
+        {
+            var parameters = new Dictionary<string, object>
+    {
+        {"@NotificationID", model.NotificationID},
+        {"@UserID", model.UserID},
+        {"@Title", model.Title},
+        {"@Message", model.Message},
+        {"@Type", model.Type},
+        {"@IsRead", model.IsRead},
+        {"@IsActive", model.IsActive},
+        {"@StartDateTime", model.StartDateTime},
+        {"@EndDateTime", model.EndDateTime},
+        {"@CreatedBy", model.CreatedBy},
+        {"@UpdatedBy", model.UpdatedBy}
+    };
+
+            return _dbHelper.ExecuteSP_ReturnInt("sp_AddOrUpdateUserNotification", parameters);
+        }
+
+
 
         public int DeleteNotification(int notificationId)
         {

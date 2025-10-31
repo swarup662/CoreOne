@@ -45,14 +45,7 @@ namespace CoreOne.API.Controllers.V1
 
 
 
-        // ✅ Add new notification
-        [HttpPost("AddNotification")]
-        public IActionResult AddNotification([FromBody] UserNotification model)
-        {
-            int result = _notificationRepo.AddNotification(model);
-            return Ok(result > 0 ? "Notification added successfully" : "Error adding notification");
-        }
-
+  
         // ✅ Mark as read
         [HttpPost("MarkAsRead")]
         public IActionResult MarkAsRead([FromBody] int notificationId)
@@ -68,5 +61,38 @@ namespace CoreOne.API.Controllers.V1
             int result = _notificationRepo.DeleteNotification(notificationId);
             return Ok(result > 0 ? "Deleted successfully" : "Error deleting notification");
         }
+
+
+        [HttpPost("SaveUserNotification")]
+        public IActionResult SaveUserNotification([FromBody] UserNotification model)
+        {
+            try
+            {
+                int newId = _notificationRepo.SaveUserNotification(model);
+
+                if (newId > 0)
+                {
+                    return Ok(new
+                    {
+                        success = true,
+                        message = "Notification saved successfully.",
+                        notificationId = newId
+                    });
+                }
+
+                return Ok(new { success = false, message = "Failed to save notification." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = "Exception: " + ex.Message
+                });
+            }
+        }
+
+
+
     }
 }

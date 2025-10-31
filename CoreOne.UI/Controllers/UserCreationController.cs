@@ -16,12 +16,18 @@ namespace CoreOne.UI.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _api;
         private readonly ActionPermissionHtmlProcessorUiHelper _htmlProcessor;
+        private readonly NotificationHelper _notificationHelper; // ✅ Add helper
 
-        public UserCreationController(IHttpClientFactory httpClientFactory, SettingsService settingsService, ActionPermissionHtmlProcessorUiHelper htmlProcessor)
+        public UserCreationController(
+            IHttpClientFactory httpClientFactory,
+            SettingsService settingsService,
+            ActionPermissionHtmlProcessorUiHelper htmlProcessor,
+            NotificationHelper notificationHelper) // ✅ Inject helper
         {
             _httpClientFactory = httpClientFactory;
             _api = settingsService.ApiSettings;
             _htmlProcessor = htmlProcessor;
+            _notificationHelper = notificationHelper; // ✅ Assign
         }
 
         [HttpGet]
@@ -668,6 +674,56 @@ namespace CoreOne.UI.Controllers
 
 
         }
+
+
+        [HttpPost]
+        public async Task<IActionResult> SaveUserNotification([FromBody] UserNotification model)
+        {
+            try
+            {
+                if (model == null || model.UserID <= 0)
+                    return Json(new { success = false, message = "Invalid user data." });
+
+                // Default values
+                model.IsActive = 1;
+                model.IsRead = 0;
+                model.CreatedDateTime = DateTime.Now;
+                model.Type ??= "System";
+
+                // Prepare HTTP Client
+                var client = _httpClientFactory.CreateClient();
+                var url = _api.BaseUrlUserNotification + "/SaveUserNotification";
+
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Send API request
+                var resp = await client.PostAsync(url, content);
+
+                if (!resp.IsSuccessStatusCode)
+                {
+                    var errorContent = await resp.Content.ReadAsStringAsync();
+                    return Json(new { success = false, message = $"API error: {errorContent}" });
+                }
+
+                var response = await resp.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<dynamic>(response);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Notification saved successfully.",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Exception: {ex.Message}" });
+            }
+        }
+
+
+
 
     }
 }
