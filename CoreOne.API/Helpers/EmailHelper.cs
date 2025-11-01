@@ -19,18 +19,18 @@ namespace CoreOne.API.Helpers
             _dbHelper = dbHelper;
         }
 
-        private (string Host, int Port, string Email, string Password) GetMailSettings(string provider)
+        private (string Host, int Port, string Email, string Password) GetMailSettings(int MailTypeId)
         {
             var parameters = new Dictionary<string, object>
             {
-                {"@Provider ", provider},
+                {"@MailTypeId ", MailTypeId},
                
             };
 
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetMailSettings", parameters);
 
             if (dt.Rows.Count == 0)
-                throw new Exception($"Mail settings for provider '{provider}' not found in database.");
+                throw new Exception($"Mail settings for provider ':{MailTypeId}' not found in database.");
 
             var row = dt.Rows[0];
 
@@ -43,55 +43,25 @@ namespace CoreOne.API.Helpers
         }
 
 
-        public bool SendEmail(string provider, string toEmail, string subject, string body)
+
+
+        public async Task<bool> SendEmailAsyncToIndividual(int MailTypeId, string toEmail, string subject, string body,string FromMail, string FromMailPassword)
         {
             try
             {
-                var (host, port, email, password) = GetMailSettings(provider);
+                var (host, port, email, password) = GetMailSettings(MailTypeId);
 
                 using var smtp = new SmtpClient
                 {
                     Host = host,
                     Port = port,
                     EnableSsl = true,
-                    Credentials = new NetworkCredential(email, password)
+                    Credentials = new NetworkCredential(FromMail, FromMailPassword)
                 };
 
                 var mail = new MailMessage
                 {
-                    From = new MailAddress(email, "CoreOne System"),
-                    Subject = subject,
-                    Body = body,
-                    IsBodyHtml = true
-                };
-                mail.To.Add(toEmail);
-
-                smtp.Send(mail);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public async Task<bool> SendEmailAsync(string provider, string toEmail, string subject, string body)
-        {
-            try
-            {
-                var (host, port, email, password) = GetMailSettings(provider);
-
-                using var smtp = new SmtpClient
-                {
-                    Host = host,
-                    Port = port,
-                    EnableSsl = true,
-                    Credentials = new NetworkCredential(email, password)
-                };
-
-                var mail = new MailMessage
-                {
-                    From = new MailAddress(email, "CoreOne System"),
+                    From = new MailAddress(FromMail, "CoreOne System"),
                     Subject = subject,
                     Body = body,
                     IsBodyHtml = true

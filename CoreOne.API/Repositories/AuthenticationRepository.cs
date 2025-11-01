@@ -5,6 +5,7 @@ using CoreOne.API.Interfaces;
 using CoreOne.DOMAIN.Models;
 using Microsoft.Data.SqlClient;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Data;
 
 namespace CoreOne.API.Repositories
@@ -196,31 +197,47 @@ namespace CoreOne.API.Repositories
             string token = dt.Rows[0]["Token"].ToString();
             int mailType = Convert.ToInt32(dt.Rows[0]["MailTypeID"]);
 
-            string provider = mailType switch
-            {
-                1 => "Gmail",
-                2 => "Yahoo",
-                3 => "Outlook",
-                _ => "Gmail"
-            };
+            
 
+            var (mailSetupDt, toDt) = GetMailSetupByPurpose(1);
             string uiBase = _config["BaseUrlUI"];
             string link = $"{uiBase}Account/ResetPassword?token={token}";
-            string subject = "Password Reset (valid for 10 minutes)";
-            string body = $@"
-            <p>Hello,</p>
-            <p>You requested a password reset. Click below:</p>
-            <p><a href='{link}' target='_blank'>Reset Password</a></p>
-            <p>This link will expire in <strong>10 minutes</strong>.</p>
-            <p>Thanks,<br/>CoreOne Support Team</p>";
+          
+            if (mailSetupDt.Rows.Count > 0)
+            {
+                string subject = mailSetupDt.Rows[0]["Subject"].ToString();
+                string FromMail = mailSetupDt.Rows[0]["FromMail"].ToString();
+                string FromMailPassword = mailSetupDt.Rows[0]["FromMailPassword"].ToString();
+                int MailTypeId = Convert.ToInt32(mailSetupDt.Rows[0]["MailTypeId"]);
+                string body = mailSetupDt.Rows[0]["Body"].ToString().Replace("{link}", link);
+                // send email using same logic as before
+                _ = _email.SendEmailAsyncToIndividual(MailTypeId, email, subject, body, FromMail, FromMailPassword);
+            }
 
-            _ = _email.SendEmailAsync(provider, email, subject, body);
+          
 
             return new PasswordValidationResponse
             {
                 Success = true,
                 Message = "Password reset link sent to your email."
             };
+        }
+
+        public (DataTable MailSetup, DataTable MailTo) GetMailSetupByPurpose(int mailPurposeId)
+        {
+            var p = new Dictionary<string, object>
+        {
+            { "@MailPurposeID", mailPurposeId },
+            { "@UserId", 0 }
+            
+        };
+
+            DataSet ds= _dbHelper.ExecuteSP_ReturnDataSet("sp_GetMailSetupByPurpose", p);
+
+            DataTable mailSetupDt = ds.Tables[0];
+            DataTable toDt = ds.Tables.Count > 1 ? ds.Tables[1] : null;
+            return (mailSetupDt, toDt);
+                
         }
 
         // 🔹 Validate Reset Token

@@ -2,7 +2,7 @@
 {
     public interface IEmailHelper
     {
-        bool SendEmail(string provider, string toEmail, string subject, string body);
-        Task<bool> SendEmailAsync(string provider, string toEmail, string subject, string body);
+       
+        Task<bool> SendEmailAsyncToIndividual(int MailTypeId, string toEmail, string subject, string body, string FromMail, string FromMailPassword);
     }
 }

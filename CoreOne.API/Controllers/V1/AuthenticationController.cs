@@ -72,7 +72,7 @@ namespace CoreOne.API.Controllers.V1
 
 
 
-        #region chage-forgot-password
+        #region change-forgot-password
         [HttpPost("ForgotPassword")]
         public IActionResult ForgotPassword([FromBody] string email)
         {
