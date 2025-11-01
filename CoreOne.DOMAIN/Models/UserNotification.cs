@@ -80,5 +80,10 @@ namespace CoreOne.DOMAIN.Models
         public int Id { get; set; }
         public string Name { get; set; }
     }
+    public class DeleteUserNotificationRequest
+    {
+        public int NotificationID { get; set; }
+        public int CreatedBy { get; set; }
+    }
 
 }

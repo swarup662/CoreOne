@@ -271,11 +271,11 @@
                                         </a>
                                         </has-permission>
                                         <has-permission module-id="16" action-id="3">
-                                            <a href="javascript:;"
-                                               class="action-icon"
-                                               onclick="openEditUserNotifyModal(@n.NotificationID)">
+                                            <a href="javascript:;" class="action-icon" onclick="DeleteUserNotifyModal(@n.NotificationID)">
                                                 <i class="mdi mdi-delete" data-toggle="tooltip" title="Delete" style="color:red"></i>
                                             </a>
+
+                                          
 
                                         </has-permission>
                                     </td>
@@ -704,4 +704,55 @@
             };
         });
     </script>
+ 
+    <script>
+        
+
+
+
+
+
+
+
+
+                function DeleteUserNotifyModal(NotificationID) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete massage`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                           $.ajax({
+            url: '/Notification/DeleteUserNotification',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(NotificationID),
+            success: function (resp) {
+                if (resp.success) {
+                    Swal.fire('Deleted!', resp.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('Deleted!', resp.message, 'success').then(() => location.reload());
+                }
+            },
+            error: function () {
+                Swal.fire('Error!', 'Something went wrong.', 'error');
+            }
+        });
+
+                }
+            });
+        }
+
+
+
+
+
+
+
+    </script>
+
+
 }

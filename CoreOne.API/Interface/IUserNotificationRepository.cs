@@ -9,7 +9,6 @@ namespace CoreOne.API.Interfaces
         DataTable GetUserNotifications(int userId);
      
         int MarkAsRead(int notificationId);
-        int DeleteNotification(int notificationId);
         int SaveUserNotification(UserNotification model);
         DataTable GetUserNotificationGrid(
              int pageSize,
@@ -21,5 +20,8 @@ namespace CoreOne.API.Interfaces
              int? createdBy
          );
         DataRow? GetUserNotificationById(int notificationId);
+
+        int DeleteUserNotification(int notificationId, int createdBy);
+
     }
 }

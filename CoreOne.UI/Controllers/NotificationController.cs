@@ -179,5 +179,58 @@ namespace CoreOne.UI.Controllers
 
             return Json(resp.IsSuccessStatusCode ? new { success = true } : new { success = false });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUserNotification([FromBody] int NotificationID)
+        {
+            var user = TokenHelper.UserFromToken(HttpContext);
+            var client = _httpClientFactory.CreateClient();
+            var url = _api.BaseUrlUserNotification + "/DeleteUserNotification";
+
+            var payload = new DeleteUserNotificationRequest
+            {
+                NotificationID = NotificationID,
+                CreatedBy = user.UserID
+            };
+
+            var json = JsonConvert.SerializeObject(payload);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            // Send request to API
+            var resp = await client.PostAsync(url, content);
+            var responseContent = await resp.Content.ReadAsStringAsync();
+
+            // Try to deserialize API response (which contains success/message)
+            dynamic? apiResponse = null;
+            try
+            {
+                apiResponse = JsonConvert.DeserializeObject<dynamic>(responseContent);
+            }
+            catch
+            {
+                // fallback if API doesn't return valid JSON
+            }
+
+            if (resp.IsSuccessStatusCode)
+            {
+                return Json(new
+                {
+                    success = apiResponse?.success ?? true,
+                    message = apiResponse?.message ?? "Notification deleted successfully."
+                });
+            }
+            else
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = apiResponse?.message ?? "Failed to delete notification."
+                });
+            }
+        }
+
+
+
+
     }
 }

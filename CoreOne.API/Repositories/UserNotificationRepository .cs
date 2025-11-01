@@ -112,14 +112,18 @@ namespace CoreOne.API.Repositories
             return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
 
-        public int DeleteNotification(int notificationId)
+        public int DeleteUserNotification(int notificationId, int createdBy)
         {
             var parameters = new Dictionary<string, object>
             {
-                {"@NotificationID", notificationId}
+                { "@NotificationID", notificationId },
+                { "@CreatedBy", createdBy }
             };
 
             return _dbHelper.ExecuteSP_ReturnInt("sp_DeleteUserNotification", parameters);
         }
+
+
+
     }
 }

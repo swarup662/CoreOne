@@ -109,6 +109,19 @@ namespace CoreOne.API.Controllers.V1
 
 
 
+        [HttpPost("DeleteUserNotification")]
+        public IActionResult DeleteUserNotification([FromBody] DeleteUserNotificationRequest act)
+        {
+            if (act.NotificationID <= 0)
+                return BadRequest(new { success = false, message = "Invalid NotificationID." });
+
+            int result = _notificationRepo.DeleteUserNotification(act.NotificationID, act.CreatedBy);
+
+            if (result > 0)
+                return Ok(new { success = true, message = "Notification deleted successfully." });
+            else
+                return NotFound(new { success = false, message = "Notification not found or already deleted." });
+        }
 
         [HttpPost("GetUserNotifications")]
         public IActionResult GetUserNotifications([FromBody] int userId)
@@ -145,14 +158,7 @@ namespace CoreOne.API.Controllers.V1
             return Ok(result > 0 ? "Marked as read" : "Error updating notification");
         }
 
-        // ✅ Delete notification
-        [HttpPost("DeleteNotification")]
-        public IActionResult DeleteNotification([FromBody] int notificationId)
-        {
-            int result = _notificationRepo.DeleteNotification(notificationId);
-            return Ok(result > 0 ? "Deleted successfully" : "Error deleting notification");
-        }
-
+      
 
         [HttpPost("SaveUserNotification")]
         public IActionResult SaveUserNotification([FromBody] UserNotification model)
