@@ -114,9 +114,14 @@
 
 
                     <div class="col-auto">
+                        
+                 <has-permission module-id="10" action-id="1">
+
                     <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                         <i class="mdi mdi-plus-circle"></i> Create Module SetUp
                     </button>
+                        </has-permission>
+
                 </div>
                 </div>
 
@@ -208,16 +213,17 @@
 
                                 <td>@(m.CreatedDate?.ToString("dd-MM-yyyy"))</td>
                                 <td>
-                                  
+                                          <has-permission module-id="10" action-id="2">
                                         <a href="javascript:;" class="action-icon" onclick="openEditModal(@m.MenuModuleID)">
                                         <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="Edit" style="color:rebeccapurple"></i></a>
-
+                                        </has-permission>
+                                                <has-permission module-id="10" action-id="4">
                                         <a href="javascript:;"
                                            class="action-icon"
                                            onclick="openEditModal(@m.MenuModuleID); $('#btnSavemenu').hide();$('#saveActionBtn').hide();">
                                             <i class="mdi mdi-eye-circle-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
                                         </a>
-
+                                        </has-permission>
                                   
                                 </td>
                             </tr>

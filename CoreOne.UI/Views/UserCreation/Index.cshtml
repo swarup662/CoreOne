@@ -621,7 +621,11 @@
                 <h5 class="modal-title">
                     <i class="bi bi-bell-fill text-warning me-2"></i> Send Notification
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button"
+                        class="btn btn-light btn-close-circle shadow-sm"
+                        onclick="window.location.href='@Url.Action("UserNotification","Notification")'">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
 
             <div class="modal-body">
@@ -656,10 +660,19 @@
                 </div>
             </div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="sendNotification()">Send</button>
+            <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
+                <button type="button"
+                        onclick="window.location.href='@Url.Action("UserNotification","Notification")'"
+                        class="btn btn-warning btn-sm"
+                        data-bs-dismiss="modal">
+                    <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
+                </button>
+
+                <button type="button" id="sendreminder" class="btn btn-sm" style="background:forestgreen; color:white" onclick="sendNotification()">
+                    <i class="mdi mdi-content-save-outline me-1"></i> Send
+                </button>
             </div>
+            
         </div>
     </div>
 </div>
