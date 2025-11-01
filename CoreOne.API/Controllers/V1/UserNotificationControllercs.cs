@@ -29,7 +29,6 @@ namespace CoreOne.API.Controllers.V1
                 UserID = row.Field<int>("UserID"),
                 Title = row.Field<string?>("Title") ?? string.Empty,
                 Message = row.Field<string?>("Message") ?? string.Empty,
-                Type = row.Field<string?>("Type") ?? string.Empty,
                 IsRead = row.Field<int>("IsRead"),
                 IsActive = row.Field<int>("IsActive"),
                 StartDateTime = row.Field<DateTime?>("StartDateTime"),

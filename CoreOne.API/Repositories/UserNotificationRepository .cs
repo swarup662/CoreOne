@@ -44,9 +44,9 @@ namespace CoreOne.API.Repositories
     {
         {"@NotificationID", model.NotificationID},
         {"@UserID", model.UserID},
+        {"@NotificationTypeID", model.NotificationTypeID},
         {"@Title", model.Title},
         {"@Message", model.Message},
-        {"@Type", model.Type},
         {"@IsRead", model.IsRead},
         {"@IsActive", model.IsActive},
         {"@StartDateTime", model.StartDateTime},

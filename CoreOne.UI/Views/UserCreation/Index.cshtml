@@ -629,22 +629,27 @@
                 <input type="hidden" id="notifyUserId" />
                 <input type="hidden" id="notifyNotificationId" value="0" />
 
-                <div class="mb-3">
+                <div class="mb-2">
                     <label class="form-label">Title</label>
                     <input type="text" class="form-control" id="notifyTitle" placeholder="Enter notification title..."  />
                 </div>
+                <div class="mb-2">
+                    <label class="form-label">Notification Type</label>
+                    <select id="notifyDropdown" name="notifyDropdown" class="form-select" asp-items="ViewBag.NotificationList">
+                    </select>
+                </div>
 
-                <div class="mb-3">
+                <div class="mb-2">
                     <label class="form-label">Message</label>
                     <textarea class="form-control" id="notifyMessage" rows="3" placeholder="Enter message..."></textarea>
                 </div>
 
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-2">
                         <label class="form-label">Start Date & Time</label>
                         <input type="datetime-local" class="form-control" id="notifyStart" />
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-2">
                         <label class="form-label">End Date & Time</label>
                         <input type="datetime-local" class="form-control" id="notifyEnd" />
                     </div>
@@ -885,39 +890,51 @@
 
 @section Scripts {
     <script>
-        // 🟢 Open modal and populate data
-        function openNotificationModal(userId, notificationId = 0, title = '', message = '', start = '', end = '') {
+             function openNotificationModal(userId, notificationId = 0, title = '', message = '', start = '', end = '', notificationTypeId = '') {
             $('#notifyUserId').val(userId);
             $('#notifyNotificationId').val(notificationId);
 
-            $('#notifyTitle').val(title || 'Reminder');
+            $('#notifyTitle').val(title || '');
             $('#notifyMessage').val(message || '');
             $('#notifyStart').val(start ? start.replace('Z', '') : '');
             $('#notifyEnd').val(end ? end.replace('Z', '') : '');
 
+            // 🟢 Now safely set dropdown
+            $('#notifyDropdown').val(notificationTypeId || '');
+
             $('#notificationModal').modal('show');
         }
 
-        // 🟢 Validate end date > start date in real-time
+
+
         $(document).on('change', '#notifyStart, #notifyEnd', function () {
             const start = $('#notifyStart').val();
             const end = $('#notifyEnd').val();
 
             if (start && end) {
-                const startDate = new Date(start);
-                const endDate = new Date(end);
+                const startDate = parseLocalDateTime(start);
+                const endDate = parseLocalDateTime(end);
 
-                if (endDate <= startDate) {
+                if (endDate.getTime() <= startDate.getTime()) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Invalid Date Range',
                         text: 'End date/time must be later than the start date/time.',
                         confirmButtonColor: '#3085d6'
                     });
-                    $('#notifyEnd').val(''); // clear invalid end date
+                    $('#notifyEnd').val('');
                 }
             }
         });
+
+        // ✅ Helper: Parse datetime-local without timezone offset
+        function parseLocalDateTime(dateTimeString) {
+            const [date, time] = dateTimeString.split('T');
+            const [year, month, day] = date.split('-').map(Number);
+            const [hour, minute] = time.split(':').map(Number);
+            return new Date(year, month - 1, day, hour, minute);
+        }
+
 
         // 🟢 Save notification (insert or update)
         async function sendNotification() {
@@ -927,6 +944,8 @@
             const message = $('#notifyMessage').val().trim();
             const startDateTime = $('#notifyStart').val();
             const endDateTime = $('#notifyEnd').val();
+         const notificationTypeId = $('#notifyDropdown').val() || 0;
+
 
             // 🟡 Validate required fields
             if (!title || !message) {
@@ -952,7 +971,8 @@
             const start = new Date(startDateTime);
             const end = new Date(endDateTime);
 
-            if (end <= start) {
+            // ✅ Strict check: end must be later than start
+            if (end.getTime() <= start.getTime()) {
                 Swal.fire({
                     icon: 'warning',
                     title: 'Invalid Dates',
@@ -976,19 +996,20 @@
 
             if (!confirmResult.isConfirmed) return;
 
-            const payload = {
-                NotificationID: parseInt(notificationId),
-                UserID: parseInt(userId),
-                Title: title,
-                Message: message,
-                Type: 'Info',
-                IsRead: 0,
-                IsActive: 1,
-                StartDateTime: startDateTime,
-                EndDateTime: endDateTime,
-                CreatedBy: 1,
-                UpdatedBy: 1
-            };
+             const payload = {
+            NotificationID: parseInt(notificationId),
+            UserID: parseInt(userId),
+            Title: title,
+            Message: message,
+            NotificationTypeID: parseInt(notificationTypeId),
+            IsRead: 0,
+            IsActive: 1,
+            StartDateTime: startDateTime,
+            EndDateTime: endDateTime,
+            CreatedBy: 1,
+            UpdatedBy: 1
+        };
+
 
             try {
                 const response = await fetch('/UserCreation/SaveUserNotification', {
@@ -1007,7 +1028,6 @@
                         timer: 2000,
                         showConfirmButton: false
                     }).then(() => {
-                        // 🟢 Redirect to Index after success
                         window.location.href = '/UserCreation/Index';
                     });
 
@@ -1031,6 +1051,7 @@
             }
         }
     </script>
+
 
 
 
@@ -1141,6 +1162,26 @@
                 setTimeout(() => preloader.remove(), 600); // removes after fade-out
             }
         });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     </script>
 
 

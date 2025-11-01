@@ -194,7 +194,23 @@ namespace CoreOne.API.Controllers.V1
             return Ok(data);
         }
 
+        [HttpGet("GetNotficationDropdown")]
+        public IActionResult GetNotficationDropdown()
+        {
+            var dt = _userRepo.GetNotficationDropdown();
 
+            var actions = new List<object>();
+            foreach (DataRow row in dt.Rows)
+            {
+                actions.Add(new
+                {
+                    Id = row["NotificationTypeID"],
+                    Name = row["NotificationTypeName"]
+                });
+            }
+
+            return Ok(actions);
+        }
 
     }
 }

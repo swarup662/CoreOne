@@ -12,7 +12,7 @@ namespace CoreOne.DOMAIN.Models
         public int UserID { get; set; }
         public string Title { get; set; }
         public string Message { get; set; }
-        public string Type { get; set; }
+        public int NotificationTypeID { get; set; }
         public int IsRead { get; set; }        // 0 = Unread, 1 = Read
         public int IsActive { get; set; }      // 1 = Active, 0 = Inactive
         public DateTime? StartDateTime { get; set; }
@@ -22,4 +22,13 @@ namespace CoreOne.DOMAIN.Models
         public int? UpdatedBy { get; set; }
         public DateTime? UpdatedDateTime { get; set; }
     }
+
+
+
+    public class Notification_Dropdown
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
 }

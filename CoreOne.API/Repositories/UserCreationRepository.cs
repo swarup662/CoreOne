@@ -304,6 +304,11 @@ namespace CoreOne.API.Repositories
             return _dbHelper.ExecuteSP_ReturnInt("sp_Users_CRUD", parameters);
         }
 
+        public DataTable GetNotficationDropdown()
+        {
+            // Only ActionID and ActionName
+            return _dbHelper.ExecuteSP_ReturnDataTable("GetNotficationDropdown", new Dictionary<string, object>());
+        }
 
     }
 }

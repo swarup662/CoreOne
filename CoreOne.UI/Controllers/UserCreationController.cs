@@ -75,7 +75,7 @@ namespace CoreOne.UI.Controllers
             ViewBag.RoleList = await GetRoles(user.UserID);
             ViewBag.GenderList = await GetGenders(user.UserID);
             ViewBag.MailTypeList = await GetMailTypes(user.UserID);
-
+            ViewBag.NotificationList = await GetNotficationDropdown();
             var ddlresponse = await client.GetAsync($"{_api.BaseUrlRolePermission}/roles");
             if (!ddlresponse.IsSuccessStatusCode)
             {
@@ -129,7 +129,43 @@ namespace CoreOne.UI.Controllers
            
         }
 
+        [HttpGet]
+        public async Task<List<SelectListItem>> GetNotficationDropdown()
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = _api.BaseUrlUserCreation + "/GetNotficationDropdown";
 
+            var dropdownList = new List<SelectListItem>();
+            var resp = await client.GetAsync(url);
+
+            if (!resp.IsSuccessStatusCode)
+                return dropdownList;
+
+            var response = await resp.Content.ReadAsStringAsync();
+
+            // Deserialize directly to your JSON structure
+            var notifications = JsonConvert.DeserializeObject<List<Notification_Dropdown>>(response);
+
+            // Add default placeholder
+            dropdownList.Add(new SelectListItem
+            {
+                Value = "",
+                Text = "-- Select Notification --",
+                Selected = true
+            });
+
+            // Convert list to dropdown items
+            foreach (var item in notifications)
+            {
+                dropdownList.Add(new SelectListItem
+                {
+                    Value = item.Id.ToString(),
+                    Text = item.Name
+                });
+            }
+
+            return dropdownList;
+        }
 
         [HttpPost]
         public async Task<List<SelectListItem>> GetMailTypes([FromBody] int userId)
@@ -688,7 +724,6 @@ namespace CoreOne.UI.Controllers
                 model.IsActive = 1;
                 model.IsRead = 0;
                 model.CreatedDateTime = DateTime.Now;
-                model.Type ??= "System";
 
                 // Prepare HTTP Client
                 var client = _httpClientFactory.CreateClient();
@@ -721,6 +756,7 @@ namespace CoreOne.UI.Controllers
                 return Json(new { success = false, message = $"Exception: {ex.Message}" });
             }
         }
+
 
 
 
