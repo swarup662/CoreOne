@@ -1,6 +1,7 @@
 ﻿using CoreOne.DOMAIN.Models;
 using CoreOne.UI.Helper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -16,6 +17,125 @@ namespace CoreOne.UI.Controllers
             _httpClientFactory = httpClientFactory;
             _api = settingsService.ApiSettings;
         }
+
+
+
+        [HttpGet]
+        public async Task<IActionResult> UserNotification(
+                   int pageNumber = 1,
+                   int pageSize = 10,
+                   string? search = "",
+                   string? searchCol = "Message",
+                   string? sortColumn = "CreatedDateTime",
+                   string? sortDir = "DESC",
+                   int? createdBy = null)
+        {
+            var model = new UserNotificationRequest
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                Search = search,
+                SearchCol = searchCol,
+                SortColumn = sortColumn,
+                SortDir = sortDir,
+                CreatedBy = createdBy
+            };
+
+            var client = _httpClientFactory.CreateClient();
+            var url = _api.BaseUrlUserNotification + "/GetUserNotificationGrid";
+
+            var json = JsonConvert.SerializeObject(model);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var resp = await client.PostAsync(url, content);
+
+            if (!resp.IsSuccessStatusCode)
+            {
+                ViewBag.Notifications = new List<UserNotificationDto>();
+                ViewBag.TotalRecords = 0;
+            }
+            else
+            {
+                var response = await resp.Content.ReadAsStringAsync();
+                var apiResult = JsonConvert.DeserializeObject<UserNotificationPagedResponse>(response);
+                ViewBag.NotificationList = await GetNotficationDropdown();
+                ViewBag.Notifications = apiResult?.Items ?? new List<UserNotificationDto>();
+                ViewBag.TotalRecords = apiResult?.TotalRecords ?? 0;
+            }
+
+            ViewBag.PageNumber = pageNumber;
+            ViewBag.PageSize = pageSize;
+            ViewBag.Search = search;
+            ViewBag.SearchCol = searchCol;
+            ViewBag.SortColumn = sortColumn;
+            ViewBag.SortDir = sortDir;
+
+            return View();
+        }
+
+
+        [HttpGet]
+        public async Task<List<SelectListItem>> GetNotficationDropdown()
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = _api.BaseUrlUserCreation + "/GetNotficationDropdown";
+
+            var dropdownList = new List<SelectListItem>();
+            var resp = await client.GetAsync(url);
+
+            if (!resp.IsSuccessStatusCode)
+                return dropdownList;
+
+            var response = await resp.Content.ReadAsStringAsync();
+
+            // Deserialize directly to your JSON structure
+            var notifications = JsonConvert.DeserializeObject<List<Notification_Dropdown>>(response);
+
+            // Add default placeholder
+            dropdownList.Add(new SelectListItem
+            {
+                Value = "",
+                Text = "-- Select Notification --",
+                Selected = true
+            });
+
+            // Convert list to dropdown items
+            foreach (var item in notifications)
+            {
+                dropdownList.Add(new SelectListItem
+                {
+                    Value = item.Id.ToString(),
+                    Text = item.Name
+                });
+            }
+
+            return dropdownList;
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserNotificationById(int id)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+                var url = $"{_api.BaseUrlUserNotification}/GetUserNotificationById?id={id}";
+
+                var resp = await client.GetAsync(url);
+                if (!resp.IsSuccessStatusCode)
+                    return Json(new { success = false, message = "Failed to fetch notification from API" });
+
+                var responseContent = await resp.Content.ReadAsStringAsync();
+                var data = JsonConvert.DeserializeObject<UserNotificationEdit>(responseContent);
+
+                return Json(data);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+
 
         // ✅ Get user-specific notifications
         [HttpGet]

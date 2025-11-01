@@ -11,5 +11,15 @@ namespace CoreOne.API.Interfaces
         int MarkAsRead(int notificationId);
         int DeleteNotification(int notificationId);
         int SaveUserNotification(UserNotification model);
+        DataTable GetUserNotificationGrid(
+             int pageSize,
+             int pageNumber,
+             string? search,
+             string? sortColumn,
+             string? sortDir,
+             string? searchCol,
+             int? createdBy
+         );
+        DataRow? GetUserNotificationById(int notificationId);
     }
 }

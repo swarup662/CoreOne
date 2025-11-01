@@ -2,6 +2,7 @@
 using CoreOne.API.Infrastructure.Data;
 using CoreOne.API.Interfaces;
 using CoreOne.DOMAIN.Models;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -17,6 +18,46 @@ namespace CoreOne.API.Repositories
             _dbHelper = dbHelper;
         }
 
+
+
+
+        public DataTable GetUserNotificationGrid(
+            int pageSize,
+            int pageNumber,
+            string? search,
+            string? sortColumn,
+            string? sortDir,
+            string? searchCol,
+            int? createdBy)
+        {
+            if (pageSize < 1) pageSize = 10;
+            if (pageNumber < 1) pageNumber = 1;
+            sortColumn = string.IsNullOrWhiteSpace(sortColumn) ? "CreatedDateTime" : sortColumn;
+            sortDir = string.IsNullOrWhiteSpace(sortDir) ? "DESC" : sortDir;
+
+            var parameters = new Dictionary<string, object>
+    {
+        { "@PageSize", pageSize },
+        { "@PageNumber", pageNumber },
+        { "@Search", (object?)search ?? DBNull.Value },
+        { "@SortColumn", sortColumn },
+        { "@SortDir", sortDir },
+        { "@SearchCol", (object?)searchCol ?? DBNull.Value },
+        { "@CreatedBy", (object?)createdBy ?? DBNull.Value }
+    };
+
+            return _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserNotificationGrid", parameters);
+        }
+
+
+
+
+
+
+
+
+
+
         public DataTable GetUserNotifications(int userId)
         {
             var parameters = new Dictionary<string, object>
@@ -27,6 +68,8 @@ namespace CoreOne.API.Repositories
             var ds = _dbHelper.ExecuteSP_ReturnDataSet("sp_GetUserNotifications", parameters);
             return ds.Tables[0];
         }
+
+
 
 
         public int MarkAsRead(int notificationId)
@@ -58,7 +101,16 @@ namespace CoreOne.API.Repositories
             return _dbHelper.ExecuteSP_ReturnInt("sp_AddOrUpdateUserNotification", parameters);
         }
 
+        public DataRow? GetUserNotificationById(int notificationId)
+        {
+            var parameters = new Dictionary<string, object>
+        {
+            {"@NotificationID", notificationId}
+        };
 
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserNotificationById", parameters);
+            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+        }
 
         public int DeleteNotification(int notificationId)
         {

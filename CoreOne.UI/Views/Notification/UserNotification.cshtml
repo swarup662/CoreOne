@@ -1,0 +1,683 @@
+﻿@model CoreOne.DOMAIN.Models.UserNotificationPagedResponse
+@using CoreOne.DOMAIN.Models
+@{
+    ViewData["Title"] = "User Notification Master";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    int pageNumber = ViewBag.PageNumber ?? 1;
+    int pageSize = ViewBag.PageSize ?? 10;
+    int totalRecords = ViewBag.TotalRecords ?? 0;
+    int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+    string search = ViewBag.Search ?? "";
+    string sortColumn = ViewBag.SortColumn ?? "CreatedDateTime";
+    string sortDir = ViewBag.SortDir ?? "DESC";
+    string searchCol = ViewBag.SearchCol ?? "";
+
+    var notifications = ViewBag.Notifications as List<UserNotificationDto> ?? new List<UserNotificationDto>();
+
+    int maxWindow = 5;
+    int startPage = Math.Max(1, pageNumber - maxWindow / 2);
+    int endPage = Math.Min(totalPages, startPage + maxWindow - 1);
+}
+<link href="~/css/usernotifiaction.css" rel="stylesheet" />
+<style>
+    /* 🔄 Preloader Styles */
+    #preloader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(13, 20, 35, 0.95);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        transition: opacity 0.6s ease, visibility 0.6s ease;
+    }
+
+        #preloader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+    .loader {
+        text-align: center;
+    }
+
+        .loader .spin {
+            font-size: 48px;
+            color: #89a4cd;
+            animation: spin 2s linear infinite;
+        }
+
+    .loading-text {
+        color: #ffffffcc;
+        margin-top: 10px;
+        font-weight: 500;
+        letter-spacing: 1px;
+    }
+</style>
+
+<!-- 🔄 Preloader -->
+<div id="preloader">
+    <div class="loader">
+        <i class="fas fa-globe logo-icon spin"></i>
+        <div class="loading-text">Loading...</div>
+    </div>
+</div>
+
+<div class="container-fluid  p-2" style="background:rgba(255, 255, 255, 0.08);">
+
+    <div class="row" style="margin-top: -19px; margin-bottom: -6px;">
+        <div class="col-12">
+            <div class="page-title-box">
+                <div class="page-title-right">
+                    <ol class="breadcrumb m-0">
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Check</a></li>
+                        <li class="breadcrumb-item"><a href="javascript:void(0);">Dashboard</a></li>
+
+                    </ol>
+                </div>
+                <h4 class="page-title">User Notification</h4>
+            </div>
+        </div>
+    </div>
+    <div class="card" style="background:rgba(255, 255, 255, 0.08);border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+                 -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+        <div class="card-body">
+            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+                 -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <div class="row justify-content-between">
+
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-blue waves-effect waves-light" style="background: linear-gradient(135deg, #8173fa, #5a48e5);border-radius: 11px;"
+                                onclick="window.location.href='@Url.Action("UserNotification","Notification")'">
+                            <i class="mdi mdi-refresh-circle"></i> Refresh
+                        </button>
+                    </div>
+
+
+
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
+                            <i class="mdi mdi-plus-circle"></i> Create Module SetUp
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px); 
+     -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+
+                <div class="col-md-3">
+                    <input type="search" id="searchBox" value="@search" class="form-control my-1 my-lg-0" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
+                </div>
+                <div class="col-md-2">
+                    <select id="searchField" class="form-select my-1 my-lg-0t" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
+                        <option value="">All Columns</option>
+                        <option value="UserName" selected="@(searchCol=="UserName")">User Name</option>
+                        <option value="Title" selected="@(searchCol=="Title")">Title</option>
+                        <option value="Message" selected="@(searchCol=="Message")">Message</option>
+                        <option value="Type" selected="@(searchCol=="Type")">Type</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button id="btnSearch" class="btn btn-primary  my-1 my-lg-0"><i class="mdi mdi-magnify"></i> Search</button>
+                </div>
+                <div class="col-md-2 ms-auto d-flex justify-content-end" >
+                    <select id="pageSize" class="form-select my-1 my-lg-0" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
+                        @{
+                            int[] sizes = {1, 10, 20, 50, 100 };
+                            foreach (var s in sizes)
+                            {
+                                <option value="@s" selected="@(s == pageSize)">@s</option>
+                            }
+                        }
+                    </select>
+                </div>
+            
+
+        </div>
+
+
+            <div class="table-responsive row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+                 -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
+                <table class="table table-bordered table-hover table-xl mt-2">
+                    <thead>
+                        <tr style="background: #f3f7f9; color:black;">
+                            <th style="color:black">#</th>
+
+                            <th style="color:black">
+                                <a href="javascript:void(0)" style="color:black" onclick="sortTable('UserName')" class="d-flex justify-content-between">
+                                    User Name
+                                    @(sortColumn == "UserName" ? (sortDir == "ASC" ? "↑" : "↓") : "↕")
+                                </a>
+                            </th>
+
+                            <th style="color:black">
+                                <a href="javascript:void(0)" style="color:black" onclick="sortTable('Title')" class="d-flex justify-content-between">
+                                    Title
+                                    @(sortColumn == "Title" ? (sortDir == "ASC" ? "↑" : "↓") : "↕")
+                                </a>
+                            </th>
+
+                            <th style="color:black">
+                                <a href="javascript:void(0)" style="color:black" onclick="sortTable('Message')" class="d-flex justify-content-between">
+                                    Message
+                                    @(sortColumn == "Message" ? (sortDir == "ASC" ? "↑" : "↓") : "↕")
+                                </a>
+                            </th>
+
+                            <th style="color:black">
+                                <a href="javascript:void(0)" style="color:black" onclick="sortTable('Type')" class="d-flex justify-content-between">
+                                    Type
+                                    @(sortColumn == "Type" ? (sortDir == "ASC" ? "↑" : "↓") : "↕")
+                                </a>
+                            </th>
+
+                            <th style="color:black">
+                                <a href="javascript:void(0)" style="color:black" onclick="sortTable('CreatedDateTime')" class="d-flex justify-content-between">
+                                    Created On
+                                    @(sortColumn == "CreatedDateTime" ? (sortDir == "ASC" ? "↑" : "↓") : "↕")
+                                </a>
+                            </th>
+
+                            <th style="color:black">Status</th>
+                            <th style="color:black">Action</th>
+                        </tr>
+                    </thead>
+                
+                    <tbody>
+                        @{
+                            int count = (pageNumber - 1) * pageSize + 1;
+                            foreach (var n in notifications)
+                            {
+                                <tr>
+                                    <td>@count</td>
+                                    <td>@n.UserName</td>
+                                    <td>@n.Title</td>
+                                    <td>@n.Message</td>
+                                    <td>@n.Type</td>
+                                    <td>@n.CreatedDateTime?.ToString("dd-MM-yyyy")</td>
+                                    <td>
+                                        @if (n.IsRead)
+                                        {
+                                            <span class="badge bg-success">Read</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">Unread</span>
+                                        }
+                                    </td>
+                                    <td>
+
+                                        <!-- ✏️ Edit button -->
+                                        <a href="javascript:;" class="action-icon" onclick="openEditUserNotifyModal(@n.NotificationID)">
+                                            <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="Edit" style="color:rebeccapurple"></i>
+                                        </a>
+
+                                        <script>
+                                            async function openEditUserNotifyModal(notificationId) {
+                                                console.log("🟦 Opening edit modal for:", notificationId);
+
+                                                // Step 1: Open modal immediately
+                                                const modalEl = document.getElementById('notificationModal');
+                                                const modal = new bootstrap.Modal(modalEl);
+                                                modal.show();
+
+                                                // Step 2: Temporary loading state
+                                                $('#notifyTitle, #notifyMessage, #notifyDropdown, #notifyStart, #notifyEnd').prop('disabled', true);
+                                                $('#notifyTitle').val("Loading...");
+                                                $('#notifyMessage').val("");
+                                                $('#notifyDropdown').val("");
+                                                $('#notifyStart').val("");
+                                                $('#notifyEnd').val("");
+
+                                                try {
+                                                    // ✅ Call your NotificationController (not ModuleSetup)
+                                                    const response = await fetch(`/Notification/GetUserNotificationById?id=${notificationId}`);
+
+                                                    if (!response.ok) throw new Error("Failed to fetch notification.");
+
+                                                    const data = await response.json();
+                                                    console.log("✅ Notification data:", data);
+
+                                                    // Step 3: Fill modal fields
+                                                    $('#notifyNotificationId').val(data.notificationID || 0);
+                                                    $('#notifyUserId').val(data.userID || '');
+                                                    $('#notifyTitle').val(data.title || '');
+                                                    $('#notifyDropdown').val(data.notificationTypeID || '');
+                                                    $('#notifyMessage').val(data.message || '');
+                                                    $('#notifyStart').val(data.startDateTime ? new Date(data.startDateTime).toISOString().slice(0, 16) : '');
+                                                    $('#notifyEnd').val(data.endDateTime ? new Date(data.endDateTime).toISOString().slice(0, 16) : '');
+
+                                                } catch (err) {
+                                                    console.error("❌ Error:", err);
+                                                    $('#notifyTitle').val("Failed to load data.");
+                                                } finally {
+                                                    $('#notifyTitle, #notifyMessage, #notifyDropdown, #notifyStart, #notifyEnd').prop('disabled', false);
+                                                }
+                                            }
+                                        </script>
+
+
+                                        <a href="javascript:;"
+                                           class="action-icon"
+                                           onclick="openEditModal(@n.NotificationID); $('#btnSavemenu').hide();$('#saveActionBtn').hide();">
+                                            <i class="mdi mdi-eye-circle-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
+                                        </a>
+                                    </td>
+
+                                </tr>
+                                count++;
+                            }
+
+                            if (!notifications.Any())
+                            {
+                                <tr><td colspan="7" class="text-center text-muted">No records found</td></tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 🔹 Pagination -->
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item @(pageNumber==1?"disabled":"")">
+                        <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber - 1)">Prev</a>
+                    </li>
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="page-item @(i==pageNumber?"active":"")">
+                            <a class="page-link" href="javascript:void(0)" data-page="@i">@i</a>
+                        </li>
+                    }
+
+                    <li class="page-item @(pageNumber>=totalPages?"disabled":"")">
+                        <a class="page-link" href="javascript:void(0)" data-page="@(pageNumber + 1)">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-bell-fill text-warning me-2"></i> Edit Notification
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="notifyNotificationId" />
+                <input type="hidden" id="notifyUserId" />
+
+                <div class="mb-2">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-control" id="notifyTitle" />
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label">Notification Type</label>
+                    <select id="notifyDropdown" name="notifyDropdown" class="form-select" asp-items="ViewBag.NotificationList">
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-control" id="notifyMessage" rows="3"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Start Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="notifyStart" />
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">End Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="notifyEnd" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="sendNotification()">Send</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+
+
+    <script>
+             function openNotificationModal(userId, notificationId = 0, title = '', message = '', start = '', end = '', notificationTypeId = '') {
+            $('#notifyUserId').val(userId);
+            $('#notifyNotificationId').val(notificationId);
+
+            $('#notifyTitle').val(title || '');
+            $('#notifyMessage').val(message || '');
+            $('#notifyStart').val(start ? start.replace('Z', '') : '');
+            $('#notifyEnd').val(end ? end.replace('Z', '') : '');
+
+            // 🟢 Now safely set dropdown
+            $('#notifyDropdown').val(notificationTypeId || '');
+
+            $('#notificationModal').modal('show');
+        }
+
+
+
+        $(document).on('change', '#notifyStart, #notifyEnd', function () {
+            const start = $('#notifyStart').val();
+            const end = $('#notifyEnd').val();
+
+            if (start && end) {
+                const startDate = parseLocalDateTime(start);
+                const endDate = parseLocalDateTime(end);
+
+                if (endDate.getTime() <= startDate.getTime()) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Invalid Date Range',
+                        text: 'End date/time must be later than the start date/time.',
+                        confirmButtonColor: '#3085d6'
+                    });
+                    $('#notifyEnd').val('');
+                }
+            }
+        });
+
+        // ✅ Helper: Parse datetime-local without timezone offset
+        function parseLocalDateTime(dateTimeString) {
+            const [date, time] = dateTimeString.split('T');
+            const [year, month, day] = date.split('-').map(Number);
+            const [hour, minute] = time.split(':').map(Number);
+            return new Date(year, month - 1, day, hour, minute);
+        }
+
+
+        // 🟢 Save notification (insert or update)
+        async function sendNotification() {
+            const userId = $('#notifyUserId').val();
+            const notificationId = $('#notifyNotificationId').val() || 0;
+            const title = $('#notifyTitle').val().trim();
+            const message = $('#notifyMessage').val().trim();
+            const startDateTime = $('#notifyStart').val();
+            const endDateTime = $('#notifyEnd').val();
+         const notificationTypeId = $('#notifyDropdown').val() || 0;
+
+
+            // 🟡 Validate required fields
+            if (!title || !message) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Fields',
+                    text: 'Please enter both title and message.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            if (!startDateTime || !endDateTime) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Missing Dates',
+                    text: 'Please select both start and end date/time.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            const start = new Date(startDateTime);
+            const end = new Date(endDateTime);
+
+            // ✅ Strict check: end must be later than start
+            if (end.getTime() <= start.getTime()) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Dates',
+                    text: 'End date/time must be later than the start date/time.',
+                    confirmButtonColor: '#3085d6'
+                });
+                return;
+            }
+
+            // 🟢 Confirm before sending
+            const confirmResult = await Swal.fire({
+                title: 'Send Notification?',
+                text: "Do you want to send this notification now?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Send it!',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33'
+            });
+
+            if (!confirmResult.isConfirmed) return;
+
+             const payload = {
+            NotificationID: parseInt(notificationId),
+            UserID: parseInt(userId),
+            Title: title,
+            Message: message,
+            NotificationTypeID: parseInt(notificationTypeId),
+            IsRead: 0,
+            IsActive: 1,
+            StartDateTime: startDateTime,
+            EndDateTime: endDateTime,
+            CreatedBy: 1,
+            UpdatedBy: 1
+        };
+
+
+            try {
+                const response = await fetch('/UserCreation/SaveUserNotification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sent!',
+                        text: result.message || 'Notification sent successfully.',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '/Notification/UserNotification';
+                    });
+
+                    $('#notificationModal').modal('hide');
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: result.message || 'Failed to send notification.',
+                        confirmButtonColor: '#d33'
+                    });
+                }
+            } catch (error) {
+                console.error('Error sending notification:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong while sending notification.',
+                    confirmButtonColor: '#d33'
+                });
+            }
+        }
+    </script>
+    <script>
+
+
+
+                function openEditModal(menuId) {
+            fetch(`/ModuleSetup/GetMenuForEdit?id=${menuId}`)
+
+                .then(res => res.ok ? res.json() : Promise.reject("Failed to load menu"))
+                .then(data => {
+                    if (!data) throw new Error("No data returned");
+
+                    // Populate menu fields
+                    $("#hdnMenuModuleID").val(data.menuID);
+                    $("#MenuName").val(data.menuName);
+                    $("#MenuSeq").val(data.menuSeq);
+                    $("#MenuSymbol").val(data.menuSymbol);
+
+                    const tbody = $("#moduleTable tbody").empty();
+
+                    if (data.modules && data.modules.length > 0) {
+                        // Sort modules by sequence ascending
+                        const sortedModules = data.modules.sort((a, b) => a.sequence - b.sequence);
+
+                        sortedModules.forEach(m => {
+                            // Check for duplicate sequence in table
+                            const seqExists = $("#moduleTable tbody tr").filter(function () {
+                                return parseInt($(this).find(".moduleSeq input").val()) === m.sequence;
+                            }).length > 0;
+
+                            if (!seqExists) {
+                                tbody.append(`
+                                            <tr data-module-id="${m.moduleID}">
+                                                <td class="moduleId" style="display:none">${m.moduleID}</td>
+                                                <td class="moduleSeq">
+                                                    <input type="number" class="form-control form-control-sm" value="${m.sequence}" />
+                                                </td>
+                                                <td class="moduleName">
+                                                    <input type="text" class="form-control form-control-sm" value="${m.name}" />
+                                                </td>
+                                                <td class="moduleUrl">
+                                                    <input type="text" class="form-control form-control-sm" value="${m.url}" />
+                                                </td>
+                                                 <td class="d-flex gap-1 justify-content-start">
+
+                    <a href="javascript:void(0);"  onclick="ActionSetup('${m.moduleID}')" style="background: #f75964;color: white;" class="btn btn-sm setupModule" title="Setup"><i class="fe-command"></i></a>
+                    </td>
+                                            </tr>
+                                        `);
+                            }
+                        });
+                    }
+                    $('#moduleModalLabel').text('Update Modules Setup :: Edit');
+                    $('#moduleSetupModal').attr('aria-labelledby', 'moduleModalLabel');
+                    $("#moduleSetupModal").modal("show");
+                })
+                .catch(err => alert(err));
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        $(document).ready(function () {
+            const current = {
+                pageNumber: @pageNumber,
+                pageSize: @pageSize,
+                search: "@search",
+                searchCol: "@searchCol",
+                sortColumn: "@sortColumn",
+                sortDir: "@sortDir"
+            };
+
+            function buildUrl(params) {
+                const qs = new URLSearchParams();
+                qs.set('pageNumber', params.pageNumber ?? 1);
+                qs.set('pageSize', params.pageSize ?? current.pageSize);
+                if ((params.search ?? '') !== '') qs.set('search', params.search ?? '');
+                qs.set('searchCol', params.searchCol ?? current.searchCol);
+                qs.set('sortColumn', params.sortColumn ?? current.sortColumn);
+                qs.set('sortDir', params.sortDir ?? current.sortDir);
+                return '@Url.Action("UserNotification", "Notification")' + '?' + qs.toString();
+            }
+
+            function navigateTo(opts) {
+                const url = buildUrl(opts);
+                console.log("➡ Navigating to:", url);
+                window.location.href = url;
+            }
+
+            // 🔍 Search
+            $(document).on('click', '#btnSearch', function () {
+                const searchVal = $('#searchBox').val();
+                const searchCol = $('#searchField').val();
+                const pageSize = $('#pageSize').val();
+                console.log("🔍 Search clicked:", searchVal, "Column:", searchCol);
+
+                navigateTo({
+                    pageNumber: 1,
+                    search: searchVal,
+                    searchCol: searchCol,
+                    pageSize: parseInt(pageSize, 10),
+                    sortColumn: current.sortColumn,
+                    sortDir: current.sortDir
+                });
+            });
+
+            // 🔁 Page Size Change
+            $(document).on('change', '#pageSize', function () {
+                navigateTo({
+                    pageNumber: 1,
+                    search: $('#searchBox').val(),
+                    searchCol: $('#searchField').val(),
+                    pageSize: parseInt($(this).val(), 10),
+                    sortColumn: current.sortColumn,
+                    sortDir: current.sortDir
+                });
+            });
+
+            // 📄 Pagination
+            $(document).on('click', '.pagination a.page-link', function (ev) {
+                ev.preventDefault();
+                const page = parseInt($(this).data('page'), 10);
+                navigateTo({
+                    pageNumber: page,
+                    search: $('#searchBox').val(),
+                    searchCol: $('#searchField').val(),
+                    pageSize: parseInt($('#pageSize').val(), 10),
+                    sortColumn: current.sortColumn,
+                    sortDir: current.sortDir
+                });
+            });
+
+            // ↕ Sorting
+            window.sortTable = function (column) {
+                const newDir = current.sortColumn === column && current.sortDir === 'ASC' ? 'DESC' : 'ASC';
+                navigateTo({
+                    pageNumber: 1,
+                    search: $('#searchBox').val(),
+                    searchCol: $('#searchField').val(),
+                    pageSize: parseInt($('#pageSize').val(), 10),
+                    sortColumn: column,
+                    sortDir: newDir
+                });
+            };
+        });
+    </script>
+}

@@ -1,4 +1,5 @@
 ﻿using CoreOne.API.Interfaces;
+using CoreOne.API.Repositories;
 using CoreOne.DOMAIN.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -17,6 +18,97 @@ namespace CoreOne.API.Controllers.V1
         {
             _notificationRepo = notificationRepo;
         }
+
+
+
+
+        [HttpPost("GetUserNotificationGrid")]
+        public IActionResult GetUserNotificationGrid([FromBody] UserNotificationRequest request)
+        {
+            if (request == null)
+                return BadRequest("Request is required.");
+
+            var dt = _notificationRepo.GetUserNotificationGrid(
+                request.PageSize,
+                request.PageNumber,
+                request.Search,
+                request.SortColumn,
+                request.SortDir,
+                request.SearchCol,
+                request.CreatedBy
+            );
+
+            var notifications = new List<UserNotificationDto>();
+            foreach (DataRow row in dt.Rows)
+            {
+                notifications.Add(new UserNotificationDto
+                {
+                    NotificationID = Convert.ToInt32(row["NotificationID"]),
+                    UserID = Convert.ToInt32(row["UserID"]),
+                    UserName = row["UserName"]?.ToString() ?? string.Empty,
+                    Title = row["Title"]?.ToString() ?? string.Empty,
+                    Message = row["Message"]?.ToString() ?? string.Empty,
+                    Type = row["Type"]?.ToString() ?? string.Empty,
+                    IsRead = row["IsRead"] != DBNull.Value && Convert.ToBoolean(row["IsRead"]),
+                    StartDateTime = row["StartDateTime"] == DBNull.Value ? null : Convert.ToDateTime(row["StartDateTime"]),
+                    CreatedDateTime = row["CreatedDateTime"] == DBNull.Value ? null : Convert.ToDateTime(row["CreatedDateTime"])
+                });
+            }
+
+            int totalRecords = 0;
+            if (dt.Rows.Count > 0 && dt.Columns.Contains("TotalRecords"))
+                totalRecords = Convert.ToInt32(dt.Rows[0]["TotalRecords"]);
+
+            var response = new UserNotificationPagedResponse
+            {
+                Items = notifications,
+                TotalRecords = totalRecords,
+                PageNumber = request.PageNumber,
+                PageSize = request.PageSize,
+                SortColumn = request.SortColumn,
+                SortDir = request.SortDir,
+                Search = request.Search,
+                SearchCol = request.SearchCol
+            };
+
+            return Ok(response);
+        }
+
+
+
+        [HttpGet("GetUserNotificationById")]
+        public IActionResult GetUserNotificationById(int id)
+        {
+            var row = _notificationRepo.GetUserNotificationById(id);
+            if (row == null)
+                return NotFound();
+
+            var dto = new UserNotificationEdit
+            {
+                NotificationID = Convert.ToInt32(row["NotificationID"]),
+                UserID = Convert.ToInt32(row["UserID"]),
+                UserName = row["UserName"]?.ToString(),
+                Title = row["Title"]?.ToString(),
+                Message = row["Message"]?.ToString(),
+                NotificationTypeID = Convert.ToInt32(row["NotificationTypeID"]),
+                IsRead = Convert.ToBoolean(row["IsRead"]),
+                StartDateTime = row["StartDateTime"] == DBNull.Value ? null : (DateTime?)row["StartDateTime"],
+                EndDateTime = row["EndDateTime"] == DBNull.Value ? null : (DateTime?)row["EndDateTime"],
+                CreatedDateTime = row["CreatedDateTime"] == DBNull.Value ? null : (DateTime?)row["CreatedDateTime"]
+            };
+
+            return Ok(dto);
+        }
+
+
+
+
+
+
+
+
+
+
 
         [HttpPost("GetUserNotifications")]
         public IActionResult GetUserNotifications([FromBody] int userId)
