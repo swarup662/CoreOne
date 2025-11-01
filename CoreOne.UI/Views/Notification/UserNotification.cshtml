@@ -100,7 +100,7 @@
 
 
 
-                    <div class="col-auto">
+                    <div class="col-auto" style="display:none">
                         <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
                             <i class="mdi mdi-plus-circle"></i> Create Module SetUp
                         </button>
@@ -212,12 +212,12 @@
                                         }
                                     </td>
                                     <td>
-
+                                     <has-permission module-id="16" action-id="2">
                                         <!-- ✏️ Edit button -->
                                         <a href="javascript:;" class="action-icon" onclick="openEditUserNotifyModal(@n.NotificationID)">
                                             <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="Edit" style="color:rebeccapurple"></i>
                                         </a>
-
+                                        </has-permission>
                                         <script>
                                             async function openEditUserNotifyModal(notificationId) {
                                                 console.log("🟦 Opening edit modal for:", notificationId);
@@ -262,13 +262,22 @@
                                             }
                                         </script>
 
-
+                                            <has-permission module-id="16" action-id="4">
                                         <a href="javascript:;"
                                            class="action-icon"
                                            onclick="openEditUserNotifyModal(@n.NotificationID)
                                                $('#sendreminder').hide();">
                                             <i class="mdi mdi-eye-circle-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
                                         </a>
+                                        </has-permission>
+                                        <has-permission module-id="16" action-id="3">
+                                            <a href="javascript:;"
+                                               class="action-icon"
+                                               onclick="openEditUserNotifyModal(@n.NotificationID)">
+                                                <i class="mdi mdi-delete" data-toggle="tooltip" title="Delete" style="color:red"></i>
+                                            </a>
+
+                                        </has-permission>
                                     </td>
 
                                 </tr>

@@ -93,7 +93,7 @@
                     <div class="col-auto">
 
 
-                    <has-permission module-id="5" action-id="1">
+                    <has-permission module-id="13" action-id="1">
 
 
                         <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#ActionModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
@@ -143,27 +143,29 @@
                             <td>@item.CreatedDate</td>
 
                             <td>
+                                        <has-permission module-id="13" action-id="2">
                                         <a href="javascript:;"
                                            class="action-icon"
                                            onclick="loadAction(@item.ActionID);">
                                             <i class="mdi mdi-square-edit-outline" data-toggle="tooltip" title="View" style="color:rebeccapurple"></i>
                                         </a>
-
-
+                                        </has-permission>
+                                         <has-permission module-id="13" action-id="4">
                                         <a href="javascript:;"
                                            class="action-icon"
                                            onclick="loadAction(@item.ActionID); $('#btnSaveAction').remove();;">
                                             <i class="mdi mdi-eye-circle-outline" data-toggle="tooltip" title="View" style="color:#fd683b"></i>
                                         </a>
 
-
+                                        </has-permission>
+                                         <has-permission module-id="13" action-id="3">
                                         <a href="javascript:;"
                                            class="action-icon"
                                            onclick="deleteAction(@item.ActionID)">
                                             <i class="mdi mdi-delete" data-toggle="tooltip" title="Delete" style="color:red"></i>
                                         </a>
 
-                           
+                                        </has-permission>
                               
 
 
