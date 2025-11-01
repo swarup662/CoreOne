@@ -370,7 +370,7 @@
                                                                     </a>
                                                                 </li>
                                                             </has-permission>
-                                                            <has-permission module-id="4" action-id="7">
+                                                            <has-permission module-id="4" action-id="12">
                                                                 <li>
                                                                     <a class="dropdown-item" href="/Account/ChangePassword">
                                                                         <i class="mdi mdi-key-variant me-1"></i> Change Password
@@ -379,7 +379,7 @@
                                                             </has-permission>
 
                                                           
-                                                            <has-permission module-id="4" action-id="9">
+                                                            <has-permission module-id="4" action-id="13">
                                                                 <li>
                                                                     <a class="dropdown-item" href="javascript:void(0);" onclick="openNotificationModal(@user.UserID)" >
                                                                         <i class="bi bi-bell-fill me-1"></i> Send Reminder
@@ -480,9 +480,16 @@
                                                 </a>
                                             </li>
                                         </has-permission>
-                                        <has-permission module-id="4" action-id="7">
+                                        <has-permission module-id="4" action-id="12">
                                             <li>
                                                 <a class="dropdown-item" href="/Account/ChangePassword">
+                                                    <i class="mdi mdi-key-variant me-1"></i> Change Password
+                                                </a>
+                                            </li>
+                                        </has-permission>
+                                        <has-permission module-id="4" action-id="13">
+                                            <li>
+                                                <a class="dropdown-item" href="javascript:void(0);" onclick="openNotificationModal(@user.UserID)">
                                                     <i class="mdi mdi-key-variant me-1"></i> Change Password
                                                 </a>
                                             </li>
@@ -623,7 +630,7 @@
                 </h5>
                 <button type="button"
                         class="btn btn-light btn-close-circle shadow-sm"
-                        onclick="window.location.href='@Url.Action("UserNotification","Notification")'">
+                        onclick="window.location.href='/UserCreation/Index'">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
@@ -662,7 +669,7 @@
 
             <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
                 <button type="button"
-                        onclick="window.location.href='@Url.Action("UserNotification","Notification")'"
+                        onclick="window.location.href='/UserCreation/Index'"
                         class="btn btn-warning btn-sm"
                         data-bs-dismiss="modal">
                     <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
