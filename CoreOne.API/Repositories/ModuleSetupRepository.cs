@@ -43,7 +43,7 @@ namespace CoreOne.API.Repositories
     };
 
             // Execute stored procedure and return DataTable
-            return _dbHelper.ExecuteSP_ReturnDataTable("sp_GetMenuModuleGrid", parameters);
+            return _dbHelper.ExecuteSP_ReturnDataTable("[sp_ModuleSetup_PagedSortedSearched]", parameters);
         }
 
 
@@ -80,7 +80,7 @@ namespace CoreOne.API.Repositories
 
             // Execute SP with TVP
             return _dbHelper.ExecuteSP_WithTableType_ReturnInt(
-                "sp_SaveMenuWithModules",
+                "sp_ModuleSetup_InsertUpdateMenuAndModules",
                 "@Modules",
                 "ModuleTableType",
                 dtModules,
@@ -89,7 +89,7 @@ namespace CoreOne.API.Repositories
         }
         public MenuModuleEditModel GetMenuModuleById(int menuId)
         {
-            var ds = _dbHelper.ExecuteSP_ReturnDataSet("sp_GetMenuWithModulesById",
+            var ds = _dbHelper.ExecuteSP_ReturnDataSet("sp_ModuleSetup_GetMenuWithModulesById",
                 new Dictionary<string, object> { { "@MenuModuleID", menuId } });
 
             if (ds == null || ds.Tables.Count < 2)
@@ -130,14 +130,14 @@ namespace CoreOne.API.Repositories
 
         public void DeleteMenu(int menuId)
         {
-            _dbHelper.ExecuteSP_ReturnInt("sp_DeleteMenuWithModules", new Dictionary<string, object> { { "@MenuModuleID", menuId } });
+            _dbHelper.ExecuteSP_ReturnInt("sp_ModuleSetup_Delete", new Dictionary<string, object> { { "@MenuModuleID", menuId } });
         }
 
 
         public DataTable GetActionDropdown()
         {
             // Only ActionID and ActionName
-            return _dbHelper.ExecuteSP_ReturnDataTable("GetActionIDsAndNames", new Dictionary<string, object>());
+            return _dbHelper.ExecuteSP_ReturnDataTable("sp_ModuleSetup_ActionDropdown", new Dictionary<string, object>());
         }
 
 
@@ -147,7 +147,7 @@ namespace CoreOne.API.Repositories
             {
                 { "@ModuleID", moduleID }
             };
-            return _dbHelper.ExecuteSP_ReturnDataTable("sp_GetActionsByModuleID", parameters);
+            return _dbHelper.ExecuteSP_ReturnDataTable("sp_ModuleSetup_GetActionsByModuleID", parameters);
         }
 
         public void SaveModuleActions(int moduleID, List<ActionDto> actions, int createdBy)
@@ -174,7 +174,7 @@ namespace CoreOne.API.Repositories
 
             // Execute stored procedure with TVP
             _dbHelper.ExecuteSP_WithTableType_ReturnInt(
-                "sp_SaveModuleActionsTVP",
+                "sp_ModuleSetup_SaveModuleActions",
                 "@Actions",
                 "ActionTableType",
                 dtActions,
