@@ -17,7 +17,7 @@ namespace CoreOne.API.Repositories
         // 1. Roles dropdown
         public async Task<IEnumerable<RolePermission>> GetRolesAsync()
         {
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetRolesForDropdown"); // SELECT * FROM Roles
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_RolePermission_RolesForDropdown]"); // SELECT * FROM Roles
             var list = new List<RolePermission>();
 
             foreach (DataRow row in dt.Rows)
@@ -50,7 +50,7 @@ namespace CoreOne.API.Repositories
         {"@SortDir", sortDir }
     };
 
-            return _dbHelper.ExecuteSP_ReturnDataTable("sp_GetRoleGrid", parameters);
+            return _dbHelper.ExecuteSP_ReturnDataTable("[sp_RolePermission_PagedSortedSearched]", parameters);
         }
 
 
@@ -58,7 +58,7 @@ namespace CoreOne.API.Repositories
         public async Task<IEnumerable<RolePermission>> GetByRoleIdAsync(int roleId)
         {
             var parameters = new Dictionary<string, object> { { "@RoleID", roleId } };
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetRolePermissionsByRoleID", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_RolePermission_GetByRoleID]", parameters);
 
             var list = new List<RolePermission>();
             foreach (DataRow row in dt.Rows)
@@ -115,7 +115,7 @@ namespace CoreOne.API.Repositories
                 { "@UserID", userId }
             };
  
-            var result = _dbHelper.ExecuteSP_WithTableType_ReturnInt("sp_SaveRolePermissions", "Permissions", "RolePermissionTableType", dt, parameters);
+            var result = _dbHelper.ExecuteSP_WithTableType_ReturnInt("sp_RolePermission_SaveRolePermissions", "Permissions", "RolePermissionTableType", dt, parameters);
             return await Task.FromResult(result);
         }
 
@@ -126,7 +126,7 @@ namespace CoreOne.API.Repositories
                 { "@RoleID", roleID },
                 { "@UserID", userId }
             };
-            return await Task.FromResult(_dbHelper.ExecuteSP_ReturnInt("sp_DeleteRolePermission", parameters));
+            return await Task.FromResult(_dbHelper.ExecuteSP_ReturnInt("[sp_RolePermission_Delete]", parameters));
         }
     }
 }
