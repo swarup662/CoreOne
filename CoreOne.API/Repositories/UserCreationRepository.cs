@@ -36,7 +36,7 @@ namespace CoreOne.API.Repositories
                 {"@ActiveFlag", status}
             };
 
-            return _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUsers", parameters);
+            return _dbHelper.ExecuteSP_ReturnDataTable("sp_UserCreation_PagedSortedSearched", parameters);
         }
 
         public int SaveUser(string recType, UserCreation user)
@@ -64,7 +64,7 @@ namespace CoreOne.API.Repositories
                 {"@UserID_Action", user.CreatedBy ?? 0}
             };
 
-            return _dbHelper.ExecuteSP_ReturnInt("sp_Users_CRUD", parameters);
+            return _dbHelper.ExecuteSP_ReturnInt("[sp_UserCreation_InsertUpdateDelete]", parameters);
         }
 
 
@@ -93,7 +93,7 @@ namespace CoreOne.API.Repositories
                 {"@UserID_Action", user.CreatedBy ?? 0}
             };
 
-            return _dbHelper.ExecuteSP_ReturnInt("sp_Users_CRUD", parameters);
+            return _dbHelper.ExecuteSP_ReturnInt("[sp_UserCreation_InsertUpdateDelete]", parameters);
         }
 
         public UserCreation? GetUserById(int userId)
@@ -103,7 +103,7 @@ namespace CoreOne.API.Repositories
                 {"@UserID", userId}
             };
 
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserById", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_UserCreation_GetById]", parameters);
             if (dt.Rows.Count == 0) return null;
 
             var row = dt.Rows[0];
@@ -132,7 +132,7 @@ namespace CoreOne.API.Repositories
                 {"@UserID", userId}
             };
 
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserById", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_UserCreation_GetById]", parameters);
             if (dt.Rows.Count == 0) return null;
 
             var row = dt.Rows[0];
@@ -163,7 +163,7 @@ namespace CoreOne.API.Repositories
                 {"@UserID", userId}
             };
 
-            DataTable dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_UserCreations_Dropdown", parameters);
+            DataTable dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_UserCreation_Dropdowns]", parameters);
             if (dt.Rows.Count == 0) return null;
 
             var row = dt.Rows[0];
@@ -178,7 +178,7 @@ namespace CoreOne.API.Repositories
                 {"@UserID", userId}
             };
 
-            DataTable dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_UserCreations_Dropdown", parameters);
+            DataTable dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_UserCreation_Dropdowns]", parameters);
             if (dt.Rows.Count == 0) return null;
 
             var row = dt.Rows[0];
@@ -192,7 +192,7 @@ namespace CoreOne.API.Repositories
                 {"@UserID", userId}
             };
 
-            DataTable dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_UserCreations_Dropdown", parameters);
+            DataTable dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_UserCreation_Dropdowns]", parameters);
             if (dt.Rows.Count == 0) return null;
 
             var row = dt.Rows[0];
@@ -248,7 +248,7 @@ namespace CoreOne.API.Repositories
                 { "@UserID", CreatedBy }
             };
 
-            var result = _dbHelper.ExecuteSP_WithTableType_ReturnInt("sp_SaveExtraPermissions", "Permissions", "ExtraPermissionTableType", dt, parameters);
+            var result = _dbHelper.ExecuteSP_WithTableType_ReturnInt("sp_UserCreation_SaveUserSpecificPermissions", "Permissions", "ExtraPermissionTableType", dt, parameters);
             return await Task.FromResult(result);
         }
 
@@ -260,7 +260,7 @@ namespace CoreOne.API.Repositories
                 { "@UserId", UserId },
                  { "@CreatedBy", CreatedBy }
             };
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetExtraPermissionsByUserID", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_UserCreation_GetUserSpecificPermissionsByUserID", parameters);
 
             var list = new List<ExtraPermission>();
             foreach (DataRow row in dt.Rows)
@@ -301,13 +301,13 @@ namespace CoreOne.API.Repositories
                 {"@UserID_Action", user.CreatedBy ?? 0}
             };
 
-            return _dbHelper.ExecuteSP_ReturnInt("sp_Users_CRUD", parameters);
+            return _dbHelper.ExecuteSP_ReturnInt("[sp_UserCreation_InsertUpdateDelete]", parameters);
         }
 
         public DataTable GetNotficationDropdown()
         {
             // Only ActionID and ActionName
-            return _dbHelper.ExecuteSP_ReturnDataTable("GetNotficationDropdown", new Dictionary<string, object>());
+            return _dbHelper.ExecuteSP_ReturnDataTable("[Sp_UserCreation_NotficationDropdown]", new Dictionary<string, object>());
         }
 
     }
