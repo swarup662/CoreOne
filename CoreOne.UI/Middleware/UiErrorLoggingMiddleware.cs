@@ -64,7 +64,7 @@ namespace CoreOne.UI.Middleware
                
                 var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
 
-                var response= await client.PostAsync(_api.BaseUrlAuthentication + "/LogHttpError", content);
+                var response= await client.PostAsync(_api.BaseUrlAuth + "/LogHttpError", content);
             }
             catch
             {
@@ -94,7 +94,7 @@ namespace CoreOne.UI.Middleware
                
                 var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
 
-                var response =await client.PostAsync(_api.BaseUrlAuthentication + "/LogException", content);
+                var response =await client.PostAsync(_api.BaseUrlAuth + "/LogException", content);
             }
             catch
             {

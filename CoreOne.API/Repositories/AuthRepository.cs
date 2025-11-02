@@ -10,14 +10,14 @@ using System.Data;
 
 namespace CoreOne.API.Repositories
 {
-    public class AuthenticationRepository : IAuthenticationRepository
+    public class AuthRepository : IAuthRepository
     {
         private readonly DBContext _dbHelper;
         private readonly TokenService _tokenService;
         private readonly IConfiguration _config;
         private readonly IEmailHelper _email;
 
-        public AuthenticationRepository(DBContext dbHelper, TokenService tokenService, IConfiguration config, IEmailHelper email)
+        public AuthRepository(DBContext dbHelper, TokenService tokenService, IConfiguration config, IEmailHelper email)
         {
             _dbHelper = dbHelper;
             _tokenService = tokenService;

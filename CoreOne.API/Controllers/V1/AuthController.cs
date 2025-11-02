@@ -9,12 +9,12 @@ namespace CoreOne.API.Controllers.V1
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/[controller]")]
-    public class AuthenticationController : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly IAuthenticationRepository _authRepository;
+        private readonly IAuthRepository _authRepository;
 
 
-        public AuthenticationController(IAuthenticationRepository authRepository)
+        public AuthController(IAuthRepository authRepository)
         {
             _authRepository = authRepository;
         }

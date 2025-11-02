@@ -2,7 +2,7 @@
 {
     public class ApiSettingsHelper
     {
-        public string BaseUrlAuthentication { get; set; }
+        public string BaseUrlAuth { get; set; }
         public string BaseUrlUser { get; set; }
         public string BaseUrlPermission { get; set; }
 

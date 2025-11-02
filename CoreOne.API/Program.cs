@@ -18,7 +18,7 @@ builder.Services.AddControllers();
 
 
 // --- Register services ---
-builder.Services.AddScoped<IAuthenticationRepository, AuthenticationRepository>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IRoleCreationRepository, RoleCreationRepository>();

@@ -78,7 +78,7 @@ namespace CoreOne.UI.Middleware
             try
             {
                 var client = _httpClientFactory.CreateClient();
-                var url = $"{_apiSettings.BaseUrlAuthentication}/Logout";
+                var url = $"{_apiSettings.BaseUrlAuth}/Logout";
 
                 var json = JsonConvert.SerializeObject(new { UserId = userId });
                 var content = new StringContent(json, Encoding.UTF8, "application/json");

@@ -32,7 +32,7 @@ namespace CoreOne.UI.Controllers
             if (!ModelState.IsValid) return View(model);
 
             var client = _httpClientFactory.CreateClient();
-            var url = _apiSettings.BaseUrlAuthentication + "/Login";
+            var url = _apiSettings.BaseUrlAuth + "/Login";
             var json = JsonConvert.SerializeObject(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
@@ -85,7 +85,7 @@ namespace CoreOne.UI.Controllers
                 try
                 {
                     var client = _httpClientFactory.CreateClient();
-                    var url = _apiSettings.BaseUrlAuthentication + "/Logout";
+                    var url = _apiSettings.BaseUrlAuth + "/Logout";
 
                     var json = JsonConvert.SerializeObject(user.UserID);
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -133,7 +133,7 @@ namespace CoreOne.UI.Controllers
         public async Task<IActionResult> ForgotPassword([FromBody] string email)
         {
             var client = _httpClientFactory.CreateClient();
-            var url = $"{_apiSettings.BaseUrlAuthentication}/ForgotPassword";
+            var url = $"{_apiSettings.BaseUrlAuth}/ForgotPassword";
             var content = new StringContent(JsonConvert.SerializeObject(email), Encoding.UTF8, "application/json");
             var res = await client.PostAsync(url, content);
             var body = await res.Content.ReadAsStringAsync();
@@ -145,7 +145,7 @@ namespace CoreOne.UI.Controllers
         public async Task<IActionResult> ValidateResetToken(string token)
         {
             var client = _httpClientFactory.CreateClient();
-            var url = $"{_apiSettings.BaseUrlAuthentication}/ValidateResetToken?token={token}";
+            var url = $"{_apiSettings.BaseUrlAuth}/ValidateResetToken?token={token}";
             var res = await client.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -162,7 +162,7 @@ namespace CoreOne.UI.Controllers
          
 
             var client = _httpClientFactory.CreateClient();
-            var url = $"{_apiSettings.BaseUrlAuthentication}/ResetPassword";
+            var url = $"{_apiSettings.BaseUrlAuth}/ResetPassword";
             var content = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8, "application/json");
             var res = await client.PostAsync(url, content);
             var body = await res.Content.ReadAsStringAsync();
@@ -177,7 +177,7 @@ namespace CoreOne.UI.Controllers
             req.UserID = user.UserID;
 
             var client = _httpClientFactory.CreateClient();
-            var url = $"{_apiSettings.BaseUrlAuthentication}/ChangePassword";
+            var url = $"{_apiSettings.BaseUrlAuth}/ChangePassword";
             var content = new StringContent(JsonConvert.SerializeObject(req), Encoding.UTF8, "application/json");
             var res = await client.PostAsync(url, content);
             var body = await res.Content.ReadAsStringAsync();

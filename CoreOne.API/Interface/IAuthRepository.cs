@@ -2,7 +2,7 @@
 
 namespace CoreOne.API.Interfaces
 {
-    public interface IAuthenticationRepository
+    public interface IAuthRepository
     {
         (bool Success, string Message, User User, string Token) Login(string userName, string password, string ipAddress);
         int Logout(int userID, string ipAddress);
