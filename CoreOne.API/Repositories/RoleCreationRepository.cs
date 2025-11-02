@@ -35,7 +35,7 @@ namespace CoreOne.API.Repositories
                 {"@SortDir", sortDir }
             };
 
-            return _dbHelper.ExecuteSP_ReturnDataTable("sp_GetRoles", parameters);
+            return _dbHelper.ExecuteSP_ReturnDataTable("sp_RoleCreation_GetPagedSortedSearched", parameters);
         }
 
         public int GetTotalRoles(string? search, string? searchCol)
@@ -57,14 +57,14 @@ namespace CoreOne.API.Repositories
                 { "@UserID", userId }
             };
 
-            return _dbHelper.ExecuteSP_ReturnInt("sp_Roles_CRUD", parameters);
+            return _dbHelper.ExecuteSP_ReturnInt("[sp_RoleCreation_InsertUpdateDelete]", parameters);
         }
 
 
 
         public RoleCreation? GetRoleById(int roleId)
         {
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Roles_CRUD", new Dictionary<string, object>
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_RoleCreation_GetById]", new Dictionary<string, object>
             {
                 { "@RecType", "GETBYID" },
                 { "@RoleID", roleId }
