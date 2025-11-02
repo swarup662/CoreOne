@@ -50,7 +50,7 @@ namespace CoreOne.API.Repositories
             string PhoneNumber = row["PhoneNumber"].ToString();
 
             // 3️⃣ Check singleton login
-            var singletonDT = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetAppSetting", new Dictionary<string, object>
+            var singletonDT = _dbHelper.ExecuteSP_ReturnDataTable("sp_Auth_GetAppSetting", new Dictionary<string, object>
             {
                 {"@SettingKey", "SingletonLogin"}
             });
@@ -58,7 +58,7 @@ namespace CoreOne.API.Repositories
 
             if (isSingleton)
             {
-                int activeSessions = _dbHelper.ExecuteSP_ReturnInt("sp_CheckActiveSession", new Dictionary<string, object>
+                int activeSessions = _dbHelper.ExecuteSP_ReturnInt("sp_Auth_CheckActiveSession", new Dictionary<string, object>
                 {
                     {"@UserID", userID}
                 });
@@ -87,7 +87,7 @@ namespace CoreOne.API.Repositories
             });
 
             // 6️⃣ Insert session record
-            _dbHelper.ExecuteSP_ReturnInt("sp_InsertUserSession", new Dictionary<string, object>
+            _dbHelper.ExecuteSP_ReturnInt("sp_Auth_InsertUserSession", new Dictionary<string, object>
             {
                 {"@UserID", userID },
                 {"@Token", token }
@@ -110,7 +110,7 @@ namespace CoreOne.API.Repositories
             });
 
             // Delete session
-            return _dbHelper.ExecuteSP_ReturnInt("sp_DeleteUserSession", new Dictionary<string, object>
+            return _dbHelper.ExecuteSP_ReturnInt("sp_Auth_DeleteUserSession", new Dictionary<string, object>
             {
                 {"@UserID", userID }
             });
@@ -156,7 +156,7 @@ namespace CoreOne.API.Repositories
 
         public PasswordValidationResponse ChangePassword(int? userId, string currentPwd, string newPwd)
         {
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_GetUserByIdChangePassword]", new() { { "@UserID", userId } });
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_Auth_ChangePassword_GetUserById]", new() { { "@UserID", userId } });
             if (dt.Rows.Count == 0)
                 return new PasswordValidationResponse { Success = false, Message = "User not found" };
 
@@ -177,7 +177,7 @@ namespace CoreOne.API.Repositories
             { "@NewPassword", newHash }
         };
 
-            int res = _dbHelper.ExecuteSP_ReturnInt("sp_ChangePassword", p);
+            int res = _dbHelper.ExecuteSP_ReturnInt("sp_Auth_PasswordChange", p);
 
             return new PasswordValidationResponse
             {
@@ -189,7 +189,7 @@ namespace CoreOne.API.Repositories
         // 🔹 Forgot Password
         public PasswordValidationResponse ForgotPassword(string email)
         {
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GeneratePasswordResetToken", new() { { "@Email", email } });
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Auth_ForgotPassword_GeneratePasswordResetToken", new() { { "@Email", email } });
 
             if (dt.Rows.Count == 0)
                 return new PasswordValidationResponse { Success = false, Message = "Email not found" };
