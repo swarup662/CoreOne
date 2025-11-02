@@ -19,7 +19,7 @@ namespace CoreOne.API.Repositories
 
         public async Task<List<ActionCreationDto>> GetActions()
         {
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("USP_GetActions");
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_ActionCreation_GetAll");
 
             List<ActionCreationDto> result = new();
 
@@ -41,7 +41,7 @@ namespace CoreOne.API.Repositories
 
         public ActionCreationDto? GetActionById(int actionId)
         {
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Action_CRUD", new Dictionary<string, object>
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_ActionCreation_CrudAndGetById]", new Dictionary<string, object>
             {
                 { "@RecType", "GETBYID" },
                 { "@ActionID", actionId }
@@ -72,7 +72,7 @@ namespace CoreOne.API.Repositories
                 { "@UserID", userId }
             };
 
-            return _dbHelper.ExecuteSP_ReturnInt("sp_Action_CRUD", parameters);
+            return _dbHelper.ExecuteSP_ReturnInt("[sp_ActionCreation_CrudAndGetById]", parameters);
         }
 
 
