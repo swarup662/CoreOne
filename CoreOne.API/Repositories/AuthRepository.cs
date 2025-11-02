@@ -177,7 +177,7 @@ namespace CoreOne.API.Repositories
             { "@NewPassword", newHash }
         };
 
-            int res = _dbHelper.ExecuteSP_ReturnInt("sp_Auth_PasswordChange", p);
+            int res = _dbHelper.ExecuteSP_ReturnInt("[sp_Auth_ChangePassword_PasswordChange]", p);
 
             return new PasswordValidationResponse
             {
@@ -232,7 +232,7 @@ namespace CoreOne.API.Repositories
             
         };
 
-            DataSet ds= _dbHelper.ExecuteSP_ReturnDataSet("sp_GetMailSetupByPurpose", p);
+            DataSet ds= _dbHelper.ExecuteSP_ReturnDataSet("[sp_Auth_ForgotPassword_GetMailSetupByMailPurposeId]", p);
 
             DataTable mailSetupDt = ds.Tables[0];
             DataTable toDt = ds.Tables.Count > 1 ? ds.Tables[1] : null;
@@ -243,7 +243,7 @@ namespace CoreOne.API.Repositories
         // 🔹 Validate Reset Token
         public PasswordValidationResponse ValidateResetToken(string token)
         {
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_ValidateResetToken", new() { { "@Token", token } });
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_Auth_ResetPassword_ValidateResetToken]", new() { { "@Token", token } });
 
             if (dt.Rows.Count == 0)
                 return new PasswordValidationResponse { Success = false, Message = "Invalid or expired token" };
@@ -269,7 +269,7 @@ namespace CoreOne.API.Repositories
             { "@Token", token }
         };
 
-            int res = _dbHelper.ExecuteSP_ReturnInt("sp_ResetPassword", p);
+            int res = _dbHelper.ExecuteSP_ReturnInt("[sp_ResetPassword_PasswordReset]", p);
 
             return new PasswordValidationResponse
             {

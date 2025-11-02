@@ -27,7 +27,7 @@ namespace CoreOne.API.Helpers
                
             };
 
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetMailSettings", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_Auth_GetMailSettings]", parameters);
 
             if (dt.Rows.Count == 0)
                 throw new Exception($"Mail settings for provider ':{MailTypeId}' not found in database.");
@@ -36,8 +36,8 @@ namespace CoreOne.API.Helpers
 
             string host = row["Host"].ToString();
             int port = Convert.ToInt32(row["Port"]);
-            string email = row["Email"].ToString();
-            string password = row["Password"].ToString();
+            string email = "";
+            string password = "";
 
             return (host, port, email, password);
         }
