@@ -46,7 +46,7 @@ namespace CoreOne.API.Repositories
         { "@CreatedBy", (object?)createdBy ?? DBNull.Value }
     };
 
-            return _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserNotificationGrid", parameters);
+            return _dbHelper.ExecuteSP_ReturnDataTable("sp_UserNotification_PagedSortedSearched", parameters);
         }
 
 
@@ -65,7 +65,7 @@ namespace CoreOne.API.Repositories
                 {"@UserID", userId}
             };
 
-            var ds = _dbHelper.ExecuteSP_ReturnDataSet("sp_GetUserNotifications", parameters);
+            var ds = _dbHelper.ExecuteSP_ReturnDataSet("sp_UserNotification_GetUserNotificationsNotExpired", parameters);
             return ds.Tables[0];
         }
 
@@ -79,7 +79,7 @@ namespace CoreOne.API.Repositories
                 {"@NotificationID", notificationId}
             };
 
-            return _dbHelper.ExecuteSP_ReturnInt("sp_MarkNotificationAsRead", parameters);
+            return _dbHelper.ExecuteSP_ReturnInt("sp_UserNotification_MarkNotificationAsRead", parameters);
         }
         public int SaveUserNotification(UserNotification model)
         {
@@ -98,7 +98,7 @@ namespace CoreOne.API.Repositories
         {"@UpdatedBy", model.UpdatedBy}
     };
 
-            return _dbHelper.ExecuteSP_ReturnInt("sp_AddOrUpdateUserNotification", parameters);
+            return _dbHelper.ExecuteSP_ReturnInt("sp_UserNotification_InsertUpdate", parameters);
         }
 
         public DataRow? GetUserNotificationById(int notificationId)
@@ -108,7 +108,7 @@ namespace CoreOne.API.Repositories
             {"@NotificationID", notificationId}
         };
 
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserNotificationById", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_UserNotification_GetById", parameters);
             return dt.Rows.Count > 0 ? dt.Rows[0] : null;
         }
 
@@ -120,7 +120,7 @@ namespace CoreOne.API.Repositories
                 { "@CreatedBy", createdBy }
             };
 
-            return _dbHelper.ExecuteSP_ReturnInt("sp_DeleteUserNotification", parameters);
+            return _dbHelper.ExecuteSP_ReturnInt("sp_UserNotification_Delete", parameters);
         }
 
 
