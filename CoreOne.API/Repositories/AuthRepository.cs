@@ -29,7 +29,7 @@ namespace CoreOne.API.Repositories
         {
             // 1️⃣ Get user by username
             var parameters = new Dictionary<string, object> { { "@UserName", userName } };
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserByUserName", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_Auth_login_GetUserDetailsByUserName]", parameters);
 
             if (dt.Rows.Count == 0)
                 return (false, "Invalid username or password", null, null);
@@ -269,7 +269,7 @@ namespace CoreOne.API.Repositories
             { "@Token", token }
         };
 
-            int res = _dbHelper.ExecuteSP_ReturnInt("[sp_ResetPassword_PasswordReset]", p);
+            int res = _dbHelper.ExecuteSP_ReturnInt("[sp_Auth_ResetPassword_PasswordReset]", p);
 
             return new PasswordValidationResponse
             {
