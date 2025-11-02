@@ -236,9 +236,8 @@
                                                 $('#notifyEnd').val("");
 
                                                 try {
-                                                    // ✅ Call your NotificationController (not ModuleSetup)
+                                                    // ✅ Fetch notification details
                                                     const response = await fetch(`/Notification/GetUserNotificationById?id=${notificationId}`);
-
                                                     if (!response.ok) throw new Error("Failed to fetch notification.");
 
                                                     const data = await response.json();
@@ -250,8 +249,10 @@
                                                     $('#notifyTitle').val(data.title || '');
                                                     $('#notifyDropdown').val(data.notificationTypeID || '');
                                                     $('#notifyMessage').val(data.message || '');
-                                                    $('#notifyStart').val(data.startDateTime ? new Date(data.startDateTime).toISOString().slice(0, 16) : '');
-                                                    $('#notifyEnd').val(data.endDateTime ? new Date(data.endDateTime).toISOString().slice(0, 16) : '');
+
+                                                    // 🕓 Proper datetime-local formatting (no timezone shift)
+                                                    $('#notifyStart').val(data.startDateTime ? formatLocalDateTime(data.startDateTime) : '');
+                                                    $('#notifyEnd').val(data.endDateTime ? formatLocalDateTime(data.endDateTime) : '');
 
                                                 } catch (err) {
                                                     console.error("❌ Error:", err);
@@ -260,7 +261,33 @@
                                                     $('#notifyTitle, #notifyMessage, #notifyDropdown, #notifyStart, #notifyEnd').prop('disabled', false);
                                                 }
                                             }
+
+                                            /**
+                                             * 🕒 formatLocalDateTime()
+                                             * Converts backend datetime (with or without timezone)
+                                             * to a format usable in <input type="datetime-local">
+                                             *
+                                             * Examples:
+                                             *   "2025-11-02T16:06:00"  → "2025-11-02T16:06"
+                                             *   "2025-11-02T16:06:00Z" → (local-adjusted) "2025-11-02T21:36" (if +05:30)
+                                             */
+                                            function formatLocalDateTime(dateString) {
+                                                if (!dateString) return '';
+
+                                                // 🟡 Case 1: Backend sends local time (no timezone, e.g. "2025-11-02T16:06:00")
+                                                if (!dateString.endsWith('Z') && !dateString.includes('+')) {
+                                                    const [datePart, timePart] = dateString.split('T');
+                                                    const [hour, minute] = timePart.split(':');
+                                                    return `${datePart}T${hour.padStart(2, '0')}:${minute.padStart(2, '0')}`;
+                                                }
+
+                                                // 🟢 Case 2: Backend sends ISO UTC ("Z") or offset time
+                                                const d = new Date(dateString);
+                                                const pad = (n) => n.toString().padStart(2, '0');
+                                                return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+                                            }
                                         </script>
+
 
                                             <has-permission module-id="16" action-id="4">
                                         <a href="javascript:;"

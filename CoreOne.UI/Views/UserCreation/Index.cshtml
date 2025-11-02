@@ -910,32 +910,36 @@
 
 @section Scripts {
     <script>
-             function openNotificationModal(userId, notificationId = 0, title = '', message = '', start = '', end = '', notificationTypeId = '') {
+        // 🕒 Fill Start/End with current & +1 hour on modal open
+        function openNotificationModal(userId, notificationId = 0, title = '', message = '', start = '', end = '', notificationTypeId = '') {
             $('#notifyUserId').val(userId);
             $('#notifyNotificationId').val(notificationId);
-
             $('#notifyTitle').val(title || '');
             $('#notifyMessage').val(message || '');
-            $('#notifyStart').val(start ? start.replace('Z', '') : '');
-            $('#notifyEnd').val(end ? end.replace('Z', '') : '');
-
-            // 🟢 Now safely set dropdown
             $('#notifyDropdown').val(notificationTypeId || '');
+
+            const now = new Date();
+            const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+
+            const toLocal = (date) => {
+                const pad = (n) => n.toString().padStart(2, '0');
+                return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+            };
+
+            $('#notifyStart').val(start ? start.replace('Z', '') : toLocal(now));
+            $('#notifyEnd').val(end ? end.replace('Z', '') : toLocal(oneHourLater));
 
             $('#notificationModal').modal('show');
         }
 
-
-
+        // ✅ Validate date range when user changes inputs
         $(document).on('change', '#notifyStart, #notifyEnd', function () {
             const start = $('#notifyStart').val();
             const end = $('#notifyEnd').val();
-
             if (start && end) {
-                const startDate = parseLocalDateTime(start);
-                const endDate = parseLocalDateTime(end);
-
-                if (endDate.getTime() <= startDate.getTime()) {
+                const startDate = new Date(start);
+                const endDate = new Date(end);
+                if (endDate <= startDate) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Invalid Date Range',
@@ -947,16 +951,14 @@
             }
         });
 
-        // ✅ Helper: Parse datetime-local without timezone offset
-        function parseLocalDateTime(dateTimeString) {
-            const [date, time] = dateTimeString.split('T');
-            const [year, month, day] = date.split('-').map(Number);
-            const [hour, minute] = time.split(':').map(Number);
-            return new Date(year, month - 1, day, hour, minute);
+        // 🟢 Convert local datetime to ISO UTC
+        function toIsoUtc(localDateTimeString) {
+            if (!localDateTimeString) return null;
+            const local = new Date(localDateTimeString);
+            return new Date(local.getTime() - local.getTimezoneOffset() * 60000).toISOString();
         }
 
-
-        // 🟢 Save notification (insert or update)
+        // 🟢 Send Notification
         async function sendNotification() {
             const userId = $('#notifyUserId').val();
             const notificationId = $('#notifyNotificationId').val() || 0;
@@ -964,45 +966,25 @@
             const message = $('#notifyMessage').val().trim();
             const startDateTime = $('#notifyStart').val();
             const endDateTime = $('#notifyEnd').val();
-         const notificationTypeId = $('#notifyDropdown').val() || 0;
-
+            const notificationTypeId = $('#notifyDropdown').val() || 0;
 
             // 🟡 Validate required fields
             if (!title || !message) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Missing Fields',
-                    text: 'Please enter both title and message.',
-                    confirmButtonColor: '#3085d6'
-                });
+                Swal.fire({ icon: 'warning', title: 'Missing Fields', text: 'Please enter both title and message.' });
                 return;
             }
-
             if (!startDateTime || !endDateTime) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Missing Dates',
-                    text: 'Please select both start and end date/time.',
-                    confirmButtonColor: '#3085d6'
-                });
+                Swal.fire({ icon: 'warning', title: 'Missing Dates', text: 'Please select both start and end date/time.' });
                 return;
             }
 
             const start = new Date(startDateTime);
             const end = new Date(endDateTime);
-
-            // ✅ Strict check: end must be later than start
-            if (end.getTime() <= start.getTime()) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Invalid Dates',
-                    text: 'End date/time must be later than the start date/time.',
-                    confirmButtonColor: '#3085d6'
-                });
+            if (end <= start) {
+                Swal.fire({ icon: 'warning', title: 'Invalid Dates', text: 'End date/time must be later than start date/time.' });
                 return;
             }
 
-            // 🟢 Confirm before sending
             const confirmResult = await Swal.fire({
                 title: 'Send Notification?',
                 text: "Do you want to send this notification now?",
@@ -1013,23 +995,22 @@
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33'
             });
-
             if (!confirmResult.isConfirmed) return;
 
-             const payload = {
-            NotificationID: parseInt(notificationId),
-            UserID: parseInt(userId),
-            Title: title,
-            Message: message,
-            NotificationTypeID: parseInt(notificationTypeId),
-            IsRead: 0,
-            IsActive: 1,
-            StartDateTime: startDateTime,
-            EndDateTime: endDateTime,
-            CreatedBy: 1,
-            UpdatedBy: 1
-        };
-
+            // ✅ Convert local time to proper UTC ISO string
+            const payload = {
+                NotificationID: parseInt(notificationId),
+                UserID: parseInt(userId),
+                Title: title,
+                Message: message,
+                NotificationTypeID: parseInt(notificationTypeId),
+                IsRead: 0,
+                IsActive: 1,
+                StartDateTime: toIsoUtc(startDateTime),
+                EndDateTime: toIsoUtc(endDateTime),
+                CreatedBy: 1,
+                UpdatedBy: 1
+            };
 
             try {
                 const response = await fetch('/UserCreation/SaveUserNotification', {
@@ -1039,7 +1020,6 @@
                 });
 
                 const result = await response.json();
-
                 if (result.success) {
                     Swal.fire({
                         icon: 'success',
@@ -1047,30 +1027,18 @@
                         text: result.message || 'Notification sent successfully.',
                         timer: 2000,
                         showConfirmButton: false
-                    }).then(() => {
-                        window.location.href = '/UserCreation/Index';
-                    });
-
+                    }).then(() => window.location.href = '/UserCreation/Index');
                     $('#notificationModal').modal('hide');
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: result.message || 'Failed to send notification.',
-                        confirmButtonColor: '#d33'
-                    });
+                    Swal.fire({ icon: 'error', title: 'Error', text: result.message || 'Failed to send notification.' });
                 }
             } catch (error) {
                 console.error('Error sending notification:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: 'Something went wrong while sending notification.',
-                    confirmButtonColor: '#d33'
-                });
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while sending notification.' });
             }
         }
     </script>
+
 
 
 
