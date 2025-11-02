@@ -20,7 +20,7 @@ namespace CoreOne.API.Repositories
         public List<MenuItem> GetUserMenu(int userID)
         {
             var parameters = new Dictionary<string, object> { { "@UserID", userID } };
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserMenu", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Permission_GetUserMenuandModules", parameters);
             if (dt.Rows.Count > 0)
             {
                 return dt.AsEnumerable()
@@ -58,7 +58,7 @@ namespace CoreOne.API.Repositories
             { "@MenuModuleID", 0 }
         };
 
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetUserAllowedActions", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Permission_GetUserAllowedActions", parameters);
 
             var list = new List<ActionDto>();
             foreach (DataRow row in dt.Rows)
@@ -82,7 +82,7 @@ namespace CoreOne.API.Repositories
             { "@ActionID", actionId }
         };
 
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_CheckUserPermission", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Permission_CheckUserPermission", parameters);
             if (dt.Rows.Count == 0) return false;
 
             // Your SP returns 1 or 0 in first column
