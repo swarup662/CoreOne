@@ -231,7 +231,7 @@ namespace CoreOne.UI.Controllers
 
         [HttpGet]
         public async Task<IActionResult> SearchUserName(string term)
-        {
+       {
             if (string.IsNullOrWhiteSpace(term))
                 return Json(new List<object>());
 
@@ -243,12 +243,24 @@ namespace CoreOne.UI.Controllers
                 return Json(new List<object>());
 
             var response = await resp.Content.ReadAsStringAsync();
-            var users = JsonConvert.DeserializeObject<List<dynamic>>(response);
 
-            // Return as JSON for autocomplete
+            // Assuming your API returns a list like:
+            // [ { "UserID": 1, "UserName": "John" }, { "UserID": 2, "UserName": "Johnny" } ]
+            var users = JsonConvert.DeserializeObject<List<UserSearchDto>>(response);
+
             return Json(users);
         }
 
 
+
     }
+
+    public class UserSearchDto
+    {
+        public int UserID { get; set; }
+        public string UserName { get; set; }
+    }
+
+
+
 }

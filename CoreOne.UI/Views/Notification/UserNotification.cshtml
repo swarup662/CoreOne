@@ -416,13 +416,13 @@
                 </h5>
                 <button type="button"
                         class="btn btn-light btn-close-circle shadow-sm"
-                        onclick="window.location.href='/UserNotification/Index'">
+                        onclick="window.location.href='/Notification/UserNotification'">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
             <div class="modal-body">
-                <!-- Hidden Fields -->
+                <!-- Hidden input to store the selected user's ID -->
                 <input type="hidden" id="notifyUserId" />
                 <input type="hidden" id="notifyNotificationId" value="0" />
                 <div class="mb-2 position-relative">
@@ -431,6 +431,7 @@
                     <ul id="userSuggestions" class="list-group position-absolute w-100" style="z-index: 1050; display:none;"></ul>
                 </div>
 
+           
                 <div class="mb-2">
                     <label class="form-label">Title</label>
                     <input type="text" class="form-control" id="notifyTitle" placeholder="Enter notification title..." />
@@ -460,7 +461,7 @@
 
             <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
                 <button type="button"
-                        onclick="window.location.href='/UserCreation/Index'"
+                        onclick="window.location.href='/Notification/UserNotification'"
                         class="btn btn-warning btn-sm"
                         data-bs-dismiss="modal">
                     <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
@@ -848,50 +849,57 @@
 
 
     </script>
+   
+
     <script>
         $(document).ready(function () {
             const $input = $('#searchUser');
             const $list = $('#userSuggestions');
 
-            $input.on('keyup', function () {
+            $input.on('input', function () {
                 const term = $(this).val().trim();
 
-                if (term.length < 2) {
-                    $list.hide();
-                    return;
-                }
+                    // allow searching from first character
+                    if (term.length < 1) {
+                        $list.hide();
+                        return;
+                    }
 
                 $.ajax({
-                    url: '/UserCreation/SearchUserName',
+                    url: '/Notification/SearchUserName',
                     type: 'GET',
                     data: { term: term },
                     success: function (data) {
                         $list.empty();
+
                         if (data && data.length > 0) {
                             data.forEach(item => {
                                 const li = $('<li>')
                                     .addClass('list-group-item list-group-item-action')
-                                    .text(item.UserName)
-                                    .attr('data-id', item.UserID)
+                                    .text(item.userName || item.UserName) // handle different key names
+                                    .attr('data-id', item.userID || item.UserID)
                                     .on('click', function () {
                                         $input.val($(this).text());
-                                        $('#notifyUserId').val($(this).data('id')); // sets hidden userId field
+                                        $('#notifyUserId').val($(this).data('id')); // set hidden field
                                         $list.hide();
                                     });
+
                                 $list.append(li);
                             });
+
                             $list.show();
                         } else {
                             $list.hide();
                         }
                     },
-                    error: function () {
+                    error: function (xhr, status, error) {
+                        console.error('Error fetching users:', xhr.status, xhr.statusText);
                         $list.hide();
                     }
                 });
             });
 
-            // Hide dropdown when clicking outside
+            // Hide list when clicking outside
             $(document).on('click', function (e) {
                 if (!$(e.target).closest('#searchUser, #userSuggestions').length) {
                     $list.hide();
@@ -899,6 +907,7 @@
             });
         });
     </script>
+
 
 
 
