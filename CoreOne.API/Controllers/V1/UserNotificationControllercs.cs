@@ -158,7 +158,33 @@ namespace CoreOne.API.Controllers.V1
             return Ok(result > 0 ? "Marked as read" : "Error updating notification");
         }
 
-      
+
+        [HttpPost("SaveUserNotificationBulk")]
+        public IActionResult SaveUserNotificationBulk([FromBody] List<UserNotification> notifications)
+        {
+            try
+            {
+                if (notifications == null || notifications.Count == 0)
+                    return BadRequest(new { success = false, message = "No notifications provided." });
+
+                var result = _notificationRepo.SaveUserNotificationBulk(notifications);
+
+                return Ok(new
+                {
+                    success = true,
+                    message = "Bulk notifications saved successfully.",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"Server Error: {ex.Message}"
+                });
+            }
+        }
 
         [HttpPost("SaveUserNotification")]
         public IActionResult SaveUserNotification([FromBody] UserNotification model)

@@ -22,6 +22,7 @@ namespace CoreOne.API.Interfaces
         DataRow? GetUserNotificationById(int notificationId);
 
         int DeleteUserNotification(int notificationId, int createdBy);
+        List<int> SaveUserNotificationBulk(List<UserNotification> notifications);
 
     }
 }

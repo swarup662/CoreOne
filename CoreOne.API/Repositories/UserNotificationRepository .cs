@@ -123,6 +123,37 @@ namespace CoreOne.API.Repositories
             return _dbHelper.ExecuteSP_ReturnInt("sp_UserNotification_Delete", parameters);
         }
 
+        public List<int> SaveUserNotificationBulk(List<UserNotification> notifications)
+        {
+            var insertedIds = new List<int>();
+
+            if (notifications == null || notifications.Count == 0)
+                return insertedIds;
+
+            foreach (var model in notifications)
+            {
+                var parameters = new Dictionary<string, object>
+        {
+            {"@NotificationID", model.NotificationID},
+            {"@UserID", model.UserID},
+            {"@NotificationTypeID", model.NotificationTypeID},
+            {"@Title", model.Title},
+            {"@Message", model.Message},
+            {"@IsRead", model.IsRead},
+            {"@IsActive", model.IsActive},
+            {"@StartDateTime", model.StartDateTime},
+            {"@EndDateTime", model.EndDateTime},
+            {"@CreatedBy", model.CreatedBy},
+            {"@UpdatedBy", model.UpdatedBy}
+        };
+
+                // Execute stored procedure for each record
+                var newId = _dbHelper.ExecuteSP_ReturnInt("sp_UserNotification_InsertUpdate", parameters);
+                insertedIds.Add(newId);
+            }
+
+            return insertedIds;
+        }
 
 
     }

@@ -229,6 +229,56 @@ namespace CoreOne.UI.Controllers
             }
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> SaveUserNotificationBulk([FromBody] List<UserNotification> model)
+        {
+            try
+            {
+                if (model == null || model.Count == 0)
+                    return Json(new { success = false, message = "No notifications provided." });
+
+                // Add defaults for each record
+                foreach (var m in model)
+                {
+                    m.IsActive = 1;
+                    m.IsRead = 0;
+                    m.CreatedDateTime = DateTime.Now;
+                }
+
+                var client = _httpClientFactory.CreateClient();
+                var url = _api.BaseUrlUserNotification + "/SaveUserNotificationBulk"; // 🟢 API endpoint for bulk save
+
+                var json = JsonConvert.SerializeObject(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var resp = await client.PostAsync(url, content);
+
+                if (!resp.IsSuccessStatusCode)
+                {
+                    var errorContent = await resp.Content.ReadAsStringAsync();
+                    return Json(new { success = false, message = $"API error: {errorContent}" });
+                }
+
+                var response = await resp.Content.ReadAsStringAsync();
+                var result = JsonConvert.DeserializeObject<dynamic>(response);
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Notifications sent successfully.",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Exception: {ex.Message}" });
+            }
+        }
+
+
+
+
         [HttpGet]
         public async Task<IActionResult> SearchUserName(string term)
        {

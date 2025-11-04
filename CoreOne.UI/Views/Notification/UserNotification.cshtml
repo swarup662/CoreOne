@@ -59,6 +59,66 @@
         letter-spacing: 1px;
     }
 </style>
+<style>
+    /* User tag (pill) */
+    .user-tag {
+        background-color: #0d6efd;
+        color: #fff;
+        border-radius: 50px;
+        padding: 6px 12px;
+        display: flex;
+        align-items: center;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        transition: background 0.2s ease-in-out;
+    }
+
+        .user-tag:hover {
+            background-color: #0b5ed7;
+        }
+
+        .user-tag .remove-user {
+            background: transparent;
+            border: none;
+            color: #ff4d4f;
+            font-size: 16px;
+            margin-left: 8px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+            .user-tag .remove-user:hover {
+                color: #ff0000;
+            }
+
+    /* Suggestion dropdown */
+    #userSuggestions li {
+        cursor: pointer;
+        transition: background 0.15s ease-in-out;
+        border: none !important;
+        padding: 10px 15px;
+        font-size: 15px;
+    }
+
+        #userSuggestions li:hover {
+            background-color: #f0f8ff;
+        }
+
+        #userSuggestions li .add-btn {
+            background-color: #198754;
+            border: none;
+            padding: 3px 10px;
+            font-size: 13px;
+            color: white;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+            #userSuggestions li .add-btn:hover {
+                background-color: #157347;
+            }
+</style>
+
 
 <!-- 🔄 Preloader -->
 <div id="preloader">
@@ -407,6 +467,7 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="notificationBulkmodal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -425,11 +486,25 @@
                 <!-- Hidden input to store the selected user's ID -->
                 <input type="hidden" id="notifyUserId" />
                 <input type="hidden" id="notifyNotificationId" value="0" />
-                <div class="mb-2 position-relative">
-                    <label class="form-label">Search User</label>
-                    <input type="text" class="form-control" id="searchUser" placeholder="Type username..." autocomplete="off" />
-                    <ul id="userSuggestions" class="list-group position-absolute w-100" style="z-index: 1050; display:none;"></ul>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Select Users</label>
+
+                    <!-- Selected user tags -->
+                    <div id="selectedUsers" class="d-flex flex-wrap gap-2 mb-2"></div>
+
+                    <!-- Search box -->
+                    <div class="position-relative">
+                        <input type="text" id="searchUser" class="form-control shadow-sm"
+                               placeholder="Type to search users..." autocomplete="off" />
+                        <ul id="userSuggestions"
+                            class="list-group position-absolute w-100 shadow-lg rounded-3 mt-1 border-0"
+                            style="z-index: 1060; display: none; max-height: 250px; overflow-y: auto;"></ul>
+                    </div>
+
                 </div>
+
+
+
 
            
                 <div class="mb-2">
@@ -466,10 +541,11 @@
                         data-bs-dismiss="modal">
                     <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
                 </button>
-
-                <button type="button" id="sendreminder" class="btn btn-sm" style="background:forestgreen; color:white" onclick="sendNotification()">
+                <button type="button" id="sendreminder" class="btn btn-sm" style="background:forestgreen; color:white"
+                        onclick="sendNotificationBulk()">
                     <i class="mdi mdi-content-save-outline me-1"></i> Send
                 </button>
+
             </div>
 
         </div>
@@ -803,15 +879,7 @@
  
     <script>
         
-
-
-
-
-
-
-
-
-                function DeleteUserNotifyModal(NotificationID) {
+  function DeleteUserNotifyModal(NotificationID) {
             Swal.fire({
                 title: 'Are you sure?',
                 text: `You are about to delete massage`,
@@ -849,21 +917,21 @@
 
 
     </script>
-   
 
     <script>
         $(document).ready(function () {
             const $input = $('#searchUser');
             const $list = $('#userSuggestions');
+            const $selectedUsers = $('#selectedUsers');
+            const selectedUsers = [];
 
+            // Autocomplete search
             $input.on('input', function () {
                 const term = $(this).val().trim();
-
-                    // allow searching from first character
-                    if (term.length < 1) {
-                        $list.hide();
-                        return;
-                    }
+                if (term.length < 1) {
+                    $list.hide();
+                    return;
+                }
 
                 $.ajax({
                     url: '/Notification/SearchUserName',
@@ -873,16 +941,43 @@
                         $list.empty();
 
                         if (data && data.length > 0) {
-                            data.forEach(item => {
-                                const li = $('<li>')
-                                    .addClass('list-group-item list-group-item-action')
-                                    .text(item.userName || item.UserName) // handle different key names
-                                    .attr('data-id', item.userID || item.UserID)
-                                    .on('click', function () {
-                                        $input.val($(this).text());
-                                        $('#notifyUserId').val($(this).data('id')); // set hidden field
-                                        $list.hide();
-                                    });
+                            // 🔥 Filter out already selected users
+                            const filtered = data.filter(item => {
+                                const id = item.userID || item.UserID;
+                                return !selectedUsers.some(u => u.id === id);
+                            });
+
+                            if (filtered.length === 0) {
+                                $list.hide();
+                                return;
+                            }
+
+                            filtered.forEach(item => {
+                                const userId = item.userID || item.UserID;
+                                const userName = item.userName || item.UserName;
+
+                                const li = $(`
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <i class="bi bi-person-circle text-primary me-2"></i>
+                                            <strong>${userName}</strong>
+                                        </div>
+                                        <button class="add-btn">Add</button>
+                                    </li>
+                                `);
+
+                                li.find('.add-btn').on('click', function (e) {
+                                    e.stopPropagation();
+                                    addUserTag(userId, userName);
+                                    $input.val('');
+                                    $list.hide();
+                                });
+
+                                li.on('click', function () {
+                                    addUserTag(userId, userName);
+                                    $input.val('');
+                                    $list.hide();
+                                });
 
                                 $list.append(li);
                             });
@@ -892,8 +987,7 @@
                             $list.hide();
                         }
                     },
-                    error: function (xhr, status, error) {
-                        console.error('Error fetching users:', xhr.status, xhr.statusText);
+                    error: function () {
                         $list.hide();
                     }
                 });
@@ -905,8 +999,151 @@
                     $list.hide();
                 }
             });
+
+            // Add tag for selected user
+            function addUserTag(userId, userName) {
+                if (selectedUsers.some(u => u.id === userId)) return; // ✅ prevent duplicates
+
+                selectedUsers.push({ id: userId, name: userName });
+
+                const tag = $(`
+                    <div class="user-tag" data-id="${userId}">
+                        <i class="bi bi-person-fill me-1"></i>
+                        ${userName}
+                        <button type="button" class="remove-user" aria-label="Remove">&times;</button>
+                    </div>
+                `);
+
+                tag.find('.remove-user').on('click', function () {
+                    removeUserTag(userId);
+                });
+
+                $selectedUsers.append(tag);
+                updateHiddenField();
+            }
+
+            // Remove tag
+            function removeUserTag(userId) {
+                const index = selectedUsers.findIndex(u => u.id === userId);
+                if (index > -1) selectedUsers.splice(index, 1);
+                $(`.user-tag[data-id="${userId}"]`).remove();
+                updateHiddenField();
+            }
+
+            // Update hidden field with IDs
+            function updateHiddenField() {
+                const ids = selectedUsers.map(u => u.id);
+                $('#notifyUserId').val(ids.join(','));
+            }
         });
     </script>
+
+
+    <script>
+        // 🕒 Convert local datetime to UTC ISO
+        function toIsoUtc(localDateTimeString) {
+            if (!localDateTimeString) return null;
+            const local = new Date(localDateTimeString);
+            return new Date(local.getTime() - local.getTimezoneOffset() * 60000).toISOString();
+        }
+
+        // ✅ BULK SAVE
+        async function sendNotificationBulk() {
+            const userIds = $('#notifyUserId').val()?.split(',').map(id => parseInt(id)).filter(id => !isNaN(id)) || [];
+               const $modal = $('#notificationBulkmodal'); // limit all queries to this modal
+
+        const notificationId = $modal.find('#notifyNotificationId').val() || 0;
+        const title = $modal.find('#notifyTitle').val().trim();
+        const message = $modal.find('#notifyMessage').val().trim();
+        const startDateTime = $modal.find('#notifyStart').val();
+        const endDateTime = $modal.find('#notifyEnd').val();
+        const notificationTypeId = $modal.find('#notifyDropdown').val() || 0;
+
+
+            if (userIds.length === 0) {
+                Swal.fire({ icon: 'warning', title: 'No User Selected', text: 'Please select at least one user.' });
+                return;
+            }
+            if (!title || !message) {
+                Swal.fire({ icon: 'warning', title: 'Missing Fields', text: 'Please enter both title and message.' });
+                return;
+            }
+            if (!startDateTime || !endDateTime) {
+                Swal.fire({ icon: 'warning', title: 'Missing Dates', text: 'Please select both start and end date/time.' });
+                return;
+            }
+
+            const start = new Date(startDateTime);
+            const end = new Date(endDateTime);
+            if (end <= start) {
+                Swal.fire({ icon: 'warning', title: 'Invalid Dates', text: 'End date/time must be later than start date/time.' });
+                return;
+            }
+
+            const confirmResult = await Swal.fire({
+                title: 'Send Notification?',
+                text: `This will send the notification to ${userIds.length} users.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Send!',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33'
+            });
+            if (!confirmResult.isConfirmed) return;
+
+            // Build bulk payload (table-like array)
+            const bulkData = userIds.map(uid => ({
+                NotificationID: parseInt(notificationId),
+                UserID: uid,
+                Title: title,
+                Message: message,
+                NotificationTypeID: parseInt(notificationTypeId),
+                IsRead: 0,
+                IsActive: 1,
+                StartDateTime: toIsoUtc(startDateTime),
+                EndDateTime: toIsoUtc(endDateTime),
+                CreatedBy: 1,
+                UpdatedBy: 1
+            }));
+
+            Swal.fire({
+                title: 'Sending...',
+                html: `<p>Sending ${userIds.length} notifications. Please wait.</p>`,
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
+
+            try {
+                const response = await fetch('/Notification/SaveUserNotificationBulk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(bulkData)
+                });
+
+                const result = await response.json();
+                Swal.close();
+
+                if (result.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: result.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => window.location.href = '/UserCreation/Index');
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Error', text: result.message });
+                }
+            } catch (error) {
+                Swal.close();
+                Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while sending notifications.' });
+                console.error('Bulk send error:', error);
+            }
+        }
+    </script>
+
+
 
 
 
