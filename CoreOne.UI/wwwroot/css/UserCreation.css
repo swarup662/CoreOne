@@ -45,6 +45,41 @@
         background-color: #ffffff;
         transition: all 0.3s ease;
     }
+.btn-send-green {
+    background: linear-gradient(90deg, #28a745, #20c997);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 13.5px;
+    letter-spacing: 0.3px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 6px rgba(40, 167, 69, 0.3);
+    transition: all 0.25s ease;
+}
+
+    .btn-send-green i {
+        font-size: 15px;
+        transition: transform 0.25s ease;
+    }
+
+    /* ✨ Hover & Active Effects */
+    .btn-send-green:hover {
+        background: linear-gradient(90deg, #28a745, #20c997);
+        color: #fff;
+        box-shadow: 0 3px 8px rgba(32, 201, 151, 0.4);
+        transform: translateY(-1px);
+    }
+
+        .btn-send-green:hover i {
+            transform: translateX(3px); /* subtle flying motion */
+        }
+
+    .btn-send-green:active {
+        transform: scale(0.97);
+    }
 
     /* Table cells */
     .table th,
