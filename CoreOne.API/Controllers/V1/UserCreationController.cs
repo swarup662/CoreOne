@@ -212,5 +212,27 @@ namespace CoreOne.API.Controllers.V1
             return Ok(actions);
         }
 
+        [HttpGet("SearchUserName")]
+        public IActionResult SearchUserName( string userName)
+        {
+            if (string.IsNullOrWhiteSpace(userName))
+                return BadRequest("Username is required.");
+
+            var dt = _userRepo.SearchUserName(userName);
+
+            var users = new List<object>();
+            foreach (DataRow row in dt.Rows)
+            {
+                users.Add(new
+                {
+                    UserID = Convert.ToInt32(row["UserID"]),
+                    UserName = row["UserName"]?.ToString()
+                });
+            }
+
+            return Ok(users);
+        }
+
+
     }
 }

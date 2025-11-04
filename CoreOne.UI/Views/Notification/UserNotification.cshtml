@@ -100,9 +100,9 @@
 
 
 
-                    <div class="col-auto" style="display:none">
-                        <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#moduleSetupModal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
-                            <i class="mdi mdi-plus-circle"></i> Create Module SetUp
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-success float-end" data-bs-toggle="modal" data-bs-target="#notificationBulkmodal" style="background: linear-gradient(135deg, #13dc72, #004993);    border-radius: 11px;">
+                            <i class="mdi mdi-plus-circle"></i> Send Bulk Notification
                         </button>
                     </div>
                 </div>
@@ -407,6 +407,74 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="notificationBulkmodal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="bi bi-bell-fill text-warning me-2"></i> Send Notification
+                </h5>
+                <button type="button"
+                        class="btn btn-light btn-close-circle shadow-sm"
+                        onclick="window.location.href='/UserNotification/Index'">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <!-- Hidden Fields -->
+                <input type="hidden" id="notifyUserId" />
+                <input type="hidden" id="notifyNotificationId" value="0" />
+                <div class="mb-2 position-relative">
+                    <label class="form-label">Search User</label>
+                    <input type="text" class="form-control" id="searchUser" placeholder="Type username..." autocomplete="off" />
+                    <ul id="userSuggestions" class="list-group position-absolute w-100" style="z-index: 1050; display:none;"></ul>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-control" id="notifyTitle" placeholder="Enter notification title..." />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Notification Type</label>
+                    <select id="notifyDropdown" name="notifyDropdown" class="form-select" asp-items="ViewBag.NotificationList">
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label class="form-label">Message</label>
+                    <textarea class="form-control" id="notifyMessage" rows="3" placeholder="Enter message..."></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">Start Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="notifyStart" />
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <label class="form-label">End Date & Time</label>
+                        <input type="datetime-local" class="form-control" id="notifyEnd" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
+                <button type="button"
+                        onclick="window.location.href='/UserCreation/Index'"
+                        class="btn btn-warning btn-sm"
+                        data-bs-dismiss="modal">
+                    <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
+                </button>
+
+                <button type="button" id="sendreminder" class="btn btn-sm" style="background:forestgreen; color:white" onclick="sendNotification()">
+                    <i class="mdi mdi-content-save-outline me-1"></i> Send
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 
 @section Scripts {
@@ -780,6 +848,58 @@
 
 
     </script>
+    <script>
+        $(document).ready(function () {
+            const $input = $('#searchUser');
+            const $list = $('#userSuggestions');
+
+            $input.on('keyup', function () {
+                const term = $(this).val().trim();
+
+                if (term.length < 2) {
+                    $list.hide();
+                    return;
+                }
+
+                $.ajax({
+                    url: '/UserCreation/SearchUserName',
+                    type: 'GET',
+                    data: { term: term },
+                    success: function (data) {
+                        $list.empty();
+                        if (data && data.length > 0) {
+                            data.forEach(item => {
+                                const li = $('<li>')
+                                    .addClass('list-group-item list-group-item-action')
+                                    .text(item.UserName)
+                                    .attr('data-id', item.UserID)
+                                    .on('click', function () {
+                                        $input.val($(this).text());
+                                        $('#notifyUserId').val($(this).data('id')); // sets hidden userId field
+                                        $list.hide();
+                                    });
+                                $list.append(li);
+                            });
+                            $list.show();
+                        } else {
+                            $list.hide();
+                        }
+                    },
+                    error: function () {
+                        $list.hide();
+                    }
+                });
+            });
+
+            // Hide dropdown when clicking outside
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('#searchUser, #userSuggestions').length) {
+                    $list.hide();
+                }
+            });
+        });
+    </script>
+
 
 
 }

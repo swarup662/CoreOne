@@ -310,5 +310,16 @@ namespace CoreOne.API.Repositories
             return _dbHelper.ExecuteSP_ReturnDataTable("[Sp_UserCreation_NotficationDropdown]", new Dictionary<string, object>());
         }
 
+        public DataTable SearchUserName(string userName)
+        {
+            var parameters = new Dictionary<string, object>
+            {
+                { "@UserName", userName }
+            };
+
+            return _dbHelper.ExecuteSP_ReturnDataTable("sp_UserCreation_UserNameSearch", parameters);
+        }
+
+
     }
 }

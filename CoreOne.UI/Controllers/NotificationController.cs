@@ -229,7 +229,25 @@ namespace CoreOne.UI.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> SearchUserName(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+                return Json(new List<object>());
 
+            var client = _httpClientFactory.CreateClient();
+            var url = $"{_api.BaseUrlUserCreation}/SearchUserName?userName={term}";
+
+            var resp = await client.GetAsync(url);
+            if (!resp.IsSuccessStatusCode)
+                return Json(new List<object>());
+
+            var response = await resp.Content.ReadAsStringAsync();
+            var users = JsonConvert.DeserializeObject<List<dynamic>>(response);
+
+            // Return as JSON for autocomplete
+            return Json(users);
+        }
 
 
     }

@@ -556,3 +556,55 @@ $(document).on("change", ".perm-checkbox", function () {
         $(this).removeAttr("checked");
     }
 });
+
+
+
+    $(document).ready(function () {
+        const $input = $('#searchUser');
+    const $list = $('#userSuggestions');
+
+    $input.on('keyup', function () {
+            const term = $(this).val().trim();
+
+    if (term.length < 2) {
+        $list.hide();
+    return;
+            }
+
+    $.ajax({
+        url: '/UserCreation/SearchUserName',
+    type: 'GET',
+    data: {term: term },
+    success: function (data) {
+        $list.empty();
+                    if (data && data.length > 0) {
+        data.forEach(item => {
+            const li = $('<li>')
+                .addClass('list-group-item list-group-item-action')
+                .text(item.UserName)
+                .attr('data-id', item.UserID)
+                .on('click', function () {
+                    $input.val($(this).text());
+                    $('#notifyUserId').val($(this).data('id')); // sets hidden userId field
+                    $list.hide();
+                });
+            $list.append(li);
+        });
+    $list.show();
+                    } else {
+        $list.hide();
+                    }
+                },
+    error: function () {
+        $list.hide();
+                }
+            });
+        });
+
+    // Hide dropdown when clicking outside
+    $(document).on('click', function (e) {
+            if (!$(e.target).closest('#searchUser, #userSuggestions').length) {
+        $list.hide();
+            }
+        });
+    });

@@ -19,6 +19,7 @@ namespace CoreOne.API.Interfaces
         UserCreation? GetUserMyAccount(int userId);
 
         DataTable GetNotficationDropdown();
+        DataTable SearchUserName(string userName);
 
 
     }
