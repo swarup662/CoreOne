@@ -58,66 +58,29 @@
         font-weight: 500;
         letter-spacing: 1px;
     }
-</style>
-<style>
-    /* User tag (pill) */
-    .user-tag {
-        background-color: #0d6efd;
-        color: #fff;
-        border-radius: 50px;
-        padding: 6px 12px;
+    /* --- CLOSE BUTTON (modern glass look) --- */
+    .btn-close-circle {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff6b6b, #ff3b3b);
+      
+        border-color: rgba(255,255,255,0.6);
         display: flex;
-        align-items: center;
-        font-weight: 500;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-        transition: background 0.2s ease-in-out;
+      
+        
     }
 
-        .user-tag:hover {
-            background-color: #0b5ed7;
-        }
-
-        .user-tag .remove-user {
-            background: transparent;
-            border: none;
-            color: #ff4d4f;
-            font-size: 16px;
-            margin-left: 8px;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-            .user-tag .remove-user:hover {
-                color: #ff0000;
-            }
-
-    /* Suggestion dropdown */
-    #userSuggestions li {
-        cursor: pointer;
-        transition: background 0.15s ease-in-out;
-        border: none !important;
-        padding: 10px 15px;
-        font-size: 15px;
-    }
-
-        #userSuggestions li:hover {
-            background-color: #f0f8ff;
-        }
-
-        #userSuggestions li .add-btn {
-            background-color: #198754;
-            border: none;
-            padding: 3px 10px;
+        .btn-close-circle i {
+            color: #ffffff;
             font-size: 13px;
-            color: white;
-            border-radius: 4px;
-            transition: background 0.2s;
+          
         }
 
-            #userSuggestions li .add-btn:hover {
-                background-color: #157347;
-            }
+      
+
 </style>
+
 
 
 <!-- 🔄 Preloader -->
@@ -469,88 +432,297 @@
 </div>
 
 <div class="modal fade" id="notificationBulkmodal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-bell-fill text-warning me-2"></i> Send Notification
-                </h5>
-                <button type="button"
-                        class="btn btn-light btn-close-circle shadow-sm"
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
+
+            <!-- Header -->
+            <div class="modal-header bg-light border-0 py-2 px-3">
+                <h6 class="modal-title fw-semibold m-0">
+                    <i class="bi bi-bell-fill text-warning me-2"></i> Send Bulk Notification
+                </h6>
+                <button type="button" class="btn btn-light btn-close-circle border-0 p-1"
                         onclick="window.location.href='/Notification/UserNotification'">
-                    <i class="bi bi-x-lg"></i>
+                    <i class="bi bi-x-lg small"></i>
                 </button>
             </div>
 
-            <div class="modal-body">
-                <!-- Hidden input to store the selected user's ID -->
+            <!-- Body -->
+            <div class="modal-body bg-white p-3">
                 <input type="hidden" id="notifyUserId" />
                 <input type="hidden" id="notifyNotificationId" value="0" />
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Select Users</label>
 
-                    <!-- Selected user tags -->
-                    <div id="selectedUsers" class="d-flex flex-wrap gap-2 mb-2"></div>
+                <div class="row g-2">
+                    <!-- Notification Section -->
+                    <div class="col-md-6">
+                        <div class="border rounded-3 p-2 bg-light shadow-sm-sm h-100">
+                            <h6 class="fw-semibold text-secondary mb-2 pb-1 border-bottom small">
+                                <i class="bi bi-card-text me-1 text-primary"></i> Notification
+                            </h6>
 
-                    <!-- Search box -->
-                    <div class="position-relative">
-                        <input type="text" id="searchUser" class="form-control shadow-sm"
-                               placeholder="Type to search users..." autocomplete="off" />
-                        <ul id="userSuggestions"
-                            class="list-group position-absolute w-100 shadow-lg rounded-3 mt-1 border-0"
-                            style="z-index: 1060; display: none; max-height: 250px; overflow-y: auto;"></ul>
+                            <div class="mb-1">
+                                <label class="form-label mb-0 small fw-semibold">Title</label>
+                                <input type="text" class="form-control form-control-sm" id="notifyTitle" placeholder="Title..." />
+                            </div>
+
+                            <div class="mb-1">
+                                <label class="form-label mb-0 small fw-semibold">Type</label>
+                                <select id="notifyDropdown" name="notifyDropdown" class="form-select form-select-sm" asp-items="ViewBag.NotificationList"></select>
+                            </div>
+
+                            <div class="mb-1">
+                                <label class="form-label mb-0 small fw-semibold">Message</label>
+                                <textarea class="form-control form-control-sm" id="notifyMessage" rows="2" placeholder="Message..."></textarea>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-6 mb-1">
+                                    <label class="form-label mb-0 small fw-semibold">Start</label>
+                                    <input type="datetime-local" class="form-control form-control-sm" id="notifyStart" />
+                                </div>
+                                <div class="col-6 mb-1">
+                                    <label class="form-label mb-0 small fw-semibold">End</label>
+                                    <input type="datetime-local" class="form-control form-control-sm" id="notifyEnd" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                </div>
+                    <!-- User Selection Section -->
+                    <div class="col-md-6">
+                        <div class="border rounded-3 p-2 bg-light shadow-sm-sm h-100">
+                            <h6 class="fw-semibold text-secondary mb-2 pb-1 border-bottom small">
+                                <i class="bi bi-search me-1 text-success"></i> Users
+                            </h6>
 
+                            <div id="selectedUsers" class="d-flex flex-wrap gap-1 mb-1"></div>
 
-
-
-           
-                <div class="mb-2">
-                    <label class="form-label">Title</label>
-                    <input type="text" class="form-control" id="notifyTitle" placeholder="Enter notification title..." />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Notification Type</label>
-                    <select id="notifyDropdown" name="notifyDropdown" class="form-select" asp-items="ViewBag.NotificationList">
-                    </select>
-                </div>
-
-                <div class="mb-2">
-                    <label class="form-label">Message</label>
-                    <textarea class="form-control" id="notifyMessage" rows="3" placeholder="Enter message..."></textarea>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">Start Date & Time</label>
-                        <input type="datetime-local" class="form-control" id="notifyStart" />
-                    </div>
-                    <div class="col-md-6 mb-2">
-                        <label class="form-label">End Date & Time</label>
-                        <input type="datetime-local" class="form-control" id="notifyEnd" />
+                            <div class="position-relative">
+                                <input type="text" id="searchUser" class="form-control form-control-sm" placeholder="Search user..." autocomplete="off" />
+                                <ul id="userSuggestions"
+                                    class="list-group position-absolute w-100 shadow rounded-3 mt-1 border-0"
+                                    style="z-index: 1060; display: none; max-height: 160px; overflow-y: auto;"></ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer border-0 pt-1 d-flex justify-content-between">
+            <!-- Footer -->
+            <div class="modal-footer border-0 py-2 px-3 d-flex justify-content-between bg-light">
                 <button type="button"
                         onclick="window.location.href='/Notification/UserNotification'"
-                        class="btn btn-warning btn-sm"
-                        data-bs-dismiss="modal">
+                        class="btn btn-outline-secondary btn-sm px-3 py-1">
                     <i class="mdi mdi-close-circle-outline me-1"></i> Cancel
                 </button>
-                <button type="button" id="sendreminder" class="btn btn-sm" style="background:forestgreen; color:white"
+                <button type="button" id="sendreminder"
+                        class="btn btn-success btn-sm px-3 py-1"
                         onclick="sendNotificationBulk()">
                     <i class="mdi mdi-content-save-outline me-1"></i> Send
                 </button>
-
             </div>
-
         </div>
     </div>
 </div>
+
+<style>
+    /* --- Animation --- */
+    .modal-content {
+        animation: fadeInUp 0.25s ease;
+        border-radius: 14px !important;
+        overflow: hidden;
+    }
+
+    @@keyframes fadeInUp {
+        from
+
+    {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    }
+
+    /* --- HEADER --- */
+    .modal-header {
+        background: linear-gradient(90deg, #0062ff, #00c6ff);
+        color: #fff;
+        padding: 8px 14px;
+    }
+
+        .modal-header .modal-title {
+            font-size: 15px;
+            letter-spacing: 0.3px;
+        }
+
+        .modal-header .bi-bell-fill {
+            color: #ffe57f !important;
+        }
+
+    .btn-close-circle i {
+        color: #fff;
+        opacity: 0.85;
+        transition: 0.2s;
+    }
+
+    .btn-close-circle:hover i {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+
+    /* --- BODY BACKGROUND --- */
+    .modal-body {
+        background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+        padding: 16px;
+    }
+
+    /* --- PANELS --- */
+    .border.rounded-3 {
+        background: linear-gradient(180deg, #ffffff 0%, #f3f8fc 100%);
+        border: 1px solid #dbe6f0 !important;
+        transition: 0.2s;
+    }
+
+        .border.rounded-3:hover {
+            box-shadow: 0 0 6px rgba(0, 123, 255, 0.2);
+        }
+
+    /* --- SECTION HEADERS --- */
+    h6.fw-semibold.text-secondary {
+        color: #0d6efd !important;
+        background: linear-gradient(90deg, #e8f0ff, #f5faff);
+        padding: 5px 8px;
+        border-radius: 6px;
+        font-size: 13px;
+        letter-spacing: 0.2px;
+    }
+
+    /* --- INPUTS --- */
+    .form-control-sm,
+    .form-select-sm {
+        font-size: 13px;
+        padding: 4px 8px;
+        height: 30px;
+        border-radius: 6px;
+        border: 1px solid #c9d6e0;
+        transition: all 0.2s ease-in-out;
+    }
+
+        .form-control-sm:focus,
+        .form-select-sm:focus {
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.25);
+        }
+
+    textarea.form-control-sm {
+        height: 60px;
+        resize: none;
+    }
+
+    /* --- USER TAGS --- */
+    .user-tag {
+        background: linear-gradient(90deg, #007bff, #20c997);
+        color: #fff;
+        border-radius: 25px;
+        padding: 3px 10px;
+        display: flex;
+        align-items: center;
+        font-size: 12px;
+        font-weight: 500;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        transition: 0.2s;
+    }
+
+        .user-tag:hover {
+            transform: scale(1.05);
+        }
+
+        .user-tag .remove-user {
+            background: transparent;
+            border: none;
+            color: #ffe57f;
+            font-size: 13px;
+            margin-left: 6px;
+            cursor: pointer;
+        }
+
+            .user-tag .remove-user:hover {
+                color: #ff4d4f;
+            }
+
+    /* --- SUGGESTION LIST --- */
+    #userSuggestions {
+        background: white;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+        #userSuggestions li {
+            cursor: pointer;
+            border: none !important;
+            padding: 7px 10px;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.2s;
+        }
+
+            #userSuggestions li:hover {
+                background: linear-gradient(90deg, #eaf7ff, #f3fff9);
+            }
+
+            #userSuggestions li .add-btn {
+                background: linear-gradient(90deg, #198754, #20c997);
+                border: none;
+                padding: 3px 8px;
+                font-size: 11px;
+                color: white;
+                border-radius: 4px;
+                transition: 0.2s;
+            }
+
+                #userSuggestions li .add-btn:hover {
+                    background: linear-gradient(90deg, #157347, #198754);
+                }
+
+    /* --- FOOTER --- */
+    .modal-footer {
+        background: linear-gradient(90deg, #f0f7ff, #eef9f3);
+        border-top: 1px solid #dbe6f0 !important;
+        padding: 8px 14px;
+    }
+
+    .btn-success {
+        background: linear-gradient(90deg, #198754, #20c997) !important;
+        border: none;
+        transition: 0.2s;
+    }
+
+        .btn-success:hover {
+            background: linear-gradient(90deg, #157347, #198754) !important;
+            transform: scale(1.02);
+        }
+
+    .btn-outline-secondary {
+        border: 1px solid #adb5bd;
+        background: linear-gradient(90deg, #fafafa, #f1f3f5);
+        transition: 0.2s;
+    }
+
+        .btn-outline-secondary:hover {
+            background: linear-gradient(90deg, #e9ecef, #dee2e6);
+        }
+
+    /* --- LIGHT SHADOW --- */
+    .shadow-sm-sm {
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+</style>
 
 
 
@@ -1131,7 +1303,7 @@
                         text: result.message,
                         timer: 2000,
                         showConfirmButton: false
-                    }).then(() => window.location.href = '/UserCreation/Index');
+                    }).then(() => window.location.href = '/Notification/UserNotification');
                 } else {
                     Swal.fire({ icon: 'error', title: 'Error', text: result.message });
                 }
