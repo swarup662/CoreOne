@@ -77,7 +77,101 @@
           
         }
 
-      
+    /* Table base */
+    .table {
+        border-collapse: separate; /* needed for border-radius */
+        border-spacing: 0; /* remove extra spacing */
+        border-radius: 0.75rem; /* adjust radius as needed */
+        overflow: hidden; /* ensures corners are rounded */
+    }
+
+        /* Table header */
+        .table thead tr {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Table body rows */
+        .table tbody tr {
+            background-color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        /* Table cells */
+        .table th,
+        .table td {
+            border: 1px solid #dcb20f; /* light gray borders */
+            vertical-align: middle;
+            padding: 0.75rem 1rem;
+           
+        }
+
+        .table th {
+            border: 1px solid #dcb20f; /* light gray borders */
+            vertical-align: middle;
+            padding: 0.75rem 1rem;
+            background: #ffe57f;
+        }
+
+        /* Optional: round only top and bottom corners */
+        .table thead tr:first-child th:first-child {
+            border-top-left-radius: 0.75rem;
+        }
+
+        .table thead tr:first-child th:last-child {
+            border-top-right-radius: 0.75rem;
+        }
+
+        .table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 0.75rem;
+        }
+
+        .table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 0.75rem;
+        }
+
+    /* === MODAL SIZE TWEAK === */
+    .modal-dialog.modal-lg {
+        max-width: 980px; /* Wider modal */
+    }
+
+    .modal-body {
+        padding: 20px 24px !important; /* More breathing space */
+    }
+
+    /* === FORM ELEMENTS — SLIGHTLY LARGER === */
+    .form-control-sm,
+    .form-select-sm {
+        font-size: 14px;
+        padding: 5px 10px;
+        height: 34px;
+    }
+
+    /* === TEXTAREA — SLIGHTLY TALLER === */
+    textarea.form-control-sm {
+        height: 70px;
+    }
+
+    /* === LABELS — MORE LEGIBLE === */
+    .form-label {
+        font-size: 13px;
+        color: #495057;
+    }
+
+    /* === USER TAG AREA — NICER ALIGNMENT === */
+    #selectedUsers {
+        background: #fffaf0;
+        border: 1px dashed #fbe1b3;
+        border-radius: 8px;
+        padding: 6px 8px;
+        min-height: 36px;
+    }
+
+    /* === USER PANEL HEIGHT FIX === */
+    .col-md-6 .border.rounded-3.h-100 {
+        min-height: 100%;
+    }
 
 </style>
 
@@ -107,10 +201,10 @@
             </div>
         </div>
     </div>
-    <div class="card" style="background:rgba(255, 255, 255, 0.08);border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+    <div class="card" style="background:rgba(255, 255, 255, 0.08);border-radius: 9px; border: 1px solid #ffe16d; backdrop-filter: blur(12px);
                  -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
         <div class="card-body">
-            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+            <div class="row align-items-center p-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #ffe16d; backdrop-filter: blur(12px);
                  -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
                 <div class="row justify-content-between">
 
@@ -131,14 +225,14 @@
                 </div>
 
             </div>
-            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px); 
+            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #ffe16d; backdrop-filter: blur(12px); 
      -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
 
                 <div class="col-md-3">
-                    <input type="search" id="searchBox" value="@search" class="form-control my-1 my-lg-0" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
+                    <input type="search" id="searchBox" value="@search" class="form-control my-1 my-lg-0" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #fffbf4, #ffffff);" />
                 </div>
                 <div class="col-md-2">
-                    <select id="searchField" class="form-select my-1 my-lg-0t" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
+                    <select id="searchField" class="form-select my-1 my-lg-0t" style="  background: linear-gradient(135deg, #fffbf4, #ffffff);   border-radius: 11px;">
                         <option value="">All Columns</option>
                         <option value="UserName" selected="@(searchCol=="UserName")">User Name</option>
                         <option value="Title" selected="@(searchCol=="Title")">Title</option>
@@ -150,7 +244,7 @@
                     <button id="btnSearch" class="btn btn-primary  my-1 my-lg-0" style="border-radius: 10px;"><i class="mdi mdi-magnify"></i> Search</button>
                 </div>
                 <div class="col-md-2 ms-auto d-flex justify-content-end" >
-                    <select id="pageSize" class="form-select my-1 my-lg-0" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
+                    <select id="pageSize" class="form-select my-1 my-lg-0" style="border-radius: 11px; background: linear-gradient(135deg, #fffbf4, #ffffff);">
                         @{
                             int[] sizes = {1, 10, 20, 50, 100 };
                             foreach (var s in sizes)
@@ -165,12 +259,12 @@
         </div>
 
 
-            <div class="table-responsive row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
+            <div class="table-responsive row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #ffe16d; backdrop-filter: blur(12px);
                  -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
                 <table class="table table-bordered table-hover table-xl mt-2">
                     <thead>
                         <tr style="background: #f3f7f9; color:black;">
-                            <th style="color:black">#</th>
+                            <th style="color:black">Sl No.</th>
 
                             <th style="color:black">
                                 <a href="javascript:void(0)" style="color:black" onclick="sortTable('UserName')" class="d-flex justify-content-between">
@@ -552,7 +646,7 @@
 
     /* --- HEADER --- */
     .modal-header {
-        background: linear-gradient(90deg, #0062ff, #00c6ff);
+        background: linear-gradient(90deg, #ec9e13, #fec764);
         color: #fff;
         padding: 8px 14px;
     }
@@ -579,14 +673,14 @@
 
     /* --- BODY BACKGROUND --- */
     .modal-body {
-        background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+        background: linear-gradient(180deg, #fffbf4 0%, #ffffff 100%);
         padding: 16px;
     }
 
     /* --- PANELS --- */
     .border.rounded-3 {
-        background: linear-gradient(180deg, #ffffff 0%, #f3f8fc 100%);
-        border: 1px solid #dbe6f0 !important;
+        background: linear-gradient(180deg, #ffffff 0%, #fff7e8 100%);
+        border: 1px solid #ffe5b7 !important;
         transition: 0.2s;
     }
 
@@ -596,8 +690,8 @@
 
     /* --- SECTION HEADERS --- */
     h6.fw-semibold.text-secondary {
-        color: #0d6efd !important;
-        background: linear-gradient(90deg, #e8f0ff, #f5faff);
+        color: #cb8200 !important;
+        background: linear-gradient(90deg, #ffe2ae, #fff3de);
         padding: 5px 8px;
         border-radius: 6px;
         font-size: 13px;
@@ -701,13 +795,13 @@
     }
 
     .btn-success {
-        background: linear-gradient(90deg, #198754, #20c997) !important;
+        background: linear-gradient(90deg, #c28009, #eca424) !important;
         border: none;
         transition: 0.2s;
     }
 
         .btn-success:hover {
-            background: linear-gradient(90deg, #157347, #198754) !important;
+            background: linear-gradient(90deg, #c28009, #eca424) !important;
             transform: scale(1.02);
         }
 
