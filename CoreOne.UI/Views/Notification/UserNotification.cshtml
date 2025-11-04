@@ -111,6 +111,7 @@
         .table th {
             border: 1px solid #dcb20f; /* light gray borders */
             vertical-align: middle;
+            font-size: 12px;
             padding: 0.75rem 1rem;
             background: #ffe57f;
         }
@@ -269,7 +270,7 @@
 
                             <th style="color:black">
                                 <a href="javascript:void(0)" style="color:black" onclick="sortTable('UserName')" class="d-flex justify-content-between">
-                                    User Name
+                                    User
                                     @(sortColumn == "UserName" ? (sortDir == "ASC" ? "↑" : "↓") : "↕")
                                 </a>
                             </th>
@@ -297,7 +298,7 @@
 
                             <th style="color:black">
                                 <a href="javascript:void(0)" style="color:black" onclick="sortTable('CreatedDateTime')" class="d-flex justify-content-between">
-                                    Created On
+                                    Date
                                     @(sortColumn == "CreatedDateTime" ? (sortDir == "ASC" ? "↑" : "↓") : "↕")
                                 </a>
                             </th>
@@ -314,7 +315,7 @@
                             {
                                 <tr>
                                     <td>@count</td>
-                                    <td>@n.UserName</td>
+                                    <td class="text-body fw-semibold">@n.UserName</td>
                                     <td>@n.Title</td>
                                     <td>@n.Message</td>
                                     <td>@n.Type</td>
