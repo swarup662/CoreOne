@@ -488,13 +488,12 @@
                     </div>
 
                     <!-- User Selection Section -->
+                    <!-- User Selection Section -->
                     <div class="col-md-6">
                         <div class="border rounded-3 p-2 bg-light shadow-sm-sm h-100">
                             <h6 class="fw-semibold text-secondary mb-2 pb-1 border-bottom small">
                                 <i class="bi bi-search me-1 text-success"></i> Users
                             </h6>
-
-                            <div id="selectedUsers" class="d-flex flex-wrap gap-1 mb-1"></div>
 
                             <div class="position-relative">
                                 <input type="text" id="searchUser" class="form-control form-control-sm" placeholder="Search user..." autocomplete="off" />
@@ -502,8 +501,12 @@
                                     class="list-group position-absolute w-100 shadow rounded-3 mt-1 border-0"
                                     style="z-index: 1060; display: none; max-height: 160px; overflow-y: auto;"></ul>
                             </div>
+
+                            <!-- 🧩 Moved below input -->
+                            <div id="selectedUsers" class="d-flex flex-wrap gap-1 mt-2"></div>
                         </div>
                     </div>
+
                 </div>
             </div>
 
