@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="Service\IMenuService.cs" />
+    <Content Include="Service\MenuService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="itext.bouncy-castle-adapter" Version="9.3.0" />
     <PackageReference Include="itext7" Version="9.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.8" />

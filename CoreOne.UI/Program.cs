@@ -2,6 +2,7 @@
 using CoreOne.UI.Controllers;
 using CoreOne.UI.Helper;
 using CoreOne.UI.Middleware;
+using CoreOne.UI.Service;
 
 using Microsoft.Extensions.Options;
 
@@ -12,6 +13,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddScoped<MenuLayoutController>();
 builder.Services.Configure<ApiSettingsHelper>(builder.Configuration.GetSection("ApiSettings"));
+// Register your service
+builder.Services.AddScoped<IMenuService, MenuService>();
 // Add this line to make ApiSettings directly injectable
 builder.Services.AddSingleton(resolver =>
     resolver.GetRequiredService<IOptions<ApiSettingsHelper>>().Value);
