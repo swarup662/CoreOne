@@ -24,7 +24,8 @@ namespace CoreOne.API.Middleware
 
             // Skip public APIs
             if (path.Contains("/auth/login") || path.Contains("/auth/forgotpassword") || path.Contains("/auth/resetpassword")
-                ||  path.Contains("/auth/loghttperror")
+               || path.Contains("/auth/create-cachekey") || path.Contains("/auth/exchange-cachekey") 
+               ||  path.Contains("/auth/loghttperror")
                  || path.Contains("/auth/logexception") || path.Contains("/index"))
             {
                 await _next(context);

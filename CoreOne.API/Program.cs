@@ -1,4 +1,4 @@
-using CoreOne.API.Helpers;
+﻿using CoreOne.API.Helpers;
 using CoreOne.API.Infrastructure.Data;
 using CoreOne.API.Infrastructure.Services;
 using CoreOne.API.Interface;
@@ -11,15 +11,20 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Add services ---
+// --- Configuration ---
+builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+// --- Add core services ---
+builder.Services.AddControllers();
+builder.Services.AddDistributedMemoryCache(); // ✅ Fixes IDistributedCache
 builder.Services.AddSingleton<DBContext>();
 builder.Services.AddSingleton<TokenService>();
-builder.Services.AddControllers();
 
-
-// --- Register services ---
+// --- Dependency Injection ---
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IEmailHelper, EmailHelper>();
 
+// --- Other repositories ---
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IRoleCreationRepository, RoleCreationRepository>();
 builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
@@ -27,11 +32,6 @@ builder.Services.AddScoped<IUserCreationRepository, UserCreationRepository>();
 builder.Services.AddScoped<IModuleSetupRepository, ModuleSetupRepository>();
 builder.Services.AddScoped<IActionCreationRepository, ActionCreationRepository>();
 builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
-builder.Services.AddScoped<PermissionController>();
-builder.Services.AddScoped<IEmailHelper, EmailHelper>();
-
-builder.Configuration
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
 // --- API Versioning ---
 builder.Services.AddApiVersioning(options =>
@@ -50,7 +50,6 @@ builder.Services.AddVersionedApiExplorer(options =>
 // --- Swagger ---
 builder.Services.AddSwaggerGen(options =>
 {
-    // JWT Bearer support in Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -70,19 +69,6 @@ builder.Services.AddSwaggerGen(options =>
             new string[]{}
         }
     });
-
-    // Dynamic SwaggerDoc per API version
-    var provider = builder.Services.BuildServiceProvider()
-        .GetRequiredService<IApiVersionDescriptionProvider>();
-
-    foreach (var description in provider.ApiVersionDescriptions)
-    {
-        options.SwaggerDoc(description.GroupName, new OpenApiInfo
-        {
-            Title = "CoreOne.API",
-            Version = description.ApiVersion.ToString()
-        });
-    }
 });
 
 // --- CORS ---
@@ -95,41 +81,29 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
 
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    foreach (var description in provider.ApiVersionDescriptions)
-    {
-        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-            $"CoreOne API {description.GroupName.ToUpperInvariant()}");
-    }
-});
-app.UseMiddleware<ErrorLoggingMiddleware>();
-// --- Swagger ---
-
-// --- Middleware order ---
+// --- Middleware pipeline ---
 app.UseHttpsRedirection();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
+app.UseMiddleware<ErrorLoggingMiddleware>();
 app.UseMiddleware<AuthorizationMiddleware>();
 app.UseMiddleware<ActivityLoggingMiddleware>();
 
-// --- Swagger ---
-var apiProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+// --- Swagger Setup (only once!) ---
+var apiVersionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
 app.UseSwagger();
 app.UseSwaggerUI(options =>
 {
-    foreach (var description in apiProvider.ApiVersionDescriptions)
+    foreach (var description in apiVersionProvider.ApiVersionDescriptions)
     {
         options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-            $"CoreOne.API {description.GroupName.ToUpperInvariant()}");
+            $"CoreOne API {description.GroupName.ToUpperInvariant()}");
     }
-    options.RoutePrefix = string.Empty; // Swagger opens at root /
+    options.RoutePrefix = string.Empty; // Swagger opens at root "/"
 });
 
 // --- Map controllers ---

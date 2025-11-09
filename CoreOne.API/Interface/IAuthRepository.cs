@@ -4,7 +4,9 @@ namespace CoreOne.API.Interfaces
 {
     public interface IAuthRepository
     {
-        (bool Success, string Message, User User, string Token) Login(string userName, string password, string ipAddress);
+        (bool Success, string Message, User User, string Token, List<dynamic> AccessList) Login(string userName, string password, string ipAddress);
+        (bool Ok, string Message, string RedirectUrl) CreateCacheKeyAndGetRedirectUrl(int userId, int companyId, int appId, int roleId, string? sourceIp, string urlType = "domain");
+        (bool Ok, string Message, string Token) ExchangeCacheKeyForToken(string cacheKey, int appId, string? callerIp );
         int Logout(int userID, string ipAddress);
         int LogHttpError(LogHttpErrorRequest request);
         int LogException(LogExceptionRequest request);

@@ -4,9 +4,11 @@ using CoreOne.API.Infrastructure.Services;
 using CoreOne.API.Interfaces;
 using CoreOne.DOMAIN.Models;
 using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Data;
+
 
 namespace CoreOne.API.Repositories
 {
@@ -16,85 +18,210 @@ namespace CoreOne.API.Repositories
         private readonly TokenService _tokenService;
         private readonly IConfiguration _config;
         private readonly IEmailHelper _email;
-
-        public AuthRepository(DBContext dbHelper, TokenService tokenService, IConfiguration config, IEmailHelper email)
+        private readonly IDistributedCache _cache;
+        public AuthRepository(DBContext dbHelper, TokenService tokenService, IConfiguration config, IEmailHelper email, IDistributedCache cache)
         {
             _dbHelper = dbHelper;
             _tokenService = tokenService;
             _config = config;
             _email = email;
+            _cache = cache; 
         }
 
-        public (bool Success, string Message, User User, string Token) Login(string userName, string password, string ipAddress)
+        public (bool Success, string Message, User User, string Token, List<dynamic> AccessList)
+            Login(string userName, string password, string ipAddress)
         {
-            // 1️⃣ Get user by username
-            var parameters = new Dictionary<string, object> { { "@UserName", userName } };
-            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_Auth_login_GetUserDetailsByUserName]", parameters);
+            var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_Auth_login_GetUserDetailsByUserName]",
+                new Dictionary<string, object> { { "@UserName", userName } });
 
             if (dt.Rows.Count == 0)
-                return (false, "Invalid username or password", null, null);
+                return (false, "Invalid username or password", null, null, null);
 
             var row = dt.Rows[0];
-            string storedHash = row["PasswordHash"].ToString();
+            if (!PasswordHelper.VerifyPassword(password, row["PasswordHash"].ToString()))
+                return (false, "Invalid username or password", null, null, null);
 
-            // 2️⃣ Check password hash
-            if (!PasswordHelper.VerifyPassword(password, storedHash))
-                return (false, "Invalid username or password", null, null);
-
-            int userID = Convert.ToInt32(row["UserID"]);
-            int roleID = Convert.ToInt32(row["RoleID"]);
-            string uName = row["UserName"].ToString();
-            string RoleName = row["RoleName"].ToString();
-            string Email = row["Email"].ToString();
-            int MailTypeID = Convert.ToInt32(row["MailTypeID"]);
-            string PhoneNumber = row["PhoneNumber"].ToString();
-
-            // 3️⃣ Check singleton login
-            var singletonDT = _dbHelper.ExecuteSP_ReturnDataTable("sp_Auth_GetAppSetting", new Dictionary<string, object>
+            var user = new User
             {
-                {"@SettingKey", "SingletonLogin"}
-            });
-            bool isSingleton = singletonDT.Rows.Count > 0 && singletonDT.Rows[0]["SettingValue"].ToString() == "true";
+                UserID = Convert.ToInt32(row["UserID"]),
+                UserName = row["UserName"].ToString(),
+                Email = row["Email"]?.ToString(),
+                MailTypeID = row["MailTypeID"] == DBNull.Value ? 0 : Convert.ToInt32(row["MailTypeID"]),
+                PhoneNumber = row["PhoneNumber"]?.ToString(),
+                IsInternal = row.Table.Columns.Contains("IsInternal") && Convert.ToInt32(row["IsInternal"]) == 1
+            };
+
+            // singleton login
+            var singletonDT = _dbHelper.ExecuteSP_ReturnDataTable("sp_Auth_GetAppSetting",
+                new Dictionary<string, object> { { "@SettingKey", "SingletonLogin" } });
+            bool isSingleton = singletonDT.Rows.Count > 0 &&
+                               singletonDT.Rows[0]["SettingValue"].ToString() == "true";
 
             if (isSingleton)
             {
-                int activeSessions = _dbHelper.ExecuteSP_ReturnInt("sp_Auth_CheckActiveSession", new Dictionary<string, object>
-                {
-                    {"@UserID", userID}
-                });
+                int activeSessions = _dbHelper.ExecuteSP_ReturnInt("sp_Auth_CheckActiveSession",
+                    new Dictionary<string, object> { { "@UserID", user.UserID } });
                 if (activeSessions > 0)
-                    return (false, "User already logged in elsewhere", null, null);
+                    return (false, "User already logged in elsewhere", null, null, null);
             }
 
-            // 4️⃣ Generate JWT token
-            var user = new User { UserID = userID, 
-                UserName = uName, 
-                RoleID = roleID ,
-                RoleName =RoleName,
-                Email =Email,
-                MailTypeID = MailTypeID,
-                PhoneNumber = PhoneNumber
-            };
-            string token = _tokenService.GenerateToken(user);
+            // get companies + apps
+            string proc = user.IsInternal
+                ? "sp_Auth_GetUserCompaniesAndApplications"
+                : "sp_Auth_GetExternalDefaultAccess";
 
-            // 5️⃣ Log login activity
+            var accessDt = _dbHelper.ExecuteSP_ReturnDataTable(proc, new Dictionary<string, object> { { "@UserID", user.UserID } });
+            var accessList = new List<dynamic>();
+            foreach (DataRow r in accessDt.Rows)
+            {
+                accessList.Add(new
+                {
+                    CompanyID = Convert.ToInt32(r["CompanyID"]),
+                    CompanyName = r["CompanyName"].ToString(),
+                    ApplicationID = Convert.ToInt32(r["ApplicationID"]),
+                    ApplicationName = r["ApplicationName"].ToString(),
+                    RoleID = Convert.ToInt32(r["RoleID"]),
+                    RoleName = r["RoleName"].ToString(),
+                });
+            }
+
             _dbHelper.ExecuteSP_ReturnInt("sp_InsertActivityLog", new Dictionary<string, object>
             {
-                {"@UserID", userID},
+                {"@UserID", user.UserID},
                 {"@ActivityDescription", "Login"},
                 {"@IPAddress", ipAddress},
-                {"@CreatedBy", userID}
+                {"@CreatedBy", user.UserID}
             });
 
-            // 6️⃣ Insert session record
-            _dbHelper.ExecuteSP_ReturnInt("sp_Auth_InsertUserSession", new Dictionary<string, object>
+            if (!user.IsInternal)
             {
-                {"@UserID", userID },
-                {"@Token", token }
-            });
+                string baseToken = _tokenService.GenerateUserToken(user, accessList);
+                _dbHelper.ExecuteSP_ReturnInt("sp_Auth_InsertUserSession",
+                    new Dictionary<string, object> { { "@UserID", user.UserID }, { "@Token", baseToken } });
+                return (true, "Login successful", user, baseToken, accessList);
+            }
+            return (true, "Login successful", user, null, accessList);
+        }
 
-            return (true, "Login successful", user, token);
+        public (bool Ok, string Message, string RedirectUrl)
+        CreateCacheKeyAndGetRedirectUrl(int userId, int companyId, int appId, int roleId, string? sourceIp , string urlType = "domain")
+        {
+            string cacheKey = Guid.NewGuid().ToString("N");
 
+            var payload = new
+            {
+                userId,
+                companyId,
+                appId,
+                roleId,
+                sourceIp,
+                exp = DateTime.UtcNow.AddMinutes(2)
+            };
+
+            _cache.SetString(cacheKey, JsonConvert.SerializeObject(payload),
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(2)
+                });
+
+            // Get App URL from DB
+            var appDt = _dbHelper.ExecuteSP_ReturnDataTable("sp_GetAppUrlById", new Dictionary<string, object>
+    {
+        { "@ApplicationID", appId }
+    });
+
+            if (appDt.Rows.Count == 0)
+                return (false, "Application not found", null);
+
+            string domainUrl = appDt.Rows[0]["DomainUrl"]?.ToString();
+            string portUrl = appDt.Rows[0]["PortUrl"]?.ToString();
+
+            string appUrl = urlType?.ToLower() switch
+            {
+                "port" => portUrl,
+                "domain" => domainUrl,
+                _ => domainUrl ?? portUrl
+            };
+
+            if (string.IsNullOrEmpty(appUrl))
+                return (false, "App URL not available for the selected type", null);
+
+            string redirectUrl = $"{appUrl.TrimEnd('/')}/auth/consume?ck={cacheKey}";
+            return (true, "OK", redirectUrl);
+        }
+
+
+        public (bool Ok, string Message, string Token)
+    ExchangeCacheKeyForToken(string cacheKey, int appId, string? callerIp)
+        {
+            // 1️⃣ Fetch and validate cache key
+            var json = _cache.GetString(cacheKey);
+            if (string.IsNullOrEmpty(json))
+                return (false, "Cache key expired or invalid", null);
+
+            dynamic data = JsonConvert.DeserializeObject(json);
+            if (DateTime.UtcNow > (DateTime)data.exp)
+            {
+                _cache.Remove(cacheKey);
+                return (false, "Expired cache key", null);
+            }
+
+            int userId = (int)data.userId;
+            int companyId = (int)data.companyId;
+            int roleId = (int)data.roleId;
+            int applicationId = (int)data.appId;
+
+            // 2️⃣ Fetch user details
+            var userDt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Auth_GetUserDetailsById",
+                new Dictionary<string, object> { { "@UserID", userId } });
+
+            if (userDt.Rows.Count == 0)
+                return (false, "User not found", null);
+
+            var row = userDt.Rows[0];
+            var user = new User
+            {
+                UserID = userId,
+                UserName = row["UserName"].ToString(),
+                Email = row["Email"]?.ToString(),
+                IsInternal = Convert.ToInt32(row["IsInternal"]) == 1
+            };
+            string proc = user.IsInternal
+             ? "sp_Auth_GetUserCompaniesAndApplications"
+             : "sp_Auth_GetExternalDefaultAccess";
+
+            var accessDt = _dbHelper.ExecuteSP_ReturnDataTable(proc, new Dictionary<string, object> { { "@UserID", user.UserID } });
+            var accessList = new List<dynamic>();
+            foreach (DataRow r in accessDt.Rows)
+            {
+                accessList.Add(new
+                {
+                    CompanyID = Convert.ToInt32(r["CompanyID"]),
+                    CompanyName = r["CompanyName"].ToString(),
+                    ApplicationID = Convert.ToInt32(r["ApplicationID"]),
+                    ApplicationName = r["ApplicationName"].ToString(),
+                    RoleID = Convert.ToInt32(r["RoleID"]),
+                    RoleName = r["RoleName"].ToString(),
+                });
+            }
+
+
+            // 4️⃣ Generate unified user token
+            string token = _tokenService.GenerateUserToken(user, accessList);
+
+            // 5️⃣ Remove cache key (one-time use)
+            _cache.Remove(cacheKey);
+
+            // 6️⃣ Log activity
+            _dbHelper.ExecuteSP_ReturnInt("sp_InsertActivityLog", new Dictionary<string, object>
+                {
+                    {"@UserID", userId},
+                    {"@ActivityDescription", $"Issued unified token for AppID:{applicationId}, CompanyID:{companyId}"},
+                    {"@IPAddress", callerIp ?? "0.0.0.0"},
+                    {"@CreatedBy", userId}
+                });
+
+            return (true, "OK", token);
         }
 
 

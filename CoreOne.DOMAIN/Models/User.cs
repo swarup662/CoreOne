@@ -17,9 +17,53 @@ namespace CoreOne.DOMAIN.Models
        
         public int RoleID { get; set; }
 
+        public Boolean IsInternal { get; set; }
+
         public string RoleName { get; set; }
         public bool ActiveFlag { get; set; }
         public int CreatedBy { get; set; }
        
+    }
+
+
+    public class LoginRequest
+    {
+        public string UserName { get; set; }
+        public string Password { get; set; }
+    }
+
+    public class CreateCacheKeyRequest
+    {
+        public int UserID { get; set; }
+        public int CompanyID { get; set; }
+        public int ApplicationID { get; set; }
+        public int RoleID { get; set; }
+        public string UrlType { get; set; } = "domain";
+    }
+
+    public class ExchangeCacheKeyRequest
+    {
+        public string CacheKey { get; set; }
+        public int ApplicationID { get; set; }
+        public string AppSecret { get; set; }
+    }
+    public class UserAccessViewModel
+    {
+        public int CompanyID { get; set; }
+        public string CompanyName { get; set; }
+        public int ApplicationID { get; set; }
+        public string ApplicationName { get; set; }
+        public int RoleID { get; set; }
+        public string RoleName { get; set; }
+    }
+
+    public class AppLaunchRequest
+    {
+        public int UserID { get; set; }
+        public int CompanyID { get; set; }
+        public int ApplicationID { get; set; }
+        public int RoleID { get; set; }
+        // NEW: Choose which app URL type to use ("domain" or "port")
+        public string UrlType { get; set; } = "domain";
     }
 }

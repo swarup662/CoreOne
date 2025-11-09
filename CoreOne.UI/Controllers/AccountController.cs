@@ -25,51 +25,155 @@ namespace CoreOne.UI.Controllers
         {
             return View();
         }
-
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
             var client = _httpClientFactory.CreateClient();
-            var url = _apiSettings.BaseUrlAuth + "/Login";
+            var url = $"{_apiSettings.BaseUrlAuth}/login";
             var json = JsonConvert.SerializeObject(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await client.PostAsync(url, content);
+            var resultJson = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
             {
-                // Read message returned from API
-                var resultJson = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<dynamic>(resultJson);
-
-                TempData["message"] = result?.message ?? "Login failed"; // use API message if available
+                TempData["message"] = result?.message ?? "Login failed";
                 TempData["messagetype"] = "error";
                 return View(model);
             }
 
-            var resultJsonSuccess = await response.Content.ReadAsStringAsync();
-            var data = JsonConvert.DeserializeObject<dynamic>(resultJsonSuccess);
+            var data = JsonConvert.DeserializeObject<dynamic>(resultJson);
 
-            var token = data.token.ToString();
+            var token = (string)data.token;
+            Boolean IsInternal = false;
+             IsInternal = data.user.isInternal;
+            if (!IsInternal) { 
+            // Store token in cookie
+            Response.Cookies.Append("jwtToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddMinutes(30)
+            });
 
-            // Store in a session cookie
-            HttpContext.Response.Cookies.Append(
-                "jwtToken",
-                token,
-                new CookieOptions
-                {
-                    HttpOnly = false,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict
-                });
-            TempData["message"] = "Login successfull";
-            TempData["messagetype"] = "success";
-            return RedirectToAction("UserDashboard", "Home");
+            // External user (redirectUrl returned directly)
+            if (data.redirectUrl != null)
+                return Redirect(data.redirectUrl.ToString());
+              }
+            // Internal user → show company selection
+            string accessListJson = data.accessList.ToString();
+
+            string userId = data.user?.userID?.ToString() ?? data.userID?.ToString();
+            TempData["accessList"] = accessListJson;
+            TempData["userId"] = data.user?.userID?.ToString() ?? data.userID?.ToString();
+
+            return RedirectToAction("CompanySelection", "Account");
         }
 
+        [HttpGet]
+        public IActionResult CompanySelection()
+        {
+            if (TempData["accessList"] == null)
+                return RedirectToAction("Login");
 
+            var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(TempData["accessList"].ToString());
+
+            // Re-stash access list so it survives page reload
+            TempData.Keep("accessList");
+            TempData.Keep("userId");
+
+            return View(accessList);
+        }
+        [HttpPost]
+        public async Task<IActionResult> LaunchApp([FromBody] AppLaunchRequest request)
+        {
+            var client = _httpClientFactory.CreateClient();
+            var url = $"{_apiSettings.BaseUrlAuth}/create-cachekey";
+
+            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+            var response = await client.PostAsync(url, content);
+            var resultJson = await response.Content.ReadAsStringAsync();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var err = JsonConvert.DeserializeObject<dynamic>(resultJson);
+                return Json(new { success = false, message = err?.message ?? "Error creating cache key" });
+            }
+
+            var data = JsonConvert.DeserializeObject<dynamic>(resultJson);
+
+            string redirectUrl = data.redirectUrl.ToString();
+
+            return Json(new { success = true, redirectUrl });
+        }
+
+        [HttpGet]
+        public IActionResult GetCompanies()
+        {
+            if (TempData["accessList"] == null)
+                return Json(new List<object>());
+
+            var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(TempData["accessList"].ToString());
+            TempData.Keep("accessList");
+
+            var companies = accessList
+                .GroupBy(a => new { a.CompanyID, a.CompanyName })
+                .Select(g => new { g.Key.CompanyID, g.Key.CompanyName })
+                .ToList();
+
+            return Json(companies);
+        }
+
+        [HttpGet]
+        public IActionResult GetApplicationsByCompany(int companyId)
+        {
+            if (TempData["accessList"] == null)
+                return Json(new List<object>());
+
+            var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(TempData["accessList"].ToString());
+            TempData.Keep("accessList");
+
+            var apps = accessList
+                .Where(a => a.CompanyID == companyId)
+                .Select(a => new
+                {
+                    a.ApplicationID,
+                    a.ApplicationName,
+                    a.RoleID,
+                    a.RoleName
+                })
+                .ToList();
+
+            return Json(apps);
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> Logout()
+        //{
+        //    var token = Request.Cookies["jwtToken"];
+        //    Response.Cookies.Delete("jwtToken");
+
+        //    if (token != null)
+        //    {
+        //        try
+        //        {
+        //            var client = _httpClientFactory.CreateClient();
+        //            var url = $"{_apiSettings.BaseUrlAuth}/api/v1/Auth/logout";
+
+        //            var request = new HttpRequestMessage(HttpMethod.Post, url);
+        //            request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        //            await client.SendAsync(request);
+        //        }
+        //        catch { /* ignore errors */ }
+        //    }
+
+        //    return RedirectToAction("Login", "Account");
+        //}
 
 
 
@@ -82,8 +186,7 @@ namespace CoreOne.UI.Controllers
 
             if (user != null)
             {
-                try
-                {
+                
                     var client = _httpClientFactory.CreateClient();
                     var url = _apiSettings.BaseUrlAuth + "/Logout";
 
@@ -101,11 +204,7 @@ namespace CoreOne.UI.Controllers
                     }
 
                     await client.SendAsync(request);
-                }
-                catch
-                {
-                    // Ignore API errors
-                }
+                
             }
 
             // Clear cookie

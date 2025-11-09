@@ -3,6 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace CoreOne.API.Infrastructure.Services
 {
@@ -21,32 +22,41 @@ namespace CoreOne.API.Infrastructure.Services
             _privateKey = _configuration["JWT:PrivateKey"];
         }
 
+        private SymmetricSecurityKey GetKey() =>
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_privateKey));
+
         /// <summary>
-        /// Generate JWT token for a user
+        /// Generates a single JWT for the user that includes all access info
         /// </summary>
-        public string GenerateToken(User user)
+        public string GenerateUserToken(User user, List<dynamic> accessList)
         {
-            var claims = new[]
+            var companyAccess = accessList.Select(a => new
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.UserName),
+                CompanyID = (int)a.CompanyID,
+                CompanyName = a.CompanyName?.ToString(),
+                ApplicationID = (int)a.ApplicationID,
+                ApplicationName = a.ApplicationName?.ToString(),
+                RoleID = (int)a.RoleID,
+                RoleName = a.RoleName?.ToString()
+            }).ToList();
+
+            var claims = new List<Claim>
+            {
                 new Claim("UserID", user.UserID.ToString()),
-                new Claim("RoleID", user.RoleID.ToString()),
-                 new Claim("RoleName", user.RoleName.ToString()),
-                  new Claim("Email", user.Email.ToString()),
-                   new Claim("EmailType", user.MailTypeID.ToString()),
-                   new Claim("PhoneNumber", user.PhoneNumber.ToString()),
+                new Claim("UserName", user.UserName ?? ""),
+                new Claim("Email", user.Email ?? ""),
+                new Claim("IsInternal", user.IsInternal ? "true" : "false"),
+                // full list of access as JSON
+                new Claim("AccessMatrix", JsonConvert.SerializeObject(companyAccess)),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_privateKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+            var creds = new SigningCredentials(GetKey(), SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
                 issuer: _issuer,
                 audience: _audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddSeconds(3600),
-
+                expires: DateTime.UtcNow.AddHours(2), // long enough for full session
                 signingCredentials: creds
             );
 
@@ -54,29 +64,28 @@ namespace CoreOne.API.Infrastructure.Services
         }
 
         /// <summary>
-        /// Validate JWT token and return ClaimsPrincipal
+        /// Validates a JWT and returns ClaimsPrincipal
         /// </summary>
         public ClaimsPrincipal ValidateToken(string token)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes(_privateKey);
+            var handler = new JwtSecurityTokenHandler();
+            var key = GetKey();
 
-            var validationParameters = new TokenValidationParameters
+            var parameters = new TokenValidationParameters
             {
                 ValidateIssuer = true,
                 ValidIssuer = _issuer,
                 ValidateAudience = true,
                 ValidAudience = _audience,
-                ValidateLifetime = true,
-                IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuerSigningKey = true,
-                ClockSkew = TimeSpan.Zero
+                IssuerSigningKey = key,
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromSeconds(30)
             };
 
             try
             {
-                var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
-                return principal;
+                return handler.ValidateToken(token, parameters, out _);
             }
             catch
             {

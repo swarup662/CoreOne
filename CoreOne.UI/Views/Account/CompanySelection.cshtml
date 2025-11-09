@@ -1,0 +1,145 @@
+﻿@model List<CoreOne.DOMAIN.Models.UserAccessViewModel>
+
+@{
+    Layout = "_AppLayout";
+
+    ViewData["Title"] = "Select Company & Application";
+    var userId = TempData["userId"];
+    TempData.Keep("userId");
+}
+
+<div class="container mt-5">
+    <h3 class="mb-4 text-center">Select Company & Application</h3>
+
+    <div class="row mb-3">
+        <div class="col-md-6 offset-md-3">
+            <label for="companyDropdown" class="form-label fw-bold">Select Company:</label>
+            <select id="companyDropdown" class="form-select">
+                <option value="">-- Select Company --</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="appSection" style="display:none;">
+        <div class="row mb-3">
+            <div class="col-md-6 offset-md-3">
+                <label for="appDropdown" class="form-label fw-bold">Select Application:</label>
+                <select id="appDropdown" class="form-select">
+                    <option value="">-- Select Application --</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <button id="btnLaunch" class="btn btn-primary mt-3" disabled>Launch Application</button>
+        </div>
+    </div>
+
+    <div id="loader" class="text-center mt-4" style="display:none;">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            const userId = '@userId';
+
+            // Load Companies on page load
+            $.getJSON('/Account/GetCompanies', function (companies) {
+                $.each(companies, function (i, company) {
+                    $('#companyDropdown').append(
+                        $('<option>', {
+                            value: company.companyID,
+                            text: company.companyName
+                        })
+                    );
+                });
+            });
+
+            // On company change → load applications
+            $('#companyDropdown').change(function () {
+                const companyId = $(this).val();
+                $('#appDropdown').empty().append('<option value="">-- Select Application --</option>');
+                $('#btnLaunch').prop('disabled', true);
+
+                if (!companyId) {
+                    $('#appSection').hide();
+                    return;
+                }
+
+                $('#loader').show();
+
+                $.getJSON('/Account/GetApplicationsByCompany?companyId=' + companyId, function (apps) {
+                    $.each(apps, function (i, app) {
+                        const optionText = app.applicationName + " (" + app.roleName + ")";
+                        $('#appDropdown').append(
+                            $('<option>', {
+                                value: JSON.stringify({
+                                    ApplicationID: app.applicationID,
+                                    RoleID: app.roleID
+                                }),
+                                text: optionText
+                            })
+                        );
+                    });
+
+                    $('#appSection').show();
+                    $('#loader').hide();
+                });
+            });
+
+            // Enable Launch button
+            $('#appDropdown').change(function () {
+                $('#btnLaunch').prop('disabled', !$(this).val());
+            });
+
+            // On click Launch
+            $('#btnLaunch').click(function () {
+                var companyId = $('#companyDropdown').val();
+                var selectedApp = JSON.parse($('#appDropdown').val());
+                     // 🔍 Auto-detect environment
+        const currentHost = window.location.hostname.toLowerCase();
+        let urlType = "domain";
+
+        if (currentHost === "localhost" || /^[0-9.]+$/.test(currentHost)) {
+            // if it's localhost or an IP like 192.168.1.100
+            urlType = "port";
+        }
+                var payload = {
+                    UserID: parseInt(userId),
+                    CompanyID: parseInt(companyId),
+                    ApplicationID: parseInt(selectedApp.ApplicationID),
+                    RoleID: parseInt(selectedApp.RoleID),
+                      UrlType: urlType  // ✅ set automatically
+                };
+                console.log(payload);
+
+                $('#loader').show();
+
+                $.ajax({
+                    url: '/Account/LaunchApp',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function (response) {
+                        $('#loader').hide();
+                        if (response.success) {
+                            window.location.href = response.redirectUrl;
+                        } else {
+                            alert('Error: ' + response.message);
+                        }
+                    },
+                    error: function () {
+                        $('#loader').hide();
+                        alert('Something went wrong while launching.');
+                    }
+                });
+            });
+        });
+    </script>
+}
