@@ -27,8 +27,19 @@ builder.Services.Configure<FileUploadSettings>(options =>
     options.UploadModules = settings.UploadModules;
 });
 
-builder.Services.AddHttpContextAccessor(); // ✅ Needed for token access
-builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<TokenHandler>();
+
+// Register a "true" default HttpClient pipeline that includes TokenHandler
+builder.Services.AddHttpClient(string.Empty) // <-- empty name = default
+    .AddHttpMessageHandler<TokenHandler>();
+
+// Still allow direct HttpClient injection to use the same pipeline
+builder.Services.AddTransient(sp =>
+{
+    var factory = sp.GetRequiredService<IHttpClientFactory>();
+    return factory.CreateClient(string.Empty);
+});
 
 builder.Services.AddScoped<PermissionHelper>();
 builder.Services.AddScoped<NotificationHelper>();

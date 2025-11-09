@@ -25,7 +25,7 @@ namespace CoreOne.API.Middleware
             // Skip public APIs
             if (path.Contains("/auth/login") || path.Contains("/auth/forgotpassword") || path.Contains("/auth/resetpassword")
                 ||  path.Contains("/auth/loghttperror")
-                 || path.Contains("/auth/logexception") || path.Contains("/index") || path.Contains("/"))
+                 || path.Contains("/auth/logexception") || path.Contains("/index"))
             {
                 await _next(context);
                 return;
@@ -63,7 +63,7 @@ namespace CoreOne.API.Middleware
                 int moduleID = int.Parse(moduleIDHeader);
                 int actionID = int.Parse(actionIDHeader);
 
-                int permissionCount = _dbHelper.ExecuteSP_ReturnInt("sp_CheckUserPermission",
+                int permissionCount = _dbHelper.ExecuteSP_ReturnInt("sp_Permission_CheckUserPermission",
                     new Dictionary<string, object>
                     {
                         {"@RoleID", roleID},
