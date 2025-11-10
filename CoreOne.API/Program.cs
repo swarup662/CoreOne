@@ -7,24 +7,29 @@ using CoreOne.API.Middleware;
 using CoreOne.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Configuration ---
+// ======================================================
+// 🧩 CONFIGURATION
+// ======================================================
 builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
 
-// --- Add core services ---
+// ======================================================
+// 🧩 SERVICES
+// ======================================================
 builder.Services.AddControllers();
-builder.Services.AddDistributedMemoryCache(); // ✅ Fixes IDistributedCache
+builder.Services.AddDistributedMemoryCache(); // For IDistributedCache
+
+// --- Custom Dependencies ---
 builder.Services.AddSingleton<DBContext>();
 builder.Services.AddSingleton<TokenService>();
 
-// --- Dependency Injection ---
+// --- Repository and Helper Injections ---
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IEmailHelper, EmailHelper>();
-
-// --- Other repositories ---
 builder.Services.AddScoped<IPermissionRepository, PermissionRepository>();
 builder.Services.AddScoped<IRoleCreationRepository, RoleCreationRepository>();
 builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
@@ -33,7 +38,9 @@ builder.Services.AddScoped<IModuleSetupRepository, ModuleSetupRepository>();
 builder.Services.AddScoped<IActionCreationRepository, ActionCreationRepository>();
 builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
 
-// --- API Versioning ---
+// ======================================================
+// 🧩 API VERSIONING
+// ======================================================
 builder.Services.AddApiVersioning(options =>
 {
     options.AssumeDefaultVersionWhenUnspecified = true;
@@ -47,13 +54,16 @@ builder.Services.AddVersionedApiExplorer(options =>
     options.SubstituteApiVersionInUrl = true;
 });
 
-// --- Swagger ---
+// ======================================================
+// 🧩 SWAGGER CONFIGURATION
+// ======================================================
 builder.Services.AddSwaggerGen(options =>
 {
+    // Add JWT bearer authentication to Swagger
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
-        Description = "Enter JWT Bearer token",
+        Description = "Enter JWT Bearer token (Example: 'Bearer eyJhbGciOi...')",
         Name = "Authorization",
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
@@ -66,50 +76,70 @@ builder.Services.AddSwaggerGen(options =>
             {
                 Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
-            new string[]{}
+            Array.Empty<string>()
         }
     });
 });
 
-// --- CORS ---
+// ======================================================
+// 🧩 CORS CONFIGURATION
+// ======================================================
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
 
-// --- Middleware pipeline ---
+// ======================================================
+// 🧩 MIDDLEWARE PIPELINE
+// ======================================================
+if (app.Environment.IsDevelopment())
+{
+    // ✅ Serve Swagger UI only in development (optional)
+    var apiVersionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+    app.UseSwagger();
+    app.UseSwaggerUI(options =>
+    {
+        // Add Swagger endpoints for each API version
+        foreach (var description in apiVersionProvider.ApiVersionDescriptions)
+        {
+            options.SwaggerEndpoint(
+                $"/swagger/{description.GroupName}/swagger.json",
+                $"CoreOne API {description.GroupName.ToUpperInvariant()}"
+            );
+        }
+
+        options.RoutePrefix = string.Empty; // Swagger UI served at root "/"
+        options.DocumentTitle = "CoreOne API Documentation";
+        options.DisplayRequestDuration();
+    });
+}
+
+// Enable middleware
 app.UseHttpsRedirection();
-app.UseCors();
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Custom middlewares (make sure ErrorLoggingMiddleware runs first)
 app.UseMiddleware<ErrorLoggingMiddleware>();
 app.UseMiddleware<AuthorizationMiddleware>();
 app.UseMiddleware<ActivityLoggingMiddleware>();
 
-// --- Swagger Setup (only once!) ---
-var apiVersionProvider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
-
-app.UseSwagger();
-app.UseSwaggerUI(options =>
-{
-    foreach (var description in apiVersionProvider.ApiVersionDescriptions)
-    {
-        options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
-            $"CoreOne API {description.GroupName.ToUpperInvariant()}");
-    }
-    options.RoutePrefix = string.Empty; // Swagger opens at root "/"
-});
-
-// --- Map controllers ---
+// ======================================================
+// 🧩 ROUTING
+// ======================================================
 app.MapControllers();
 
-// --- Default redirect to Swagger ---
+// Redirect root to Swagger if UI not already at root
 app.MapGet("/", context =>
 {
     context.Response.Redirect("/swagger");
