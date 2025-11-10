@@ -28,7 +28,7 @@ namespace CoreOne.API.Repositories
             _cache = cache; 
         }
 
-        public (bool Success, string Message, User User, string Token, List<dynamic> AccessList)
+        public (bool Success, string Message, User User, string Token, List<UserAccessViewModel> AccessList)
             Login(string userName, string password, string ipAddress)
         {
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_Auth_login_GetUserDetailsByUserName]",
@@ -71,10 +71,11 @@ namespace CoreOne.API.Repositories
                 : "sp_Auth_GetExternalDefaultAccess";
 
             var accessDt = _dbHelper.ExecuteSP_ReturnDataTable(proc, new Dictionary<string, object> { { "@UserID", user.UserID } });
-            var accessList = new List<dynamic>();
+            List<UserAccessViewModel> accessList = new List<UserAccessViewModel>();
+
             foreach (DataRow r in accessDt.Rows)
             {
-                accessList.Add(new
+                accessList.Add(new UserAccessViewModel
                 {
                     CompanyID = Convert.ToInt32(r["CompanyID"]),
                     CompanyName = r["CompanyName"].ToString(),
@@ -82,8 +83,8 @@ namespace CoreOne.API.Repositories
                     ApplicationName = r["ApplicationName"].ToString(),
                     RoleID = Convert.ToInt32(r["RoleID"]),
                     RoleName = r["RoleName"].ToString(),
-                    ColorCode = r["ColorCode"].ToString(),
-                    Icon = r["Icon"].ToString(),
+                    ColorCode = r.Table.Columns.Contains("ColorCode") ? r["ColorCode"].ToString() : "#3498db",  // Default if missing
+                    Icon = r.Table.Columns.Contains("Icon") ? r["Icon"].ToString() : "default-icon"
                 });
             }
 
@@ -195,10 +196,11 @@ namespace CoreOne.API.Repositories
              : "sp_Auth_GetExternalDefaultAccess";
 
             var accessDt = _dbHelper.ExecuteSP_ReturnDataTable(proc, new Dictionary<string, object> { { "@UserID", user.UserID } });
-            var accessList = new List<dynamic>();
+            List<UserAccessViewModel> accessList = new List<UserAccessViewModel>();
+
             foreach (DataRow r in accessDt.Rows)
             {
-                accessList.Add(new
+                accessList.Add(new UserAccessViewModel
                 {
                     CompanyID = Convert.ToInt32(r["CompanyID"]),
                     CompanyName = r["CompanyName"].ToString(),
@@ -206,8 +208,11 @@ namespace CoreOne.API.Repositories
                     ApplicationName = r["ApplicationName"].ToString(),
                     RoleID = Convert.ToInt32(r["RoleID"]),
                     RoleName = r["RoleName"].ToString(),
+                    ColorCode = r.Table.Columns.Contains("ColorCode") ? r["ColorCode"].ToString() : "#3498db",  // Default if missing
+                    Icon = r.Table.Columns.Contains("Icon") ? r["Icon"].ToString() : "default-icon"
                 });
             }
+
 
 
             // 4️⃣ Generate unified user token

@@ -32,7 +32,7 @@ namespace CoreOne.API.Controllers.V1
 
             var user = loginResult.User;
             var token = loginResult.Token;
-            var accessList = loginResult.AccessList ?? new List<dynamic>();
+            var accessList = loginResult.AccessList ?? new List<UserAccessViewModel>();
 
             // External user → auto redirect
             if (user != null && !user.IsInternal)

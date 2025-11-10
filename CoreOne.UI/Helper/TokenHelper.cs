@@ -2,6 +2,7 @@
 using System.Linq;
 using CoreOne.DOMAIN.Models;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace CoreOne.UI.Helper
 {
@@ -49,38 +50,44 @@ namespace CoreOne.UI.Helper
 
             // Extract claims
             var userIdClaim = jwt.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
-            var userNameClaim = jwt.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Sub)?.Value;
+            var userNameClaim = jwt.Claims.FirstOrDefault(c => c.Type == "UserName")?.Value;
             var emailClaim = jwt.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
             var mailTypeIdClaim = jwt.Claims.FirstOrDefault(c => c.Type == "EmailType")?.Value;
-            var roleIdClaim = jwt.Claims.FirstOrDefault(c => c.Type == "RoleID")?.Value;
-            var roleNameClaim = jwt.Claims.FirstOrDefault(c => c.Type == "RoleName")?.Value;
-            var phoneClaim = jwt.Claims.FirstOrDefault(c => c.Type == "PhoneNumber")?.Value;
 
+            var rolesClaim = jwt.Claims.FirstOrDefault(c => c.Type == "RoleList")?.Value;
+            var phoneClaim = jwt.Claims.FirstOrDefault(c => c.Type == "PhoneNumber")?.Value;
+            var accessListClaim = jwt.Claims.FirstOrDefault(c => c.Type == "AccessMatrix")?.Value;
             // Parse and assign to user model
             if (!int.TryParse(userIdClaim, out int userId)) return null;
-            if (!int.TryParse(roleIdClaim, out int roleId)) return null;
+
 
             int? mailTypeId = null;
             if (int.TryParse(mailTypeIdClaim, out int parsedMailTypeId))
             {
                 mailTypeId = parsedMailTypeId;
             }
-
+            var AccessMatrixJson = CompressionHelper.DecompressFromBase64(accessListClaim);
+            List<UserAccessViewModel> AccessMatrix = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(AccessMatrixJson);
+            var RolesJson = CompressionHelper.DecompressFromBase64(rolesClaim);
+            List<Roles> Roles = JsonConvert.DeserializeObject<List<Roles>>(RolesJson);
             var user = new User
             {
                 UserID = userId,
                 UserName = userNameClaim ?? string.Empty,
                 Email = emailClaim ?? string.Empty,
                 MailTypeID = mailTypeId,
-                RoleID = roleId,
+               
                 PhoneNumber = phoneClaim ?? string.Empty,
-                RoleName = roleNameClaim ?? string.Empty,
+             
                 // Defaulting unset fields as they are not in token
                 PasswordHash = string.Empty,
                
                 ActiveFlag = true,  // Or false depending on your needs
-                CreatedBy = userId       // Unknown from token
+              
+                UserAccessList = AccessMatrix,
+                Roles = Roles,
             };
+
 
             return user;
         }

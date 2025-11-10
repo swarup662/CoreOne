@@ -14,19 +14,28 @@ namespace CoreOne.DOMAIN.Models
         public string Email { get; set; }
         public int? MailTypeID { get; set; }
         public string PhoneNumber { get; set; }
-       
-        public int RoleID { get; set; }
 
+
+
+
+        // 🔹 Key = RoleID, Value = RoleName
+        public List<Roles>? Roles { get; set; } 
         public Boolean IsInternal { get; set; }
 
-        public string RoleName { get; set; }
+      
         public bool ActiveFlag { get; set; }
         public int CreatedBy { get; set; }
-       
+        public List<UserAccessViewModel>? UserAccessList { get; set; }
+
+
     }
+public class Roles
+{
+    public int RoleID { get; set; }
+    public string? RoleName{ get; set; }
+}
 
-
-    public class LoginRequest
+public class LoginRequest
     {
         public string UserName { get; set; }
         public string Password { get; set; }
