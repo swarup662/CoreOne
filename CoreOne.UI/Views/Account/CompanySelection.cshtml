@@ -34,70 +34,65 @@
     </div>
 </div>
 
-<!-- ✅ Modern Card Styles -->
+<!-- ✅ Odoo-Style Tile Design -->
 <style>
     .app-card {
-        transition: all 0.25s ease;
-        border-radius: 12px;
-        cursor: pointer;
-        background: #fff;
-        border: 2px solid transparent;
-        height: 120px;
+        position: relative;
+        width: 100%;
+        height: 140px;
+        border-radius: 18px;
+        background: var(--app-color, #6c63ff);
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
+        color: white;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     }
 
         .app-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-        }
-
-        .app-card.selected {
-            outline: 3px solid #007bff;
+            transform: translateY(-6px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
         }
 
     .app-icon {
-        font-size: 2.2rem;
-        margin-bottom: 0.3rem;
+        font-size: 2.5rem;
+        margin-bottom: 0.4rem;
+        color: #fff;
     }
 
     .app-name {
-        font-size: 0.95rem;
+        font-size: 1rem;
         font-weight: 600;
-        color: #333;
+        color: #fff;
         text-transform: capitalize;
         margin: 0;
     }
 
-    .app-card:hover .app-name {
-        color: #000;
-    }
-
-    /* Smooth fade-in animation */
     #appGrid {
         animation: fadeIn 0.3s ease-in;
     }
 
     @@keyframes fadeIn {
-        from
+        from {
+            opacity: 0;
+            transform: translateY(8px);
+        }
 
-    {
-        opacity: 0;
-        transform: translateY(5px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 </style>
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- ✅ Include SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
         $(document).ready(function () {
@@ -127,10 +122,8 @@
                     return;
                 }
 
-                // Fetch applications for selected company
                 $.getJSON('/Account/GetApplicationsByCompany?companyId=' + companyId)
                     .done(function (apps) {
-                        console.log("Apps received before filtering:", apps);
                         $('#appGrid').empty();
 
                         if (!apps.length) {
@@ -140,7 +133,7 @@
                             return;
                         }
 
-                        // ✅ Remove duplicates (same ApplicationID)
+                        // Remove duplicate apps (same ApplicationID)
                         const uniqueApps = [];
                         const seen = new Set();
 
@@ -151,19 +144,17 @@
                             }
                         });
 
-                        console.log("Filtered unique apps:", uniqueApps);
-
-                        // ✅ Render clean, short cards
+                        // Render app tiles
                         $.each(uniqueApps, function (i, app) {
-                            const color = app.colorCode || '#007bff';
+                            const color = app.colorCode || '#6c63ff';
                             const icon = app.icon || 'fa-solid fa-cube';
 
                             const card = `
                                 <div class="col-6 col-md-4 col-lg-3">
-                                    <div class="app-card shadow-sm text-center border-0"
+                                    <div class="app-card"
                                          data-app='${JSON.stringify(app)}'
-                                         style="border-color:${color};">
-                                        <i class="${icon} app-icon" style="color:${color};"></i>
+                                         style="--app-color:${color}; background:${color};">
+                                        <i class="${icon} app-icon"></i>
                                         <p class="app-name">${app.applicationName}</p>
                                     </div>
                                 </div>`;
@@ -176,7 +167,11 @@
                     })
                     .fail(function (xhr) {
                         $('#loader').hide();
-                        alert("Error fetching applications: " + xhr.statusText);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Unable to load applications: ' + xhr.statusText
+                        });
                     });
             });
 
@@ -188,7 +183,6 @@
                 $('.app-card').removeClass('selected');
                 $(this).addClass('selected');
 
-                // Auto-detect environment (domain vs port)
                 const currentHost = window.location.hostname.toLowerCase();
                 let urlType = (currentHost === "localhost" || /^[0-9.]+$/.test(currentHost)) ? "port" : "domain";
 
@@ -200,8 +194,6 @@
                     UrlType: urlType
                 };
 
-                console.log("Launching app:", payload);
-
                 $('#loader').show();
 
                 $.ajax({
@@ -211,15 +203,39 @@
                     data: JSON.stringify(payload),
                     success: function (response) {
                         $('#loader').hide();
-                        if (response.success) {
-                            window.location.href = response.redirectUrl;
+
+                        if (response.success && response.redirectUrl) {
+                            // ✅ Verify URL exists
+                            $.ajax({
+                                url: response.redirectUrl,
+                                type: 'HEAD',
+                                timeout: 5000,
+                                success: function () {
+                                    window.location.href = response.redirectUrl; // open in same tab
+                                },
+                                error: function () {
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Application not exist',
+                                        text: 'The application link is invalid or unreachable.'
+                                    });
+                                }
+                            });
                         } else {
-                            alert('Error: ' + response.message);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Application not exist',
+                                text: 'The application link could not be found.'
+                            });
                         }
                     },
                     error: function () {
                         $('#loader').hide();
-                        alert('Something went wrong while launching the application.');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Something went wrong while launching the application.'
+                        });
                     }
                 });
             });
