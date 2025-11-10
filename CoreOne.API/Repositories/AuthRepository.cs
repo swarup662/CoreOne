@@ -82,6 +82,8 @@ namespace CoreOne.API.Repositories
                     ApplicationName = r["ApplicationName"].ToString(),
                     RoleID = Convert.ToInt32(r["RoleID"]),
                     RoleName = r["RoleName"].ToString(),
+                    ColorCode = r["ColorCode"].ToString(),
+                    Icon = r["Icon"].ToString(),
                 });
             }
 

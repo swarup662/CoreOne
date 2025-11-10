@@ -55,6 +55,8 @@ namespace CoreOne.DOMAIN.Models
         public string ApplicationName { get; set; }
         public int RoleID { get; set; }
         public string RoleName { get; set; }
+        public string ColorCode { get; set; }     // Example: "#3498db"
+        public string Icon { get; set; }
     }
 
     public class AppLaunchRequest

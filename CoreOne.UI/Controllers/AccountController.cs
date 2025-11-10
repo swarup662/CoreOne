@@ -145,12 +145,15 @@ namespace CoreOne.UI.Controllers
                     a.ApplicationID,
                     a.ApplicationName,
                     a.RoleID,
-                    a.RoleName
+                    a.RoleName,
+                    a.ColorCode, // ✅ New field
+                    a.Icon     // ✅ New field
                 })
                 .ToList();
 
             return Json(apps);
         }
+
 
         //[HttpPost]
         //public async Task<IActionResult> Logout()
