@@ -90,9 +90,7 @@
 </style>
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- ✅ Include SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
 
     <script>
         $(document).ready(function () {
@@ -184,7 +182,14 @@
                 $(this).addClass('selected');
 
                 const currentHost = window.location.hostname.toLowerCase();
-                let urlType = (currentHost === "localhost" || /^[0-9.]+$/.test(currentHost)) ? "port" : "domain";
+                        let urlType;
+                    if (currentHost === "localhost") {
+                        urlType = "local";
+                    } else if (/^[0-9.]+$/.test(currentHost)) {
+                        urlType = "ipport"; // when the host is an IP address
+                    } else {
+                        urlType = "domain"; // when the host is a domain name
+                    }
 
                 const payload = {
                     UserID: parseInt(userId),

@@ -136,13 +136,15 @@ namespace CoreOne.API.Repositories
                 return (false, "Application not found", null);
 
             string domainUrl = appDt.Rows[0]["DomainUrl"]?.ToString();
-            string portUrl = appDt.Rows[0]["PortUrl"]?.ToString();
+            string ipUrl = appDt.Rows[0]["IpUrl"]?.ToString();
+            string localUrl = appDt.Rows[0]["LocalUrl"]?.ToString();
 
             string appUrl = urlType?.ToLower() switch
             {
-                "port" => portUrl,
+                "ipport" => ipUrl,
+                "local" => localUrl,
                 "domain" => domainUrl,
-                _ => domainUrl ?? portUrl
+                _ => domainUrl ?? ipUrl
             };
 
             if (string.IsNullOrEmpty(appUrl))
