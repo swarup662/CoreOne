@@ -16,9 +16,6 @@ namespace CoreOne.DOMAIN.Models
         public string PhoneNumber { get; set; }
 
 
-
-
-        // 🔹 Key = RoleID, Value = RoleName
         public List<Roles>? Roles { get; set; } 
         public Boolean IsInternal { get; set; }
 
@@ -29,7 +26,29 @@ namespace CoreOne.DOMAIN.Models
 
 
     }
-public class Roles
+
+    public class CurrentUserDetail
+    {
+        public int CurrentUserID { get; set; }
+        public string CurrentUserName { get; set; }
+        public int CurrentApplicationId { get; set; }
+        public int CurrentCompanyID { get; set; }
+        public int CurrentRoleId { get; set; }
+        public string CurrentEmail { get; set; }
+        public int? CurrentMailTypeID { get; set; }
+        public string CurrentPhoneNumber { get; set; }
+
+        public Boolean IsInternal { get; set; }
+
+        public List<Roles>? Roles { get; set; }
+        public bool ActiveFlag { get; set; }
+        public int CreatedBy { get; set; }
+        public List<UserAccessViewModel>? UserAccessList { get; set; }
+
+
+    }
+
+    public class Roles
 {
     public int RoleID { get; set; }
     public string? RoleName{ get; set; }
