@@ -6,97 +6,346 @@
     var userId = TempData["userId"];
     TempData.Keep("userId");
 }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
 
-<div class="container mt-5">
-    <h3 class="mb-4 text-center fw-bold">Select Company & Application</h3>
-
-    <!-- Company Selection -->
-    <div class="row mb-4 justify-content-center">
-        <div class="col-md-6">
-            <label for="companyDropdown" class="form-label fw-bold">Select Company:</label>
-            <select id="companyDropdown" class="form-select shadow-sm">
-                <option value="">-- Select Company --</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Applications Section -->
-    <div id="appSection" style="display:none;">
-        <h5 class="text-center mb-3 fw-semibold">Available Applications</h5>
-        <div id="appGrid" class="row justify-content-center g-3"></div>
-    </div>
-
-    <!-- Loader -->
-    <div id="loader" class="text-center mt-4" style="display:none;">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-        </div>
-    </div>
-</div>
-
-<!-- ✅ Odoo-Style Tile Design -->
-<style>
-    .app-card {
-        position: relative;
-        width: 100%;
-        height: 140px;
-        border-radius: 18px;
-        background: var(--app-color, #6c63ff);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: column;
-        color: white;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.25s ease;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    }
-
-        .app-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+    <style>
+        /* === Glassy App Grid Section === */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            max-width: 1300px;
+            min-height: 560px;
+            position: relative;
+            transition: all 0.3s ease;
         }
 
-    .app-icon {
-        font-size: 2.5rem;
-        margin-bottom: 0.4rem;
-        color: #fff;
-    }
+        /* Floating Search Bar */
+        .search-bar {
+            background: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 12px;
+            padding: 7px 9px;
+            font-size: 1rem;
+            width: 100%;
+            max-width: 350px;
+            color: #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: 0.2s ease-in-out;
+        }
 
-    .app-name {
-        font-size: 1rem;
-        font-weight: 600;
-        color: #fff;
-        text-transform: capitalize;
-        margin: 0;
-    }
+            .search-bar:focus {
+                outline: none;
+                box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+                transform: scale(1.03);
+            }
 
-    #appGrid {
-        animation: fadeIn 0.3s ease-in;
-    }
+        /* Floating Card Hover */
+        .app-card {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            border-radius: 18px;
+            background: var(--app-color, #6c63ff);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.25s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
 
-    @@keyframes fadeIn {
-        from {
+            .app-card:hover {
+                transform: translateY(-10px) scale(1.05);
+                box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+            }
+
+        .app-icon {
+            font-size: 2.4rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .app-name {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        /* Grid animation */
+        #appGrid {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @@keyframes fadeIn {
+            from
+
+        {
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(10px);
         }
 
         to {
             opacity: 1;
             transform: translateY(0);
         }
-    }
-</style>
+
+        }
+
+        body {
+            background-image: url('@Url.Content("~/assets/images/bg-ikikgh.png")');
+            background-attachment: fixed;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        /* Glassmorphism for modal */
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #fff;
+            position: relative;
+        }
+
+        .modal-dialog {
+            position: relative;
+            max-width: 40%;
+        }
+
+        .modal-title {
+            font-weight: bold;
+            font-size: 1.6rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- Company Dropdown Styling Fix --- */
+        .form-select {
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.2); /* lighter for readability */
+            color: #000; /* black text for company names */
+            font-size: 1rem;
+            font-weight: 500;
+            appearance: none;
+            backdrop-filter: blur(10px);
+            transition: 0.3s ease;
+        }
+
+            /* when hovering or focusing */
+            .form-select:hover,
+            .form-select:focus {
+                background-color: rgba(255, 255, 255, 0.2);
+                color: #000;
+                outline: none;
+                box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+            }
+
+            /* options dropdown list */
+            .form-select option {
+                background-color: #fff !important;
+                color: #000 !important;
+                font-weight: 500;
+            }
+
+        .btn-close {
+            background-color: rgba(255, 0, 0, 0.5);
+            border: none;
+            width: 1.5rem;
+            height: 1.5rem;
+            border-radius: 50%;
+            opacity: 1;
+        }
+
+            .btn-close:hover {
+                background-color: rgba(255, 0, 0, 0.7);
+            }
+
+        /* App Cards */
+        .app-card {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            background: var(--app-color, #6c63ff);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+            .app-card:hover {
+                transform: translateY(-7px) scale(1.03);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+                border-color: rgba(255, 255, 255, 0.6);
+            }
+
+        .app-icon {
+            font-size: 2.4rem;
+            margin-bottom: 0.4rem;
+            color: #fff;
+        }
+
+        .app-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #fff;
+            text-transform: capitalize;
+            margin: 0;
+        }
+
+        #appGrid {
+            animation: fadeIn 0.3s ease-in;
+            max-width: 1000px;
+            margin: 80px auto;
+        }
+
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+      
+
+        #appGrid .col-auto {
+            display: flex;
+            justify-content: center;
+        }
+
+
+    </style>
+    <style>
+        /* 🔄 Preloader Styles */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 20, 35, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
+        }
+
+            #preloader.hidden {
+                opacity: 0;
+                visibility: hidden;
+            }
+
+        .loader {
+            text-align: center;
+        }
+
+            .loader .spin {
+                font-size: 48px;
+                color: #89a4cd;
+                animation: spin 2s linear infinite;
+            }
+
+        .loading-text {
+            color: #ffffffcc;
+            margin-top: 10px;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+
+<body>
+
+
+
+    <div id="preloader">
+        <div class="loader">
+            <i class="fas fa-globe logo-icon spin"></i>
+            <div class="loading-text">Loading...</div>
+        </div>
+    </div>
+
+
+
+
+
+
+    <!-- Glassy Modal for Company Dropdown -->
+    <div class="modal fade show" id="companyModal"  data-bs-backdrop="static" data-bs-keyboard="false"
+         tabindex="-1" aria-labelledby="companyModalLabel" aria-hidden="true" style="display: block;margin-top: -40px;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content position-relative">
+                <button type="button" class="btn-close position-absolute top-0 end-0 m-3" id="closeButton" aria-label="Close"></button>
+                <div class="modal-header justify-content-center border-0">
+                    <h5 class="modal-title" id="companyModalLabel" style="color: #dee2e6;">ERP System</h5>
+                </div>
+                <div class="modal-body text-center">
+                    <select id="companyDropdown" class="form-select" style="color: ghostwhite;">
+                        <option value="" style="color: #343a40; background-color:whitesmoke;">-- Choose Company --</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Section (Glassy Floating Grid) -->
+    <div id="appSection" style="display:none; position: relative;" class="text-center w-100 mt-3">
+        <!-- Floating Close Button -->
+      
+     
+        <!-- Glassy Container -->
+        <div class="glass-container mx-auto p-4 mt-2">
+            <div class="d-flex justify-content-between align-items-center" style="margin-top: -17px;">
+                <!-- Search Bar -->
+                <input type="text" id="searchApp" class="form-control search-bar" placeholder="🔍 Search application...">
+                <button type="button" id="closeApps" class="btn-close" aria-label="Close" style="margin-bottom: 10px;"></button>
+            </div>
+
+            <!-- App Grid -->
+            <div id="appGrid" class="row justify-content-center g-4 mb-3"></div>
+        </div>
+    </div>
+
+
+  
+</body>
+</html>
 
 @section Scripts {
-    
-
     <script>
         $(document).ready(function () {
             const userId = '@userId';
 
-            // 🔹 Load Companies
+            // Load companies
             $.getJSON('/Account/GetCompanies', function (companies) {
                 $.each(companies, function (i, company) {
                     $('#companyDropdown').append(
@@ -108,17 +357,12 @@
                 });
             });
 
-            // 🔹 When Company Changes
+            // When selecting a company
             $('#companyDropdown').change(function () {
                 const companyId = $(this).val();
-                $('#appGrid').empty();
-                $('#appSection').hide();
-                $('#loader').show();
+                if (!companyId) return;
 
-                if (!companyId) {
-                    $('#loader').hide();
-                    return;
-                }
+                $('#preloader').show();
 
                 $.getJSON('/Account/GetApplicationsByCompany?companyId=' + companyId)
                     .done(function (apps) {
@@ -126,45 +370,41 @@
 
                         if (!apps.length) {
                             $('#appGrid').append('<p class="text-center text-muted">No applications found for this company.</p>');
-                            $('#loader').hide();
-                            $('#appSection').show();
-                            return;
+                        } else {
+                            const uniqueApps = [];
+                            const seen = new Set();
+
+                            $.each(apps, function (i, app) {
+                                if (!seen.has(app.applicationID)) {
+                                    seen.add(app.applicationID);
+                                    uniqueApps.push(app);
+                                }
+                            });
+
+                            // Render apps
+                            $.each(uniqueApps, function (i, app) {
+                                const color = app.colorCode || '#6c63ff';
+                                const icon = app.icon || 'fa-solid fa-cube';
+                                const card = `
+                                    <div class="col-auto">
+                                        <div class="app-card"
+                                             data-app='${JSON.stringify(app)}'
+                                             style="--app-color:${color}; background:${color};">
+                                            <i class="${icon} app-icon"></i>
+                                            <p class="app-name">${app.applicationName}</p>
+                                        </div>
+                                    </div>`;
+                                $('#appGrid').append(card);
+                            });
                         }
 
-                        // Remove duplicate apps (same ApplicationID)
-                        const uniqueApps = [];
-                        const seen = new Set();
-
-                        $.each(apps, function (i, app) {
-                            if (!seen.has(app.applicationID)) {
-                                seen.add(app.applicationID);
-                                uniqueApps.push(app);
-                            }
+                        $('#preloader').hide();
+                        $('#companyModal').fadeOut(300, function () {
+                            $('#appSection').fadeIn(300);
                         });
-
-                        // Render app tiles
-                        $.each(uniqueApps, function (i, app) {
-                            const color = app.colorCode || '#6c63ff';
-                            const icon = app.icon || 'fa-solid fa-cube';
-
-                            const card = `
-                                <div class="col-6 col-md-4 col-lg-3">
-                                    <div class="app-card"
-                                         data-app='${JSON.stringify(app)}'
-                                         style="--app-color:${color}; background:${color};">
-                                        <i class="${icon} app-icon"></i>
-                                        <p class="app-name">${app.applicationName}</p>
-                                    </div>
-                                </div>`;
-                            $('#appGrid').append(card);
-                        });
-
-                        $('#loader').hide();
-                        $('#appSection').show();
-                        $('#appGrid').fadeIn(200);
                     })
                     .fail(function (xhr) {
-                        $('#loader').hide();
+                        $('#preloader').hide();
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -173,23 +413,28 @@
                     });
             });
 
-            // 🔹 When Clicking an App Card
+            // Close app grid → return to modal
+            $('#closeApps').click(function () {
+                $('#appSection').fadeOut(200, function () {
+                    $('#companyModal').fadeIn(300);
+                    $('#companyDropdown').val('');
+                });
+            });
+
+            // Launch app
             $(document).on('click', '.app-card', function () {
                 const app = $(this).data('app');
                 const companyId = $('#companyDropdown').val();
 
-                $('.app-card').removeClass('selected');
-                $(this).addClass('selected');
-
                 const currentHost = window.location.hostname.toLowerCase();
-                        let urlType;
-                    if (currentHost === "localhost") {
-                        urlType = "local";
-                    } else if (/^[0-9.]+$/.test(currentHost)) {
-                        urlType = "ipport"; // when the host is an IP address
-                    } else {
-                        urlType = "domain"; // when the host is a domain name
-                    }
+                let urlType;
+                if (currentHost === "localhost") {
+                    urlType = "local";
+                } else if (/^[0-9.]+$/.test(currentHost)) {
+                    urlType = "ipport";
+                } else {
+                    urlType = "domain";
+                }
 
                 const payload = {
                     UserID: parseInt(userId),
@@ -199,43 +444,49 @@
                     UrlType: urlType
                 };
 
-                $('#loader').show();
+                $('#preloader').show();
 
                 $.ajax({
                     url: '/Account/LaunchApp',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
-                    success: function (response) {
-                        $('#loader').hide();
+                        success: function (response) {
+            if (response.success && response.redirectUrl) {
+                // ✅ Show loader while checking app link
+                $('#preloader').show();
 
-                        if (response.success && response.redirectUrl) {
-                            // ✅ Verify URL exists
-                            $.ajax({
-                                url: response.redirectUrl,
-                                type: 'HEAD',
-                                timeout: 5000,
-                                success: function () {
-                                    window.location.href = response.redirectUrl; // open in same tab
-                                },
-                                error: function () {
-                                    Swal.fire({
-                                        icon: 'error',
-                                        title: 'Application not exist',
-                                        text: 'The application link is invalid or unreachable.'
-                                    });
-                                }
-                            });
-                        } else {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Application not exist',
-                                text: 'The application link could not be found.'
-                            });
-                        }
+                $.ajax({
+                    url: response.redirectUrl,
+                    type: 'HEAD',
+                    timeout: 5000,
+                    success: function () {
+                        // If app exists, go to it
+                        $('#preloader').hide();
+                        window.location.href = response.redirectUrl;
                     },
                     error: function () {
-                        $('#loader').hide();
+                        // If app does not exist
+                        $('#preloader').hide();
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Application not exist',
+                            text: 'The application link is invalid or unreachable.'
+                        });
+                    }
+                });
+            } else {
+                $('#preloader').hide();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Application not exist',
+                    text: 'The application link could not be found.'
+                });
+            }
+        },
+
+                    error: function () {
+                        $('#preloader').hide();
                         Swal.fire({
                             icon: 'error',
                             title: 'Error',
@@ -245,5 +496,14 @@
                 });
             });
         });
+                // 🔍 Filter apps by name
+        $(document).on('input', '#searchApp', function () {
+            const searchValue = $(this).val().toLowerCase();
+            $('#appGrid .app-card').each(function () {
+                const appName = $(this).find('.app-name').text().toLowerCase();
+                $(this).toggle(appName.includes(searchValue));
+            });
+        });
+
     </script>
 }
