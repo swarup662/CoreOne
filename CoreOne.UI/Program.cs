@@ -3,7 +3,7 @@ using CoreOne.UI.Controllers;
 using CoreOne.UI.Helper;
 using CoreOne.UI.Middleware;
 using CoreOne.UI.Service;
-
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -62,6 +62,11 @@ builder.Services.AddHttpClient("ApiWithToken")
     });
 
 var app = builder.Build();
+// ✅ Add this before other middlewares that use IP or authentication
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 app.UseStatusCodePages(async context =>
 {
     var response = context.HttpContext.Response;

@@ -1,4 +1,5 @@
-﻿using CoreOne.API.Helpers;
+﻿using Azure.Core;
+using CoreOne.API.Helpers;
 using CoreOne.API.Infrastructure.Data;
 using CoreOne.API.Infrastructure.Services;
 using CoreOne.API.Interfaces;
@@ -29,7 +30,7 @@ namespace CoreOne.API.Repositories
         }
 
         public (bool Success, string Message, User User, string Token, List<UserAccessViewModel> AccessList)
-            Login(string userName, string password, string ipAddress)
+            Login(string userName, string password, string ipAddress,  string userAgent)
         {
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("[sp_Auth_login_GetUserDetailsByUserName]",
                 new Dictionary<string, object> { { "@UserName", userName } });
@@ -87,12 +88,14 @@ namespace CoreOne.API.Repositories
                     Icon = r.Table.Columns.Contains("Icon") ? r["Icon"].ToString() : "default-icon"
                 });
             }
-
+            
             _dbHelper.ExecuteSP_ReturnInt("sp_InsertActivityLog", new Dictionary<string, object>
             {
                 {"@UserID", user.UserID},
-                {"@ActivityDescription", "Login"},
-                {"@IPAddress", ipAddress},
+                  {"@RoleID", 0},
+                {"@ActivityDescription", "Login successfull"},
+                {"@IPAddress", ipAddress?? "0.0.0.0"},
+                {"@DeviceInfo", userAgent},  // ✅ New field
                 {"@CreatedBy", user.UserID}
             });
 
@@ -151,13 +154,13 @@ namespace CoreOne.API.Repositories
             if (string.IsNullOrEmpty(appUrl))
                 return (false, "App URL not available for the selected type", null);
 
-            string redirectUrl = $"{appUrl.TrimEnd('/')}/auth/consume?ck={cacheKey}";
+            string redirectUrl = $"{appUrl.TrimEnd('/')}/auth/consume?OAuth={cacheKey}";
             return (true, "OK", redirectUrl);
         }
 
 
         public (bool Ok, string Message, string Token)
-    ExchangeCacheKeyForToken(string cacheKey, int appId, string? callerIp)
+    ExchangeCacheKeyForToken(string cacheKey, int appId, string? callerIp, string userAgent)
         {
             // 1️⃣ Fetch and validate cache key
             var json = _cache.GetString(cacheKey);
@@ -225,8 +228,10 @@ namespace CoreOne.API.Repositories
             _dbHelper.ExecuteSP_ReturnInt("sp_InsertActivityLog", new Dictionary<string, object>
                 {
                     {"@UserID", userId},
+                     {"@RoleID", 0},
                     {"@ActivityDescription", $"Issued unified token for AppID:{applicationId}, CompanyID:{companyId}"},
                     {"@IPAddress", callerIp ?? "0.0.0.0"},
+                    {"@DeviceInfo", userAgent},  // ✅ New field
                     {"@CreatedBy", userId}
                 });
 
@@ -234,14 +239,16 @@ namespace CoreOne.API.Repositories
         }
 
 
-        public int Logout(int userID, string ipAddress)
+        public int Logout(int userID, string ipAddress, string userAgent)
         {
             // Insert logout activity
             _dbHelper.ExecuteSP_ReturnInt("sp_InsertActivityLog", new Dictionary<string, object>
             {
                 {"@UserID", userID },
+                  {"@RoleID", 0},
                 {"@ActivityDescription", "Logout" },
                 {"@IPAddress", ipAddress },
+                {"@DeviceInfo", userAgent},  // ✅ New field
                 {"@CreatedBy", userID }
             });
 

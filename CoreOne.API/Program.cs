@@ -5,6 +5,7 @@ using CoreOne.API.Interface;
 using CoreOne.API.Interfaces;
 using CoreOne.API.Middleware;
 using CoreOne.API.Repositories;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.Extensions.Options;
@@ -96,6 +97,11 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+// ✅ Add this before other middlewares that use IP or authentication
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 // ======================================================
 // 🧩 MIDDLEWARE PIPELINE

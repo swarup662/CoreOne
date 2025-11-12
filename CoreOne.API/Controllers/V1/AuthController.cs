@@ -22,10 +22,11 @@ namespace CoreOne.API.Controllers.V1
         [HttpPost("login")]
         public IActionResult Login([FromBody] LoginRequest request)
         {
-            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            string userAgent = Request.Headers["User-Agent"].ToString();
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
             // DO NOT deconstruct. Keep as single variable to avoid dynamic deconstruction errors.
-            var loginResult = _authRepository.Login(request.UserName, request.Password, ip);
+            var loginResult = _authRepository.Login(request.UserName, request.Password, ipAddress, userAgent);
 
             if (!loginResult.Success)
                 return Unauthorized(new { message = loginResult.Message });
@@ -48,7 +49,7 @@ namespace CoreOne.API.Controllers.V1
                     (int)access.CompanyID,
                     (int)access.ApplicationID,
                     (int)access.RoleID,
-                    ip);
+                    ipAddress);
 
                 // cacheResult may be named tuple or plain tuple; use Item1/Item2/Item3 which always works
                 bool ok = false;
@@ -103,7 +104,9 @@ namespace CoreOne.API.Controllers.V1
         [HttpPost("create-cachekey")]
         public IActionResult CreateCacheKey([FromBody] CreateCacheKeyRequest req)
         {
-            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+            string userAgent = Request.Headers["User-Agent"].ToString();
+            string ip= HttpContext.Connection.RemoteIpAddress?.ToString();
 
             var cacheResult = _authRepository.CreateCacheKeyAndGetRedirectUrl(  req.UserID, req.CompanyID, req.ApplicationID, req.RoleID, ip,req.UrlType);
 
@@ -151,8 +154,10 @@ namespace CoreOne.API.Controllers.V1
         [HttpPost("exchange-cachekey")]
         public IActionResult ExchangeCacheKey([FromBody] ExchangeCacheKeyRequest req)
         {
-            var callerIp = HttpContext.Connection.RemoteIpAddress?.ToString();
-            var exchangeResult = _authRepository.ExchangeCacheKeyForToken(req.CacheKey, req.ApplicationID, callerIp);
+
+            string userAgent = Request.Headers["User-Agent"].ToString();
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var exchangeResult = _authRepository.ExchangeCacheKeyForToken(req.CacheKey, req.ApplicationID, ipAddress, userAgent);
 
             bool ok = false;
             string msg = "Unknown error";
@@ -198,8 +203,10 @@ namespace CoreOne.API.Controllers.V1
         [HttpPost("Logout")]
         public IActionResult Logout([FromBody] int userID)
         {
-            string ip = HttpContext.Connection.RemoteIpAddress?.ToString();
-            int result = _authRepository.Logout(userID, ip);
+
+            string userAgent = Request.Headers["User-Agent"].ToString();
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            int result = _authRepository.Logout(userID, ipAddress, userAgent);
             return Ok(result > 0 ? "Logged out successfully" : "Logout failed");
         }
 

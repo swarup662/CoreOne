@@ -257,6 +257,28 @@
         .apptile-input:checked + .apptile-tile {
             border-color: var(--primary-color, #2676ab);
         }
+        /* Hover effect — border, icon, and text use --primary-color */
+        .apptile-tile:hover {
+            border-color: var(--primary-color, #2676ab);
+            transform: translateY(-3px);
+        }
+
+            .apptile-tile:hover .apptile-icon i,
+            .apptile-tile:hover .apptile-label {
+                color: var(--primary-color, #2676ab);
+            }
+
+        /* Active (clicked/selected) state — border, icon, and text use --primary-color */
+        .apptile-input:checked + .apptile-tile {
+            border-color: var(--primary-color, #2676ab);
+            box-shadow: 0 0 10px var(--primary-color, #2676ab)33;
+        }
+
+            .apptile-input:checked + .apptile-tile .apptile-icon i,
+            .apptile-input:checked + .apptile-tile .apptile-label {
+                color: var(--primary-color, #2676ab);
+            }
+
 
         /* === Custom Modal === */
         #customModal {

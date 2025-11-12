@@ -19,9 +19,9 @@ namespace CoreOne.App.Controllers
         }
 
         [HttpGet("consume")]
-        public async Task<IActionResult> Consume([FromQuery] string ck)
+        public async Task<IActionResult> Consume([FromQuery] string OAuth)
         {
-            if (string.IsNullOrEmpty(ck))
+            if (string.IsNullOrEmpty(OAuth))
                 return BadRequest("Missing cache key");
 
             var client = _httpClientFactory.CreateClient();
@@ -31,7 +31,7 @@ namespace CoreOne.App.Controllers
 
             var requestBody = new
             {
-                CacheKey = ck,
+                CacheKey = OAuth,
                 ApplicationID = int.Parse(appId),
                 AppSecret = appSecret
             };
