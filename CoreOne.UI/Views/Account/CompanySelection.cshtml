@@ -15,7 +15,6 @@
     <title>@ViewData["Title"]</title>
 
     <style>
-        /* === Modern Background Gradient === */
         body {
             font-family: "Segoe UI", sans-serif;
             min-height: 100vh;
@@ -37,6 +36,7 @@
             justify-content: center;
             align-items: center;
             z-index: 2000;
+            flex-direction: column;
         }
 
         .loader .spin {
@@ -58,16 +58,13 @@
         }
 
         /* === Custom Company Dropdown === */
-        /* === Fixed: Company Dropdown + Logout alignment === */
         .company-select-wrapper {
             position: relative;
-            width: 505px; /* Increased width for long names */
+            width: 505px;
             margin: 15vh auto 0;
             text-align: left;
-           
             border-radius: 16px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-           
         }
 
         .company-select-box {
@@ -90,9 +87,8 @@
             list-style: none;
             margin: 0;
             padding: 10px;
-           
             box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-            position: relative; /* ✅ changed from absolute to relative */
+            position: relative;
             width: 100%;
             z-index: 1;
             max-height: 260px;
@@ -101,38 +97,36 @@
             display: none;
         }
 
-            /* Each item still card-like */
-            .company-dropdown li {
-                display: flex;
-                align-items: center;
-                gap: 12px;
-                background: #ffffff;
-                margin-bottom: 8px;
-                border-radius: 10px;
-                padding: 12px 16px;
-                font-weight: 500;
-                cursor: pointer;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-                transition: all 0.25s ease;
-                border-left: 4px solid transparent;
-                word-break: break-word;
-            }
+        .company-dropdown li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-weight: 500;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            transition: all 0.25s ease;
+            border-left: 4px solid transparent;
+            word-break: break-word;
+        }
 
-                .company-dropdown li:hover {
-                    transform: translateY(-2px);
-                    background: #e8f2ff;
-                    border-left: 4px solid #2676ab;
-                    color: #2676ab;
-                }
+        .company-dropdown li:hover {
+            transform: translateY(-2px);
+            background: #e8f2ff;
+            border-left: 4px solid #2676ab;
+            color: #2676ab;
+        }
 
-                .company-dropdown li.active {
-                    background: #d6e4ff;
-                    border-left: 4px solid #2676ab;
-                    color: #2676ab;
-                    font-weight: 600;
-                }
+        .company-dropdown li.active {
+            background: #d6e4ff;
+            border-left: 4px solid #2676ab;
+            color: #2676ab;
+            font-weight: 600;
+        }
 
-        /* === Logout footer now always below dropdown === */
         .dropdown-footer {
             position: relative;
             background: linear-gradient(145deg, #fff, #f5f7fa);
@@ -141,7 +135,7 @@
             box-shadow: inset 0 4px 8px rgba(0, 0, 0, 0.03);
             text-align: center;
             padding: 12px 0;
-            z-index: 2; /* ensure above dropdown background */
+            z-index: 2;
         }
 
         .logout-btn {
@@ -157,18 +151,13 @@
             transition: all 0.25s ease;
         }
 
-            .logout-btn:hover {
-                color: #fff;
-                background: #d33;
-                padding: 8px 16px;
-                border-radius: 10px;
-            }
+        .logout-btn:hover {
+            color: #fff;
+            background: #d33;
+            padding: 8px 16px;
+            border-radius: 10px;
+        }
 
-            .logout-btn i {
-                font-size: 1.2rem;
-            }
-
-        /* === Floating Search + App Tiles (unchanged) === */
         .search-card {
             background: linear-gradient(160deg, rgba(255, 255, 255, 0.96), rgba(237, 242, 252, 0.95));
             border-radius: 20px;
@@ -211,22 +200,9 @@
             color: #555;
         }
 
-            #closeApps:hover {
-                background: #f3d1d1;
-                color: #d33;
-            }
-
-
-    
-        /* === App Tile Styling === */
-        :root {
-            --primary-color: #2676ab;
-            --dark-color: #494949;
-            --darker-color: #00000066;
-        }
-
-        *, *:after, *:before {
-            box-sizing: border-box;
+        #closeApps:hover {
+            background: #f3d1d1;
+            color: #d33;
         }
 
         .apptile-group {
@@ -262,62 +238,74 @@
             margin: 0.7rem;
         }
 
-        .apptile-icon ion-icon,
         .apptile-icon i {
             font-size: 2.3rem;
         }
 
-        .apptile-tile::before {
-            content: "";
-            position: absolute;
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 3px solid var(--darker-color);
-            border-radius: 50%;
-            top: 0.25rem;
-            left: 0.25rem;
-            transition: 0.25s ease;
-            background-image: url("check.png");
-            background-size: 35px;
-            background-position: 50%;
-            transform: scale(0);
-        }
-
-        .apptile-tile:hover::before {
-            transform: scale(1);
-        }
-
         .apptile-tile:hover {
-            border-color: var(--darker-color);
+            border-color: #00000066;
             transform: translateY(-3px);
         }
 
-        .apptile-icon {
-            transition: 0.5s ease;
-            color: var(--dark-color);
-        }
-
         .apptile-label {
-            color: var(--dark-color);
+            color: #494949;
             transition: 0.4s ease;
             font-weight: 500;
             margin-top: 5px;
         }
 
         .apptile-input:checked + .apptile-tile {
-            border-color: var(--primary-color);
+            border-color: var(--primary-color, #2676ab);
         }
 
-            .apptile-input:checked + .apptile-tile::before {
-                border-color: var(--primary-color);
-                background-color: var(--primary-color);
-                transform: scale(1);
-            }
+        /* === Custom Modal === */
+        #customModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
 
-            .apptile-input:checked + .apptile-tile .apptile-icon,
-            .apptile-input:checked + .apptile-tile .apptile-label {
-                color: var(--primary-color);
-            }
+        #customModal .modal-box {
+            background: linear-gradient(145deg, #ffffff, #f3f7ff);
+            border-radius: 16px;
+            padding: 25px 30px;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.3s ease;
+        }
+
+        #customModal h3 {
+            color: #d33;
+            margin-bottom: 10px;
+        }
+
+        #customModal p {
+            color: #333;
+            font-size: 1rem;
+        }
+
+        #closeModalBtn {
+            margin-top: 20px;
+            background: #2676ab;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        @@keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 
@@ -330,6 +318,15 @@
         </div>
     </div>
 
+    <!-- 🔹 Custom Modal -->
+<div id="customModal">
+  <div class="modal-box">
+    <h3 id="modalTitle">Title</h3>
+    <p id="modalMessage">Message</p>
+    <button id="closeModalBtn">OK</button>
+  </div>
+</div>
+
     <!-- 🔹 Company Selection -->
     <div id="companyModal">
         <div class="company-select-wrapper">
@@ -339,7 +336,6 @@
             </div>
             <ul id="companyDropdown" class="company-dropdown"></ul>
 
-            <!-- 🔹 Logout/Close Option -->
             <div class="dropdown-footer">
                 <button id="closeButton" class="logout-btn">
                     <i class="fe-log-out"></i> Logout
@@ -348,15 +344,12 @@
         </div>
     </div>
 
-
     <!-- 🔹 Application Section -->
     <div id="appSection" style="display:none;" class="text-center w-100 mt-3">
-
         <div class="search-card">
             <input type="text" id="searchApp" class="form-control search-bar" placeholder="🔍 Search application...">
             <button type="button" id="closeApps" title="Back to Company">&times;</button>
         </div>
-
         <div id="appGrid" class="apptile-group"></div>
     </div>
 </body>
@@ -364,103 +357,90 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            const userId = '@userId';
+    $(document).ready(function () {
+        const userId = '@userId';
+        const selected = new Set();
 
-            // Load companies dynamically
-            $.getJSON('/Account/GetCompanies', function (companies) {
-                $('#companyDropdown').empty();
-                       $.each(companies, function (i, company) {
-            $('#companyDropdown').append(`
-                <li data-id="${company.companyID}">
-                    <i class="fe-briefcase"></i> ${company.companyName}
-                </li>
-            `);
+        // === Load Companies ===
+        $.getJSON('/Account/GetCompanies', function (companies) {
+            $('#companyDropdown').empty();
+            $.each(companies, function (i, company) {
+                $('#companyDropdown').append(`
+                    <li data-id="${company.companyID}">
+                        <i class="fe-briefcase"></i> ${company.companyName}
+                    </li>
+                `);
+            });
         });
 
-            });
+        // === Toggle Dropdown ===
+        $('.company-select-box').click(function () {
+            $('.company-dropdown').slideToggle(180);
+            $('.dropdown-arrow').toggleClass('rotate');
+        });
 
-            // Toggle dropdown
-            $('.company-select-box').click(function () {
-                $('.company-dropdown').slideToggle(180);
-                $('.dropdown-arrow').toggleClass('rotate');
-            });
+        // === Company Selection ===
+        $(document).on('click', '#companyDropdown li', function () {
+            const companyId = $(this).data('id');
+            const name = $(this).text().trim();
+            $(this).toggleClass('active');
 
-            // Store multiple selections
-            const selected = new Set();
+            if (selected.has(companyId)) selected.delete(companyId);
+            else selected.add(companyId);
 
-            // On click company
-            $(document).on('click', '#companyDropdown li', function () {
-                const companyId = $(this).data('id');
-                const name = $(this).text().trim();
+            const names = Array.from(selected).map(id =>
+                $('#companyDropdown li[data-id="' + id + '"]').text().trim()
+            );
+            $('#selectedCompanies').text(names.length ? names.join(', ') : 'Select Company');
 
-                $(this).toggleClass('active');
+            if (selected.size > 0) {
+                const companyId = Array.from(selected)[0];
+                $('#preloader').fadeIn(200).find('.loading-text').text('Loading applications...');
 
-                if (selected.has(companyId)) selected.delete(companyId);
-                else selected.add(companyId);
-
-                const names = Array.from(selected).map(id =>
-                    $('#companyDropdown li[data-id="' + id + '"]').text().trim()
-                );
-                $('#selectedCompanies').text(names.length ? names.join(', ') : 'Select Company');
-
-                if (selected.size > 0) {
-                    const companyId = Array.from(selected)[0]; // use first for now
-                    $('#preloader').show();
-                    $.getJSON('/Account/GetApplicationsByCompany?companyId=' + companyId)
-                        .done(function (apps) {
-                            $('#appGrid').empty();
-                            if (!apps.length) {
-                                $('#appGrid').append('<p class="text-center text-muted">No applications found for this company.</p>');
-                            } else {
-                                const seen = new Set();
-                                $.each(apps, function (i, app) {
-                                    if (!seen.has(app.applicationID)) {
-                                        seen.add(app.applicationID);
-                                        const color = app.colorCode || '#2676ab';
-                                        const icon = app.icon || 'fa-solid fa-cube';
-                                        const appName = app.applicationName || 'App';
-                                        $('#appGrid').append(`
-                                            <div class="apptile">
-                                                <label class="apptile-wrapper">
-                                                   <input type="checkbox" class="apptile-input" data-app='${JSON.stringify(app)}'>
-
-                                                     <span class="apptile-tile" style="--primary-color:${color}">
-                                                        <span class="apptile-icon">
-                                                            <i class="${icon}" style="font-size: 2rem"></i>
-                                                        </span>
-                                                        <span class="apptile-label">${appName}</span>
-                                                    </span>
-                                                </label>
-                                            </div>
-                                        `);
-                                    }
-                                });
-                            }
-                            $('#preloader').hide();
-                            $('#companyModal').fadeOut(300, function () {
-                                $('#appSection').fadeIn(300);
+                $.getJSON('/Account/GetApplicationsByCompany?companyId=' + companyId)
+                    .done(function (apps) {
+                        $('#appGrid').empty();
+                        if (!apps.length) {
+                            $('#appGrid').append('<p class="text-center text-muted">No applications found for this company.</p>');
+                        } else {
+                            const seen = new Set();
+                            $.each(apps, function (i, app) {
+                                if (!seen.has(app.applicationID)) {
+                                    seen.add(app.applicationID);
+                                    const color = app.colorCode || '#2676ab';
+                                    const icon = app.icon || 'fa-solid fa-cube';
+                                    const appName = app.applicationName || 'App';
+                                    $('#appGrid').append(`
+                                        <div class="apptile">
+                                            <label class="apptile-wrapper">
+                                                <input type="checkbox" class="apptile-input" data-app='${JSON.stringify(app)}'>
+                                                <span class="apptile-tile" style="--primary-color:${color}">
+                                                    <span class="apptile-icon"><i class="${icon}"></i></span>
+                                                    <span class="apptile-label">${appName}</span>
+                                                </span>
+                                            </label>
+                                        </div>
+                                    `);
+                                }
                             });
+                        }
+                        $('#preloader').fadeOut(300);
+                        $('#companyModal').fadeOut(300, function () {
+                            $('#appSection').fadeIn(300);
                         });
-                }
-            });
+                    });
+            }
+        });
 
-            // Close app section
-                 // Close app section and refresh company selection
+        // === Close App Section ===
         $('#closeApps').click(function () {
             $('#appSection').fadeOut(200, function () {
-                // Show company modal again
                 $('#companyModal').fadeIn(300);
-
-                // 🔹 Reset selection display
                 $('#selectedCompanies').text('Select Company');
                 $('#companyDropdown').empty();
                 $('.dropdown-arrow').removeClass('rotate');
+                selected.clear();
 
-                // 🔹 Clear selected set if declared globally
-                if (typeof selected !== 'undefined') selected.clear();
-
-                // 🔹 Re-fetch companies dynamically
                 $.getJSON('/Account/GetCompanies', function (companies) {
                     $('#companyDropdown').empty();
                     $.each(companies, function (i, company) {
@@ -474,61 +454,124 @@
             });
         });
 
-            // === Launch app ===
-            $(document).on('change', '.apptile-input', function () {
-                if (!this.checked) return;
-                const app = $(this).data('app');
-                const companyId = Array.from(selected)[0];
-                const currentHost = window.location.hostname.toLowerCase();
-                let urlType = /^[0-9.]+$/.test(currentHost) ? "ipport" : (currentHost === "localhost" ? "local" : "domain");
+        // === Launch App + Verification + Toast ===
+        $(document).on('change', '.apptile-input', function () {
+            if (!this.checked) return;
+            const app = $(this).data('app');
+            const companyId = Array.from(selected)[0];
+            const currentHost = window.location.hostname.toLowerCase();
+            let urlType = /^[0-9.]+$/.test(currentHost) ? "ipport" : (currentHost === "localhost" ? "local" : "domain");
 
-                const payload = {
-                    UserID: parseInt('@userId'),
-                    CompanyID: parseInt(companyId),
-                    ApplicationID: parseInt(app.applicationID),
-                    RoleID: parseInt(app.roleID || app.defaultRoleID),
-                    UrlType: urlType
-                };
+            const payload = {
+                UserID: parseInt('@userId'),
+                CompanyID: parseInt(companyId),
+                ApplicationID: parseInt(app.applicationID),
+                RoleID: parseInt(app.roleID || app.defaultRoleID),
+                UrlType: urlType
+            };
 
-                $('#preloader').show();
-                $.ajax({
-                    url: '/Account/LaunchApp',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(payload),
-                    success: function (response) {
-                        $('#preloader').hide();
-                        if (response.success && response.redirectUrl) {
-                            window.location.href = response.redirectUrl;
-                        } else {
-                            Swal.fire({ icon: 'error', title: 'Application not found', text: 'The app link could not be found.' });
-                        }
-                    },
-                    error: function () {
-                        $('#preloader').hide();
-                        Swal.fire({ icon: 'error', title: 'Error', text: 'Something went wrong while launching the app.' });
+            // 🔹 Show centered verification loader
+            $('#preloader').fadeIn(200).find('.loading-text').text('Verifying application...');
+
+            $.ajax({
+                url: '/Account/LaunchApp',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                timeout: 10000,
+                success: function (response) {
+                    if (response.success && response.redirectUrl) {
+                        // ✅ Check the URL first
+                        verifyApplicationUrl(response.redirectUrl);
+                    } else {
+                        $('#preloader').fadeOut(300);
+                        showToast('Application not found or unavailable.', 'error');
                     }
-                });
-            });
-
-            // === Search (unchanged) ===
-            $(document).on('input', '#searchApp', function () {
-                const searchValue = $(this).val().toLowerCase();
-                $('#appGrid .apptile-label').each(function () {
-                    const appName = $(this).text().toLowerCase();
-                    $(this).closest('.apptile').toggle(appName.includes(searchValue));
-                });
+                },
+                error: function (xhr, status) {
+                    $('#preloader').fadeOut(300);
+                    let message = "An unexpected error occurred.";
+                    if (status === "timeout") {
+                        message = "Request timed out. Check your internet connection.";
+                    } else if (xhr.status === 0) {
+                        message = "Server not reachable. (Connection refused)";
+                    } else if (xhr.status >= 500) {
+                        message = "Internal server error.";
+                    }
+                    showToast(message, 'error');
+                }
             });
         });
 
-                // 🔹 Attach logout function to close button
+        // === Verify Application URL ===
+        async function verifyApplicationUrl(url) {
+            $('#preloader').find('.loading-text').text('Connecting to application...');
+            try {
+                const check = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+                $('#preloader').fadeOut(200);
+                showToast('Application launched successfully!', 'success');
+                setTimeout(() => { window.location.href = url; }, 800);
+            } catch (err) {
+                $('#preloader').fadeOut(200);
+                showToast('Failed to connect. The application server is not responding.', 'error');
+            }
+        }
+
+        // === Compact Toast (Success & Error) ===
+        function showToast(message, type = 'error') {
+            $('.toast-message').remove(); // remove existing toast
+
+            const bgColor = type === 'success' ? '#16a34a' : '#d33'; // green or red
+            const toast = $(`
+                <div class="toast-message">${message}</div>
+            `).appendTo('body');
+
+            toast.css({
+                position: 'fixed',
+                top: '25px',
+                right: '25px',
+                background: bgColor,
+                color: '#fff',
+                padding: '10px 16px',
+                borderRadius: '10px',
+                fontSize: '0.9rem',
+                fontWeight: '500',
+                boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+                zIndex: 5000,
+                opacity: 0,
+                transform: 'translateY(-10px)',
+                transition: 'opacity 0.3s ease, transform 0.3s ease'
+            });
+
+            // Animate in
+            setTimeout(() => toast.css({ opacity: 1, transform: 'translateY(0)' }), 50);
+
+            // Auto-hide after 2.5 seconds
+            setTimeout(() => {
+                toast.css({ opacity: 0, transform: 'translateY(-10px)' });
+                setTimeout(() => toast.remove(), 400);
+            }, 2500);
+        }
+
+        // === Search Filter ===
+        $(document).on('input', '#searchApp', function () {
+            const searchValue = $(this).val().toLowerCase();
+            $('#appGrid .apptile-label').each(function () {
+                const appName = $(this).text().toLowerCase();
+                $(this).closest('.apptile').toggle(appName.includes(searchValue));
+            });
+        });
+
+        // === Custom Modal Close ===
+        $(document).on('click', '#closeModalBtn', function () {
+            $('#customModal').fadeOut(200);
+        });
+
+        // === Logout ===
         $(document).on('click', '#closeButton', function () {
             logoutUser();
         });
-        
 
-
-        // 🔹 Logout function
         async function logoutUser() {
             const result = await Swal.fire({
                 title: 'Are you sure?',
@@ -547,7 +590,6 @@
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' }
                     });
-
                     let data = await response.json();
 
                     if (data.success) {
@@ -558,19 +600,16 @@
                             timer: 1500,
                             showConfirmButton: false
                         });
-
-                        setTimeout(() => {
-                            window.location.href = data.redirectUrl;
-                        }, 1600);
+                        setTimeout(() => window.location.href = data.redirectUrl, 1600);
                     } else {
                         Swal.fire('Logout Failed', 'Please try again.', 'error');
                     }
                 } catch (err) {
-                    console.error("Logout error:", err);
                     Swal.fire('Error', 'An error occurred during logout.', 'error');
                 }
             }
         }
-
+    });
     </script>
 }
+
