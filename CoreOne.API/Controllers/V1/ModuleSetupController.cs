@@ -24,16 +24,14 @@ namespace CoreOne.API.Controllers.V1
         [HttpPost("GetMenuModule")]
         public IActionResult GetMenuModule([FromBody] RoleCreationsRequest request)
         {
-            if (request == null) return BadRequest("Request is required.");
-
-            // Call repository
             var dt = _menuModuleRepo.GetMenuModule(
                 request.PageSize,
                 request.PageNumber,
                 request.Search,
                 request.SortColumn,
                 request.SortDir,
-                request.SearchCol // kept for interface compatibility
+                request.SearchCol,
+                request.ApplicationID   // ✔ ADD THIS
             );
 
             // Map DataTable to MenuModuleDto

@@ -24,25 +24,42 @@ namespace CoreOne.UI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index( int pageNumber = 1, int pageSize = 10, string search = null,  string searchCol = "", string sortColumn = "", string sortDir = null)
+        public async Task<IActionResult> Index(
+       int pageNumber = 1, int pageSize = 10,
+       string search = null, string searchCol = "",
+       string sortColumn = "", string sortDir = null,
+       int applicationId = 1)
         {
-            // Prepare the request model
+            // 1. LOAD APPLICATION LIST (NEW)
+            var clientApps = _httpClientFactory.CreateClient();
+            var appResp = await clientApps.GetAsync(_api.BaseUrlApplication + "/GetAll");
+            if (appResp.IsSuccessStatusCode)
+            {
+                var appJson = await appResp.Content.ReadAsStringAsync();
+                ViewBag.Applications = JsonConvert.DeserializeObject<List<ApplicationDto>>(appJson);
+            }
+            else
+            {
+                ViewBag.Applications = new List<ApplicationDto>();
+            }
+
+            // 2. LOAD MODULES USING SP
             var model = new RoleCreationsRequest
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 Search = search,
-                SearchCol = searchCol, // optional, kept for compatibility
+                SearchCol = searchCol,
                 SortColumn = sortColumn,
-                SortDir = sortDir
+                SortDir = sortDir,
+                ApplicationID = applicationId
             };
 
             var client = _httpClientFactory.CreateClient();
-            var url = _api.BaseUrlModuleSetup + "/GetMenuModule"; // call your ModuleSetup API
+            var url = _api.BaseUrlModuleSetup + "/GetMenuModule";
             var json = JsonConvert.SerializeObject(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            // Call API
             var resp = await client.PostAsync(url, content);
             if (!resp.IsSuccessStatusCode)
             {
@@ -58,16 +75,18 @@ namespace CoreOne.UI.Controllers
                 ViewBag.TotalRecords = apiResult?.TotalRecords ?? 0;
             }
 
-            // Set ViewBag for UI
+            // ViewBag for UI
             ViewBag.PageNumber = pageNumber;
             ViewBag.PageSize = pageSize;
             ViewBag.Search = search;
             ViewBag.SearchCol = searchCol;
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortDir = sortDir;
+            ViewBag.ApplicationID = applicationId;
 
             return View();
         }
+
 
 
 
