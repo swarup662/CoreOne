@@ -6,7 +6,7 @@ namespace CoreOne.API.Interface
     public interface IModuleSetupRepository
     {
 
-         DataTable GetMenuModule(int pageSize, int pageNumber, string? search, string? sortColumn, string? sortDir, string? searchCol);
+        DataTable GetMenuModule(int pageSize, int pageNumber, string? search, string? sortColumn, string? sortDir, string? searchCol, int applicationId);
         int SaveMenuWithModules(MenuWithModulesSave model);
         MenuModuleEditModel GetMenuModuleById(int menuId);
         void DeleteMenu(int menuId);

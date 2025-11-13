@@ -38,6 +38,7 @@ builder.Services.AddScoped<IUserCreationRepository, UserCreationRepository>();
 builder.Services.AddScoped<IModuleSetupRepository, ModuleSetupRepository>();
 builder.Services.AddScoped<IActionCreationRepository, ActionCreationRepository>();
 builder.Services.AddScoped<IUserNotificationRepository, UserNotificationRepository>();
+builder.Services.AddScoped<IApplicationsRepository, ApplicationsRepository>();
 
 // ======================================================
 // 🧩 API VERSIONING

@@ -17,32 +17,26 @@ namespace CoreOne.API.Repositories
             _dbHelper = dbHelper;
         }
         public DataTable GetMenuModule(
-        int pageSize,
-        int pageNumber,
-        string? search,
-        string? sortColumn,
-        string? sortDir,
-        string? searchCol // now used
-    )
+     int pageSize,
+     int pageNumber,
+     string? search,
+     string? sortColumn,
+     string? sortDir,
+     string? searchCol,
+     int applicationId
+ )
         {
-            // Ensure default values
-            if (pageSize < 1) pageSize = 10;
-            if (pageNumber < 1) pageNumber = 1;
-            sortColumn = string.IsNullOrWhiteSpace(sortColumn) ? "MenuName" : sortColumn;
-            sortDir = string.IsNullOrWhiteSpace(sortDir) ? "ASC" : sortDir;
-
-            // Prepare parameters for SP
             var parameters = new Dictionary<string, object>
     {
         {"@PageSize", pageSize },
         {"@PageNumber", pageNumber },
         {"@Search", (object?)search ?? DBNull.Value },
-        {"@SortColumn", sortColumn },
-        {"@SortDir", sortDir },
-        {"@SearchCol", (object?)searchCol ?? DBNull.Value } // pass searchCol to SP
+        {"@SortColumn", sortColumn ?? "MenuName" },
+        {"@SortDir", sortDir ?? "ASC" },
+        {"@SearchCol", (object?)searchCol ?? DBNull.Value },
+        {"@ApplicationID", applicationId }        // ✅ NEW
     };
 
-            // Execute stored procedure and return DataTable
             return _dbHelper.ExecuteSP_ReturnDataTable("[sp_ModuleSetup_PagedSortedSearched]", parameters);
         }
 

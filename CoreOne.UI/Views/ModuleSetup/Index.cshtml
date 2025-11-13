@@ -127,43 +127,102 @@
 
             </div>
 
-            <div class="row align-items-center p-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
-                 -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
-                <div class="col-md-3">
-                    <input type="search" id="searchBox" value="@search" class="form-control my-1 my-lg-0" placeholder="Search..." style="border-radius: 11px;  background: linear-gradient(135deg, #f8fbff, #ffffff);" />
+            <div class="row g-2 align-items-center p-3 mt-2"
+                 style="background:rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            border: 1px solid #b1d8ff;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            color: white;">
+
+                <!-- 🔍 Search Text -->
+                <div class="col-md-4">
+                    <input type="search" id="searchBox" value="@search"
+                           class="form-control"
+                           placeholder="Search..."
+                           style="border-radius: 11px; background:#fff;">
                 </div>
+
+                <!-- 📑 Search Field Dropdown -->
                 <div class="col-md-2">
-                    <select class="form-select my-1 my-lg-0" id="searchField" style="  background: linear-gradient(135deg, #f8fbff, #ffffff);   border-radius: 11px;">
-                        @{
-                            string[] searchableFields = { "MenuName", "ModuleName" };
-                            string[] searchableNames = { "Menu", "Modules" };
-                            for (int i = 0; i < searchableFields.Length; i++)
-                            {
-                                var field = searchableFields[i];
-                                <option value="@field" selected="@(field == searchCol)">@searchableNames[i]</option>
-                            }
+                    <select class="form-select" id="searchField"
+                            style="border-radius: 11px; background:#fff;">
+                        @foreach (var pair in new[] {
+                        new { Value = "MenuName", Label = "Menu" },
+                        new { Value = "ModuleName", Label = "Modules" }
+                        })
+                        {
+                            <option value="@pair.Value" selected="@(pair.Value == searchCol)">
+                                @pair.Label
+                            </option>
+                        }
+
+                        <!-- Application Filter -->
+                        <option value="ApplicationID" selected="@(searchCol == "ApplicationID")">
+                            Application
+                        </option>
+                    </select>
+                </div>
+
+                <!-- 🏛 Application Dropdown -->
+                <div class="col-md-3">
+                    <select id="applicationId" class="form-select"
+                            style="border-radius:11px; background:#fff;">
+                        @foreach (var app in ViewBag.Applications as List<ApplicationDto>)
+                        {
+                            <option value="@app.ApplicationID"
+                                    selected="@(app.ApplicationID == (int)ViewBag.ApplicationID)">
+                                @app.ApplicationName
+                            </option>
                         }
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <button id="btnSearch" class="btn icon-btn my-1 my-lg-0">
+
+                <!-- 🔎 Search Button -->
+                <div class="col-md-1 d-grid">
+                    <button id="btnSearch" class="btn btn-primary"
+                            style="border-radius: 11px;">
                         <i class="mdi mdi-magnify"></i>
                     </button>
-              
                 </div>
-                <div class="col-md-2 ms-auto d-flex justify-content-end">
-                    <select class="form-select my-1 my-lg-0" id="pageSize" style="border-radius: 11px; background: linear-gradient(135deg, #f8fbff, #ffffff);">
+
+                <!-- 📄 Page Size -->
+                <div class="col-md-2">
+                    <select class="form-select" id="pageSize"
+                            style="border-radius: 11px; background:#fff;">
                         @{
-                            int[] pageSizes = { 1, 10, 20, 50, 100 };
+                            int[] pageSizes = { 10, 20, 50, 100 };
                             foreach (var size in pageSizes)
                             {
-                                <option value="@size" selected="@(size == pageSize)">@size</option>
+                                <option value="@size" selected="@(size == pageSize)">
+                                    @size
+                                </option>
                             }
                         }
                     </select>
                 </div>
-            </div>
 
+            </div>
+            @* 🔵 Application Info Bar *@
+            @if (ViewBag.ApplicationID != null && ViewBag.Applications != null)
+            {
+                var selectedApp = (ViewBag.Applications as List<ApplicationDto>)
+                .FirstOrDefault(a => a.ApplicationID == (int)ViewBag.ApplicationID);
+
+                if (selectedApp != null)
+                {
+                    <div class="alert alert-info mt-2"
+                         style="background: rgba(13, 110, 253, 0.15);
+                    border: 1px solid rgba(13, 110, 253, 0.35);
+                    color: #0d6efd;
+                    border-radius: 10px;
+                    font-weight: 500;">
+                        <i class="mdi mdi-information-outline me-2"></i>
+                        Showing modules for:
+                        <strong>@selectedApp.ApplicationName</strong>
+                    </div>
+                }
+            }
             <div class="table-responsive row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
                  -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
             <table class="table table-bordered table-hover table-xl mt-2">
@@ -516,12 +575,12 @@
  
         // Pagination and filtiring ---------------------------------------------------------------------
 
-
         (function () {
             const searchInput = document.getElementById('searchBox');
             const searchField = document.getElementById('searchField');
             const pageSizeSelect = document.getElementById('pageSize');
             const btnSearch = document.getElementById('btnSearch');
+            const appDropdown = document.getElementById('applicationId');
 
             const current = {
                 pageNumber: @pageNumber,
@@ -529,75 +588,109 @@
                 search: "@search",
                 searchCol: "@searchCol",
                 sortColumn: "@sortColumn",
-                sortDir: "@sortDir"
+                sortDir: "@sortDir",
+                applicationId: @ViewBag.ApplicationID
             };
 
+            // Build URL with all filters
             function buildUrl(params) {
                 const qs = new URLSearchParams();
-                qs.set('pageNumber', params.pageNumber ?? 1);
-                qs.set('pageSize', params.pageSize ?? current.pageSize);
-                if ((params.search ?? current.search) !== '') qs.set('search', params.search ?? current.search);
-                qs.set('searchCol', params.searchCol ?? current.searchCol);
-                qs.set('sortColumn', params.sortColumn ?? current.sortColumn);
-                qs.set('sortDir', params.sortDir ?? current.sortDir);
-                return '@Url.Action("Index", "ModuleSetup")' + '?' + qs.toString();
+
+                qs.set("pageNumber", params.pageNumber ?? current.pageNumber);
+                qs.set("pageSize", params.pageSize ?? current.pageSize);
+                if ((params.search ?? current.search) !== "")
+                    qs.set("search", params.search ?? current.search);
+
+                qs.set("searchCol", params.searchCol ?? current.searchCol);
+                qs.set("sortColumn", params.sortColumn ?? current.sortColumn);
+                qs.set("sortDir", params.sortDir ?? current.sortDir);
+
+                // 🔥 IMPORTANT — Add Application ID
+                qs.set("applicationId", params.applicationId ?? current.applicationId);
+
+                return '@Url.Action("Index", "ModuleSetup")' + "?" + qs.toString();
             }
 
-            function navigateTo(opts) { window.location.href = buildUrl(opts); }
+            function navigateTo(opts) {
+                window.location.href = buildUrl(opts);
+            }
 
-            // Search button click
-            btnSearch?.addEventListener('click', () => {
+            // 🔎 Search button
+            btnSearch?.addEventListener("click", () => {
                 navigateTo({
                     pageNumber: 1,
                     search: searchInput.value,
                     searchCol: searchField.value,
-                    pageSize: parseInt(pageSizeSelect.value, 10),
+                    pageSize: parseInt(pageSizeSelect.value),
                     sortColumn: current.sortColumn,
-                    sortDir: current.sortDir
+                    sortDir: current.sortDir,
+                    applicationId: appDropdown.value
                 });
             });
 
-            // Page size change
-            pageSizeSelect?.addEventListener('change', () => {
+            // 📄 Page size change
+            pageSizeSelect?.addEventListener("change", () => {
                 navigateTo({
                     pageNumber: 1,
                     search: searchInput.value,
                     searchCol: searchField.value,
-                    pageSize: parseInt(pageSizeSelect.value, 10),
+                    pageSize: parseInt(pageSizeSelect.value),
                     sortColumn: current.sortColumn,
-                    sortDir: current.sortDir
+                    sortDir: current.sortDir,
+                    applicationId: appDropdown.value
                 });
             });
 
-            // Pagination links
-            document.querySelectorAll('.pagination a.page-link').forEach(el => {
-                el.addEventListener('click', ev => {
+            // 📑 Pagination links
+            document.querySelectorAll(".pagination a.page-link").forEach(el => {
+                el.addEventListener("click", ev => {
                     ev.preventDefault();
-                    const page = parseInt(el.dataset.page, 10) || 1;
+                    const page = parseInt(el.dataset.page);
+
                     navigateTo({
                         pageNumber: page,
                         search: searchInput.value,
                         searchCol: searchField.value,
-                        pageSize: parseInt(pageSizeSelect.value, 10),
+                        pageSize: parseInt(pageSizeSelect.value),
                         sortColumn: current.sortColumn,
-                        sortDir: current.sortDir
+                        sortDir: current.sortDir,
+                        applicationId: appDropdown.value
                     });
                 });
             });
 
-            // Sorting
+            // ↕ Sorting
             window.sortTable = function (column) {
-                let newDir = current.sortColumn === column && current.sortDir === 'ASC' ? 'DESC' : 'ASC';
+                let newDir = (current.sortColumn === column && current.sortDir === "ASC") ? "DESC" : "ASC";
+
                 navigateTo({
                     pageNumber: 1,
                     search: searchInput.value,
                     searchCol: searchField.value,
-                    pageSize: parseInt(pageSizeSelect.value, 10),
+                    pageSize: parseInt(pageSizeSelect.value),
                     sortColumn: column,
-                    sortDir: newDir
+                    sortDir: newDir,
+                    applicationId: appDropdown.value
                 });
             };
+
+            // 🆕 Application dropdown
+            appDropdown?.addEventListener("change", function () {
+                navigateTo({
+                    pageNumber: 1,
+                    search: searchInput.value,
+                    searchCol: searchField.value,
+                    pageSize: parseInt(pageSizeSelect.value),
+                    sortColumn: current.sortColumn,
+                    sortDir: current.sortDir,
+                    applicationId: this.value
+                });
+            });
+
         })();
+
+
+
         document.addEventListener("DOMContentLoaded", function () {
             const icons = document.querySelectorAll(".icon-item");
             const input = document.getElementById("MenuSymbol");

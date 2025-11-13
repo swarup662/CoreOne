@@ -55,11 +55,13 @@ namespace CoreOne.DOMAIN.Models
 
     public class RoleCreationsRequest
     {
-        public int PageSize { get; set; } = 10;
-        public int PageNumber { get; set; } = 1;
-        public string? Search { get; set; } 
-        public string? SortColumn { get; set; } 
-        public string? SortDir { get; set; } 
+        public int PageSize { get; set; }
+        public int PageNumber { get; set; }
+        public string? Search { get; set; }
         public string? SearchCol { get; set; }
+        public string? SortColumn { get; set; }
+        public string? SortDir { get; set; }
+        public int ApplicationID { get; set; } = 1;  // ✔ default
     }
+
 }

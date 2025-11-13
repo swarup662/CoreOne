@@ -14,7 +14,12 @@ namespace CoreOne.DOMAIN.Models
         public bool IsModule { get; set; }
         public bool ActiveFlag { get; set; }
     }
-
+    public class ApplicationDto
+    {
+        public int ApplicationID { get; set; }
+        public string ApplicationName { get; set; } = string.Empty;
+        public int ActiveFlag { get; set; }
+    }
     public class MenuModuleDto
     {
         public int MenuModuleID { get; set; }
