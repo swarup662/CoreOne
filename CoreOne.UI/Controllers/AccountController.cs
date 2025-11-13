@@ -54,10 +54,10 @@ namespace CoreOne.UI.Controllers
             if (!IsInternal) { 
             // Store token in cookie
             Response.Cookies.Append("jwtToken", token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                SameSite = SameSiteMode.Strict,
+                {
+                    HttpOnly = true,
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddMinutes(30)
             });
 
