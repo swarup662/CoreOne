@@ -203,32 +203,27 @@
                 </div>
 
             </div>
-
-        </div>  <!-- end of filter row -->
-
-        @* 🔵 Application Info Bar *@
-        @if (ViewBag.ApplicationID != null && ViewBag.Applications != null)
-        {
-            var selectedApp = (ViewBag.Applications as List<ApplicationDto>)
-            .FirstOrDefault(a => a.ApplicationID == (int)ViewBag.ApplicationID);
-
-            if (selectedApp != null)
+            @* 🔵 Application Info Bar *@
+            @if (ViewBag.ApplicationID != null && ViewBag.Applications != null)
             {
-                <div class="alert alert-info mt-2"
-                     style="background: rgba(13, 110, 253, 0.15);
+                var selectedApp = (ViewBag.Applications as List<ApplicationDto>)
+                .FirstOrDefault(a => a.ApplicationID == (int)ViewBag.ApplicationID);
+
+                if (selectedApp != null)
+                {
+                    <div class="alert alert-info mt-2"
+                         style="background: rgba(13, 110, 253, 0.15);
                     border: 1px solid rgba(13, 110, 253, 0.35);
                     color: #0d6efd;
                     border-radius: 10px;
                     font-weight: 500;">
-                    <i class="mdi mdi-information-outline me-2"></i>
-                    Showing modules for:
-                    <strong>@selectedApp.ApplicationName</strong>
-                </div>
+                        <i class="mdi mdi-information-outline me-2"></i>
+                        Showing modules for:
+                        <strong>@selectedApp.ApplicationName</strong>
+                    </div>
+                }
             }
-        }
-
-        <div class="table-responsive row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
-
+            <div class="table-responsive row align-items-center p-2 mt-2 mb-2" style="background:rgba(255, 255, 255, 0.08); border-radius: 9px; border: 1px solid #b1d8ff; backdrop-filter: blur(12px);
                  -webkit-backdrop-filter: blur(12px); border-radius: 16px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2); color: white;">
             <table class="table table-bordered table-hover table-xl mt-2">
                 
