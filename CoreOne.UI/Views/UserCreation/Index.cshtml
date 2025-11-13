@@ -491,7 +491,7 @@
                                         <has-permission module-id="4" action-id="13">
                                             <li>
                                                 <a class="dropdown-item" href="javascript:void(0);" onclick="openNotificationModal(@user.UserID)">
-                                                    <i class="mdi mdi-key-variant me-1"></i> Change Password
+                                                    <i class="bi bi-bell-fill me-1"></i> Send Reminder
                                                 </a>
                                             </li>
                                         </has-permission>
@@ -679,7 +679,7 @@
                
                 <button type="button" id="sendreminder"
                         class="btn btn-send-green btn-sm px-3 py-1"
-                        onclick="sendNotificationBulk()">
+                        onclick="sendNotification()">
                     <i class="bi bi-send-fill me-1"></i> Send Notification
                 </button>
                 <style>
@@ -888,7 +888,7 @@
                 <div class="row mb-4">
                     <div class="col-md-6">
                         <label class="form-label fw-semibold text-dark">Select Role</label>
-                        <select id="roleDropdown"
+                        <select id="roleDropdown"openNotificationModal
                                 class="form-select shadow-sm border rounded-3 px-3 py-2"
                                 onchange="onRoleChange()"
                                 style="transition: all 0.2s ease;">
