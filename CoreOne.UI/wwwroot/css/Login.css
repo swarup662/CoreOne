@@ -1,10 +1,58 @@
-﻿
-body.authentication-bg-pattern {
-    background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.05), rgba(0,0,0,0) 60%), radial-gradient(circle at 80% 80%, rgba(80,100,130,0.18), rgba(0,0,0,0) 65%), linear-gradient(120deg, #1e262e 0%, #2e3640 40%, #3f4752 60%, #222831 100%), repeating-linear-gradient( 90deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 1px, rgba(0,0,0,0.15) 1px, rgba(0,0,0,0.15) 3px );
-    background-attachment: fixed;
-    background-size: cover;
-    color: white;
-}
+﻿/* Make body behave like the container */
+/*body.authentication-bg-pattern {
+    margin: 0;
+    z-index: -1;
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    --c: #09f;
+    background-color: #000;
+    background-image: radial-gradient(4px 100px at 0px 235px, var(--c), #0000), radial-gradient(4px 100px at 300px 235px, var(--c), #0000), radial-gradient(1.5px 1.5px at 150px 117.5px, var(--c) 100%, #0000 150%),*/
+    /* ... keep the rest of your gradients ... */
+    /*radial-gradient(4px 100px at 300px 210px, var(--c), #0000), radial-gradient(1.5px 1.5px at 150px 105px, var(--c) 100%, #0000 150%);
+    background-size: 300px 235px, 300px 235px, 300px 235px,*/
+    /* ... your background sizes ... */
+    /*300px 210px, 300px 210px, 300px 210px;
+    animation: hi 150s linear infinite;
+}*/
+
+
+    /* Blurred overlay layer */
+    /*body.authentication-bg-pattern::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        backdrop-filter: blur(1em) brightness(6);
+        background-image: radial-gradient( circle at 50% 50%, #0000 0, #0000 2px, hsl(0 0 4%) 2px );
+        background-size: 8px 8px;
+        pointer-events: none;
+    }
+
+
+
+
+.glass-card {
+    position: relative;
+    z-index: 5;
+}*/
+  
+
+/* Your existing keyframes */
+/*@keyframes hi {
+    0% {
+        background-position: 0px 220px, 3px 220px, 151.5px 337.5px,*/
+        /* ... keep the rest ... */
+        /*426.5px 180px;
+    }
+
+    to {
+        background-position: 0px 6800px, 3px 6800px, 151.5px 6917.5px,*/
+        /* ... keep the rest ... */
+        /*426.5px 6480px;
+    }
+}*/
+
 
 /* 🌐 Metallic Logo */
 .logo-icon {
