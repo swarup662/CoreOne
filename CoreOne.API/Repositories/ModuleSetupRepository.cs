@@ -65,6 +65,7 @@ namespace CoreOne.API.Repositories
             var parameters = new Dictionary<string, object>
         {
             { "@MenuModuleID", model.MenuModuleID ?? (object)DBNull.Value },
+            { "@ApplicationID", model.ApplicationID ?? (object)DBNull.Value },
             { "@Name", model.Name },
             { "@MenuSymbol", model.MenuSymbol ?? (object)DBNull.Value },
             { "@Sequence", model.Sequence },

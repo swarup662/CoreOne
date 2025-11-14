@@ -59,7 +59,7 @@ namespace CoreOne.DOMAIN.Models
         public int Sequence { get; set; }
         public char RecType { get; set; }        // 'I' = Insert, 'U' = Update
         public int? CreatedBy { get; set; }
-
+        public int? ApplicationID { get; set; }
         public List<ModuleItemSave> Modules { get; set; } = new List<ModuleItemSave>();
     }
 

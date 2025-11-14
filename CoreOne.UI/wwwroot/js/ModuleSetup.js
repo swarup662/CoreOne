@@ -2,9 +2,9 @@
 
 
 // Open edit modal
+// Open edit modal
 function openEditModal(menuId) {
     fetch(`/ModuleSetup/GetMenuForEdit?id=${menuId}`)
-
         .then(res => res.ok ? res.json() : Promise.reject("Failed to load menu"))
         .then(data => {
             if (!data) throw new Error("No data returned");
@@ -18,37 +18,54 @@ function openEditModal(menuId) {
             const tbody = $("#moduleTable tbody").empty();
 
             if (data.modules && data.modules.length > 0) {
-                // Sort modules by sequence ascending
+
                 const sortedModules = data.modules.sort((a, b) => a.sequence - b.sequence);
 
                 sortedModules.forEach(m => {
-                    // Check for duplicate sequence in table
                     const seqExists = $("#moduleTable tbody tr").filter(function () {
                         return parseInt($(this).find(".moduleSeq input").val()) === m.sequence;
                     }).length > 0;
 
                     if (!seqExists) {
                         tbody.append(`
-                                    <tr data-module-id="${m.moduleID}">
-                                        <td class="moduleId" style="display:none">${m.moduleID}</td>
-                                        <td class="moduleSeq">
-                                            <input type="number" class="form-control form-control-sm" value="${m.sequence}" />
-                                        </td>
-                                        <td class="moduleName">
-                                            <input type="text" class="form-control form-control-sm" value="${m.name}" />
-                                        </td>
-                                        <td class="moduleUrl">
-                                            <input type="text" class="form-control form-control-sm" value="${m.url}" />
-                                        </td>
-                                         <td class="d-flex gap-1 justify-content-start">
-       
-            <a href="javascript:void(0);"  onclick="ActionSetup('${m.moduleID}')" style="background: #f75964;color: white;" class="btn btn-sm setupModule" title="Setup"><i class="fe-command"></i></a>
-            </td>
-                                    </tr>
-                                `);
+                            <tr data-module-id="${m.moduleID}">
+                                <td class="moduleId" style="display:none">${m.moduleID}</td>
+                                <td class="moduleSeq">
+                                    <input type="number" class="form-control form-control-sm" value="${m.sequence}" />
+                                </td>
+                                <td class="moduleName">
+                                    <input type="text" class="form-control form-control-sm" value="${m.name}" />
+                                </td>
+                                <td class="moduleUrl">
+                                    <input type="text" class="form-control form-control-sm" value="${m.url}" />
+                                </td>
+                                <td class="d-flex gap-1 justify-content-start">
+                                    <a href="javascript:void(0);" onclick="ActionSetup('${m.moduleID}')" 
+                                       style="background: #f75964;color: white;" 
+                                       class="btn btn-sm setupModule" title="Setup">
+                                       <i class="fe-command"></i></a>
+                                </td>
+                            </tr>
+                        `);
                     }
                 });
             }
+
+            // ---------------------------------------------------------
+            // ⭐ ADD THIS BLOCK HERE (THIS FIXES APPLICATION NAME & ID)
+            // ---------------------------------------------------------
+            const appDropdown = document.getElementById("applicationId");
+            const selectedAppId = appDropdown.value;
+            const selectedAppName = appDropdown.options[appDropdown.selectedIndex].text;
+
+            // Show app name in modal
+            document.getElementById("selectedAppName").textContent = selectedAppName;
+            document.getElementById("selectedAppInfo").style.display = "block";
+
+            // Set hidden field for save
+            document.getElementById("ModalApplicationID").value = selectedAppId;
+            // ---------------------------------------------------------
+
             $('#moduleModalLabel').text('Update Modules Setup :: Edit');
             $('#moduleSetupModal').attr('aria-labelledby', 'moduleModalLabel');
             $("#moduleSetupModal").modal("show");
@@ -249,6 +266,7 @@ $("#btnSavemenu").click(async function () {
         Name: $("#MenuName").val().trim(),
         MenuSymbol: $("#MenuSymbol").val().trim(),
         Sequence: parseInt($("#MenuSeq").val()),
+        ApplicationID: parseInt($("#ModalApplicationID").val()),
         RecType: menuId ? 'U' : 'I',
         Modules: []
     };

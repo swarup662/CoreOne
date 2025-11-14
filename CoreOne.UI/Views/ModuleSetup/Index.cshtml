@@ -346,6 +346,16 @@
             <form id="menuModuleForm">
                 <div class="modal-body p-3 bg-light">
                     <input asp-for="MenuModuleID" type="hidden" id="hdnMenuModuleID" />
+                        <input type="hidden" id="ModalApplicationID" name="ApplicationID" />
+
+
+                        <!-- Selected Application Display -->
+                        <div class="alert alert-info py-1 mb-2" id="selectedAppInfo" style="display:none;">
+                            <strong>Application:</strong> <span id="selectedAppName"></span>
+                        </div>
+
+                      
+
 
                     <!-- Accordion -->
                     <div class="accordion" id="menuModuleAccordion">
@@ -713,8 +723,45 @@
 
 
 
+      
 
 </script>
+
+
+
+
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            // Detect when the Create Module Setup button is clicked
+            document.body.addEventListener("click", function (e) {
+
+                const btn = e.target.closest('[data-bs-target="#moduleSetupModal"]');
+                if (!btn) return; // Ignore clicks that are not the create button
+
+                const appDropdown = document.getElementById("applicationId");
+
+                const selectedAppId = appDropdown.value;
+                const selectedAppName = appDropdown.options[appDropdown.selectedIndex].text;
+
+                // Show application name inside modal
+                document.getElementById("selectedAppName").textContent = selectedAppName;
+
+                // Show alert box
+                document.getElementById("selectedAppInfo").style.display = "block";
+
+                // Set hidden field so backend gets ApplicationID
+                document.getElementById("ModalApplicationID").value = selectedAppId;
+
+                console.log("Application ID set:", selectedAppId);
+            });
+
+        });
+    </script>
+
     <script>
         // Preloader hide on page load
         window.addEventListener('load', function () {
