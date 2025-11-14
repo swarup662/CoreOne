@@ -48,6 +48,7 @@ body.authentication-bg-pattern {
     margin-top: 35px;
     box-shadow: 0 8px 28px rgba(0,0,0,0.5), inset 0 1px 3px rgba(255,255,255,0.05), inset 0 -1px 3px rgba(0,0,0,0.5);
     color: #e5e9f0;
+    border: 2px dotted #424e5a;
 }
 
 .login-header {
@@ -102,7 +103,7 @@ input.form-control {
     }
 
 .mb-3 {
-    margin-bottom: 10px !important;
+    margin-bottom: 18px !important;
 }
 
 .text-center.mt-3 {
