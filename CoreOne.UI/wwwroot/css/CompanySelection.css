@@ -1,1 +1,366 @@
 ﻿
+        body {
+            font-family: "Segoe UI", sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            /* ✨ Light Blue Metallic Steel Background */
+            background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22), rgba(255,255,255,0) 60%), radial-gradient(circle at 70% 70%, rgba(180,205,230,0.25), rgba(180,205,230,0) 65%), linear-gradient(115deg, #a8bcd2 0%, #c3d3e3 40%, #dfe8f2 50%, #c1cedd 60%, #90a4b8 100%), repeating-linear-gradient( 90deg, rgba(255,255,255,0.10) 0px, rgba(255,255,255,0.10) 2px, rgba(0,20,40,0.06) 2px, rgba(0,20,40,0.06) 4px );
+            background-blend-mode: overlay, soft-light, normal, overlay;
+            background-size: cover;
+            background-attachment: fixed;
+            color: #2d2d2d;
+            overflow-x: hidden;
+        }
+
+
+
+        /* === Preloader === */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 20, 35, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+        }
+
+        .loader .spin {
+            font-size: 48px;
+            color: #89a4cd;
+            animation: spin 2s linear infinite;
+        }
+
+        .loading-text {
+            color: #ffffffcc;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .apptile-tile {
+            background-image: linear-gradient(145deg, #ffffff, #d9d9d9);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.25), inset 0 1px 3px rgba(255,255,255,0.6), inset 0 -1px 3px rgba(0,0,0,0.2);
+            border: 1px solid #b8b8b8;
+        }
+
+        .company-select-wrapper,
+        .company-select-box {
+            background: linear-gradient(145deg, #f8f9fa, #d9d9d9);
+            border: 1px solid #b5b5b5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 2px rgba(255,255,255,0.6);
+        }
+
+        .company-select-wrapper {
+            position: relative;
+            width: 505px;
+            margin: 15vh auto 0;
+            text-align: left;
+            border-radius: 16px;
+            /* Light-blue metallic shell */
+            background: linear-gradient(145deg, #dbe4f0, #b7c4d4);
+            border: 1px solid #9fb0bf;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.28), inset 0 2px 4px rgba(255,255,255,0.8), inset 0 -2px 4px rgba(0,0,0,0.25);
+        }
+
+
+
+        .company-select-box {
+            background: linear-gradient(145deg, #eef5ff, #c7d5e4);
+            border-radius: 14px 14px 0 0;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.25), inset 0 1px 3px rgba(255,255,255,0.85), inset 0 -2px 3px rgba(0,0,0,0.25);
+            padding: 16px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            font-size: 1.05rem;
+            color: #1f2937;
+            border: 1px solid #9fb0bf;
+            transition: all 0.25s ease;
+        }
+
+
+        .company-dropdown {
+            list-style: none;
+            margin: 0;
+            padding: 10px;
+            background: linear-gradient(145deg, #e8f1fb, #cbd8e6);
+            border: 1px solid #9fb0bf;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.7), inset 0 -2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            width: 100%;
+            z-index: 1;
+            max-height: 260px;
+            overflow-y: auto;
+            display: none;
+        }
+
+            .company-dropdown li {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: linear-gradient(145deg, #ffffff, #d9e4f0);
+                margin-bottom: 8px;
+                border-radius: 10px;
+                padding: 12px 16px;
+                border: 1px solid #8fa1b2;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.18), inset 0 1px 2px rgba(255,255,255,0.75), inset 0 -1px 2px rgba(0,0,0,0.25);
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.25s ease;
+                border-left: 4px solid #8fa1b2;
+            }
+
+                .company-dropdown li:hover {
+                    transform: translateY(-2px);
+                    background: linear-gradient(145deg, #f4f8ff, #d5e4f3);
+                    box-shadow: 0 3px 15px rgba(0,0,0,0.28), inset 0 1px 3px rgba(255,255,255,0.9), inset 0 -1px 3px rgba(0,0,0,0.25);
+                    border-left: 4px solid #2676ab;
+                    color: #2676ab;
+                }
+
+
+        .company-dropdown li.active {
+            background: #d6e4ff;
+            border-left: 4px solid #2676ab;
+            color: #2676ab;
+            font-weight: 600;
+        }
+
+                .company-dropdown li.active {
+                    background: linear-gradient(145deg, #d7e6ff, #b8c9dd);
+                    border-left: 4px solid #2676ab;
+                    color: #2676ab;
+                    font-weight: 600;
+                }
+
+        .dropdown-footer {
+            position: relative;
+            background: linear-gradient(145deg, #d8e2ee, #bfcbd9);
+            border-top: 1px solid #9fb0bf;
+            border-radius: 0 0 14px 14px;
+            box-shadow: inset 0 2px 4px rgba(255,255,255,0.75), inset 0 -1px 3px rgba(0,0,0,0.22);
+            text-align: center;
+            padding: 12px 0;
+            z-index: 2;
+        }
+
+        .logout-btn {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #aa2222;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease-in-out;
+        }
+
+            .logout-btn:hover {
+                background: linear-gradient(145deg, #ffe3e3, #e6b8b8);
+                border: 1px solid #c77;
+                color: #7a0000;
+                padding: 8px 16px;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25), inset 0 1px 3px rgba(255,255,255,0.8);
+            }
+
+
+        .search-card {
+            background: linear-gradient(145deg, white, #cedeef);
+            border-radius: 20px;
+            padding: 15px 20px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.7), inset 0 -2px 4px rgba(0,0,0,0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 650px;
+            width: 90%;
+            margin: 30px auto;
+            position: sticky;
+            top: 20px;
+            z-index: 50;
+        }
+
+        .search-bar {
+            flex: 1;
+            background: linear-gradient(145deg, white, #cedeef);
+            border: 1px solid #b4b4b4;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 1rem;
+            color: #222;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.7), inset 0 -1px 2px rgba(0,0,0,0.25);
+        }
+
+
+        #closeApps {
+            background: linear-gradient(145deg, white, #cedeef);
+            border: 1px solid #b5b5b5;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            margin-left: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25), inset 0 1px 2px rgba(255,255,255,0.7), inset 0 -1px 2px rgba(0,0,0,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+        }
+
+            #closeApps:hover {
+                background: linear-gradient(145deg, #ffe1e1, #d7b3b3);
+                color: #a11;
+            }
+
+        .apptile-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 0 auto;
+            max-width: 600px;
+        }
+
+        .apptile-input {
+            display: none;
+        }
+
+        .apptile-tile {
+            display: flex;
+            position: relative;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 7rem;
+            height: 7rem;
+            border-radius: 0.8rem;
+            border: 2.5px solid transparent;
+            /* Metallic body */
+            background-image: linear-gradient(145deg, #f4f4f4, #cedeef);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.25), inset 0 2px 4px rgba(255,255,255,0.7), inset 0 -2px 4px rgba(0,0,0,0.25);
+            transition: 0.25s ease;
+            cursor: pointer;
+        }
+
+
+        .apptile-group > * {
+            margin: 0.7rem;
+        }
+
+        .apptile-icon i {
+            font-size: 2.3rem;
+        }
+
+        .apptile-tile:hover {
+            border-color: var(--primary-color, #2676ab);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.35), inset 0 1px 3px rgba(255,255,255,0.8), inset 0 -1px 3px rgba(0,0,0,0.3);
+        }
+
+            .apptile-tile:hover .apptile-icon i,
+            .apptile-tile:hover .apptile-label {
+                color: var(--primary-color, #2676ab);
+            }
+
+        .apptile-label {
+            color: #494949;
+            transition: 0.4s ease;
+            font-weight: 500;
+            margin-top: 5px;
+        }
+
+        .apptile-input:checked + .apptile-tile {
+            border-color: var(--primary-color, #2676ab);
+            box-shadow: 0 0 12px var(--primary-color, #2676ab), inset 0 2px 3px rgba(255,255,255,0.8), inset 0 -2px 3px rgba(0,0,0,0.3);
+        }
+
+            .apptile-input:checked + .apptile-tile .apptile-icon i,
+            .apptile-input:checked + .apptile-tile .apptile-label {
+                color: var(--primary-color, #2676ab);
+            }
+
+        /* Hover effect — border, icon, and text use --primary-color */
+        .apptile-tile:hover {
+            border-color: var(--primary-color, #2676ab);
+            transform: translateY(-3px);
+        }
+
+            .apptile-tile:hover .apptile-icon i,
+            .apptile-tile:hover .apptile-label {
+                color: var(--primary-color, #2676ab);
+            }
+
+        /* Active (clicked/selected) state — border, icon, and text use --primary-color */
+        .apptile-input:checked + .apptile-tile {
+            border-color: var(--primary-color, #2676ab);
+            box-shadow: 0 0 10px var(--primary-color, #2676ab)33;
+        }
+
+            .apptile-input:checked + .apptile-tile .apptile-icon i,
+            .apptile-input:checked + .apptile-tile .apptile-label {
+                color: var(--primary-color, #2676ab);
+            }
+
+
+        /* === Custom Modal === */
+        #customModal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        #customModal .modal-box {
+            background: linear-gradient(145deg, #ffffff, #f3f7ff);
+            border-radius: 16px;
+            padding: 25px 30px;
+            text-align: center;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.3s ease;
+        }
+
+        #customModal h3 {
+            color: #d33;
+            margin-bottom: 10px;
+        }
+
+        #customModal p {
+            color: #333;
+            font-size: 1rem;
+        }
+
+        #closeModalBtn {
+            margin-top: 20px;
+            background: #2676ab;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
