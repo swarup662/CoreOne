@@ -3,7 +3,14 @@
 @{
     Layout = "_LoginLayout";
 }
-
+<style>
+    body.authentication-bg-pattern {
+        background-image: url('@Url.Content("~/assets/images/bg-material1.jpg")');
+        background-attachment: fixed;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+</style>
 <link href="~/css/login.css" rel="stylesheet" />
 <!-- 🔄 Preloader -->
 <div id="preloader">
