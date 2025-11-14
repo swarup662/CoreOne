@@ -63,6 +63,20 @@
 </html>
 @section Scripts {
 <script>
+                const csKey = "@ViewBag.CompanyKey";
+
+            async function validateCsKey() {
+                const res = await fetch(`/authapi/validate-company-selection?cs=${csKey}`);
+                if (!res.ok) {
+                    window.location.href = "/Account/Login";
+                }
+            }
+
+            // Check every 10 seconds
+            setInterval(validateCsKey, 10000);
+
+            // Initial check
+            validateCsKey();
 $(document).ready(function () {
     const userId = '@userId';
     const selected = new Set();

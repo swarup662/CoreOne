@@ -1,6 +1,8 @@
 ﻿using CoreOne.API.Infrastructure.Data;
 using CoreOne.API.Infrastructure.Services;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System.Linq;
 
 namespace CoreOne.API.Middleware
@@ -25,8 +27,8 @@ namespace CoreOne.API.Middleware
             // Skip public APIs
             if (path.Contains("/auth/login") || path.Contains("/auth/forgotpassword") || path.Contains("/auth/resetpassword")
                || path.Contains("/auth/create-cachekey") || path.Contains("/auth/exchange-cachekey") 
-               ||  path.Contains("/auth/loghttperror")
-                 || path.Contains("/auth/logexception") || path.Contains("/index"))
+               ||  path.Contains("/auth/loghttperror") || path.Contains("/account/companyselection") || path.Contains("auth/create-company-selection-key")
+                 || path.Contains("/auth/validate-company-selection") || path.Contains("/auth/logexception") || path.Contains("/index"))
             {
                 await _next(context);
                 return;

@@ -1,6 +1,7 @@
 ﻿using CoreOne.DOMAIN.Models;
 using CoreOne.UI.Helper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using System.Text;
 using static System.Net.WebRequestMethods;
@@ -11,12 +12,14 @@ namespace CoreOne.UI.Controllers
         private readonly string BaseUrlAuth;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _apiSettings;
+        private readonly IDistributedCache _cache;
 
-        public AccountController(IConfiguration config, IHttpClientFactory httpClientFactory, SettingsService settingsService)
+        public AccountController(IConfiguration config, IHttpClientFactory httpClientFactory, SettingsService settingsService, IDistributedCache cache)
         {
 
             _httpClientFactory = httpClientFactory;
             _apiSettings = settingsService.ApiSettings;
+            _cache = cache;
 
         }
 
@@ -72,31 +75,65 @@ namespace CoreOne.UI.Controllers
             TempData["accessList"] = accessListJson;
             TempData["userId"] = data.user?.userID?.ToString() ?? data.userID?.ToString();
 
-            return RedirectToAction("CompanySelection", "Account");
+            if (IsInternal)
+            {
+                // 1. create company selection cache key
+                var companyKeyReq = new HttpRequestMessage(HttpMethod.Post, $"{_apiSettings.BaseUrlAuth}/create-company-selection-key");
+                var companyKeyRes = await client.SendAsync(companyKeyReq);
+                var keyJson = await companyKeyRes.Content.ReadAsStringAsync();
+                var keyObj = JsonConvert.DeserializeObject<dynamic>(keyJson);
+                string csKey = keyObj.key;
+
+                // 2. Redirect company selection with cache key
+                return Redirect($"/Account/CompanySelection?cs={csKey}");
+            }
+            return Redirect($"/Account/CompanySelection");
         }
 
         [HttpGet]
-        public IActionResult CompanySelection()
+        public async Task<IActionResult> CompanySelection(string cs)
         {
-            if (TempData["accessList"] == null)
+            if (string.IsNullOrEmpty(cs))
                 return RedirectToAction("Login");
 
-            var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(TempData["accessList"].ToString());
+            // Validate using Auth API
+            var client = _httpClientFactory.CreateClient();
+            var res = await client.GetAsync($"{_apiSettings.BaseUrlAuth}/validate-company-selection?cs={cs}");
 
-            // Re-stash access list so it survives page reload
+            if (!res.IsSuccessStatusCode)
+                return RedirectToAction("Login");
+
+            // **CacheKey valid → load page**
             TempData.Keep("accessList");
             TempData.Keep("userId");
 
+            var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(TempData["accessList"].ToString());
+
+            ViewBag.CompanyKey = cs; // pass to view
+
             return View(accessList);
         }
+
+
         [HttpPost]
         public async Task<IActionResult> LaunchApp([FromBody] AppLaunchRequest request)
         {
+            // get jwt from cookie (or TempData)
+            var token = Request.Cookies["jwtToken"];
+
             var client = _httpClientFactory.CreateClient();
             var url = $"{_apiSettings.BaseUrlAuth}/create-cachekey";
 
             var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
-            var response = await client.PostAsync(url, content);
+            var httpReq = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = content
+            };
+
+            if (!string.IsNullOrEmpty(token))
+                httpReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            var response = await client.SendAsync(httpReq);
             var resultJson = await response.Content.ReadAsStringAsync();
 
             if (!response.IsSuccessStatusCode)
@@ -107,10 +144,15 @@ namespace CoreOne.UI.Controllers
 
             var data = JsonConvert.DeserializeObject<dynamic>(resultJson);
 
-            string redirectUrl = data.redirectUrl.ToString();
+            // Set a cookie to enforce company selection timeout (5 minutes)
+            Response.Cookies.Append("companySelectExpiry",
+                DateTime.UtcNow.AddMinutes(5).ToString("o"),
+                new CookieOptions { HttpOnly = false, Secure = true });
 
+            string redirectUrl = data.redirectUrl.ToString();  // this contains #<cacheKey>
             return Json(new { success = true, redirectUrl });
         }
+
 
         [HttpGet]
         public IActionResult GetCompanies()
