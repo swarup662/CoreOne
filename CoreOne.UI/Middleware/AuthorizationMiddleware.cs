@@ -60,14 +60,21 @@ namespace CoreOne.UI.Middleware
                 }
 
                 // ✅ Fetch menu and capture MenuID early
-                var menuService = context.RequestServices.GetRequiredService<IMenuService>();
-                var menuList = await menuService.GetUserMenu(context);
 
-                var matchedMenu = menuList.FirstOrDefault(m =>
-                    !string.IsNullOrEmpty(m.Url) &&
-                    path.StartsWith(m.Url.ToLower())
-                );
+                bool TokenValid = TokenHelper.IsTokenValid(context);
 
+                MenuItem matchedMenu = new MenuItem();
+                List<MenuItem> menuList = new List<MenuItem>();
+                if (TokenValid)
+                {
+
+                    var menuService = context.RequestServices.GetRequiredService<IMenuService>();
+                     menuList = await menuService.GetUserMenu(context);
+                    matchedMenu = menuList.FirstOrDefault(m =>
+                       !string.IsNullOrEmpty(m.Url) &&
+                       path.StartsWith(m.Url.ToLower())
+                   );
+                }
                 // ✅ Store MenuID and full menulist (for layout)
                 if (matchedMenu != null)
                 {
