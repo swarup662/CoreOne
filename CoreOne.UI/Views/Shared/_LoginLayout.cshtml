@@ -9,14 +9,14 @@
 
     if (!path.Contains("/Home/Error", StringComparison.OrdinalIgnoreCase))
     {
-        bool tokenValid = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
+        // bool tokenValid = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
 
-        if (tokenValid)
-        {
-            TempData["message"] = "Welcome";
-            TempData["messagetype"] = "success";
-            HttpContextAccessor.HttpContext.Response.Redirect("/Home/UserDashboard");
-        }
+        // if (tokenValid)
+        // {
+        //     TempData["message"] = "Welcome";
+        //     TempData["messagetype"] = "success";
+        //     HttpContextAccessor.HttpContext.Response.Redirect("/Home/UserDashboard");
+        // }
     }
 }
 <!DOCTYPE html>

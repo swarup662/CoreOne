@@ -15,8 +15,9 @@ namespace CoreOne.UI.Controllers
         private readonly IDistributedCache _cache;
         private readonly SignedCookieHelper _cookieHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly EncryptionHelper EncryptionHelper;
 
-        public AccountController(IConfiguration config, IHttpClientFactory httpClientFactory, SettingsService settingsService, IDistributedCache cache, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
+        public AccountController(IConfiguration config, IHttpClientFactory httpClientFactory, SettingsService settingsService, IDistributedCache cache, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper, EncryptionHelper encryptionHelper)
         {
 
             _httpClientFactory = httpClientFactory;
@@ -24,6 +25,7 @@ namespace CoreOne.UI.Controllers
             _cache = cache;
             _cookieHelper = cookieHelper;
             _httpContextAccessor = httpContextAccessor;
+            EncryptionHelper = encryptionHelper;
         }
 
         [HttpGet]
@@ -113,24 +115,39 @@ namespace CoreOne.UI.Controllers
             var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(TempData["accessList"].ToString());
 
             ViewBag.CompanyKey = cs; // pass to view
-
+            ViewBag.BaseUrlAuth = _apiSettings.BaseUrlAuth;
             return View(accessList);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ValidateCompanySelection(string cs)
+        {
+            var client = _httpClientFactory.CreateClient();
+
+            var res = await client.GetAsync($"{_apiSettings.BaseUrlAuth}/validate-company-selection?cs={cs}");
+
+            if (!res.IsSuccessStatusCode)
+                return BadRequest("Invalid or expired CS key");
+
+            return Ok("Valid");
+        }
 
         [HttpPost]
         public async Task<IActionResult> LaunchApp([FromBody] AppLaunchRequest request)
         {
-            
             var client = _httpClientFactory.CreateClient();
             var url = $"{_apiSettings.BaseUrlAuth}/create-cachekey";
 
-            var content = new StringContent(JsonConvert.SerializeObject(request), Encoding.UTF8, "application/json");
+            var content = new StringContent(
+                JsonConvert.SerializeObject(request),
+                Encoding.UTF8,
+                "application/json"
+            );
+
             var httpReq = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = content
             };
-
 
             var response = await client.SendAsync(httpReq);
             var resultJson = await response.Content.ReadAsStringAsync();
@@ -143,15 +160,59 @@ namespace CoreOne.UI.Controllers
 
             var data = JsonConvert.DeserializeObject<dynamic>(resultJson);
 
-            // Set a cookie to enforce company selection timeout (5 minutes)
-            Response.Cookies.Append("companySelectExpiry",
-                DateTime.UtcNow.AddMinutes(5).ToString("o"),
-                new CookieOptions { HttpOnly = false, Secure = true });
+            // The redirectUrl 
+            // The redirectUrl DOES NOT CHANGE
+            string redirectUrl = data.redirectUrl;
 
-            string redirectUrl = data.redirectUrl.ToString();  // this contains #<cacheKey>
-            return Json(new { success = true, redirectUrl });
+            // Extract OAuth from redirectUrl
+            var uri = new Uri(redirectUrl);
+            var query = Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query);
+            string oauth = query["OAuth"].ToString();
+
+            // Build a clean redirect to your consume endpoint with all parameters
+            string finalRedirect = Url.Action("Consume", "Auth", new
+            {
+                OAuth = oauth,
+                UserID = request.UserID,
+                CompanyID = request.CompanyID,
+                ApplicationID = request.ApplicationID,
+                RoleID = request.RoleID
+            }, Request.Scheme);
+
+         
+            return Json(new
+            {
+                success = true,
+                redirectUrl = finalRedirect
+            });
+
+
         }
 
+
+
+
+
+        private async Task<bool> UrlExistsAsync(string url)
+        {
+            try
+            {
+                var client = _httpClientFactory.CreateClient();
+
+                var request = new HttpRequestMessage(HttpMethod.Head, url);
+
+                var response = await client.SendAsync(
+                    request,
+                    HttpCompletionOption.ResponseHeadersRead
+                );
+
+                return response.IsSuccessStatusCode; // 200–299
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
         [HttpGet]
         public IActionResult GetCompanies()

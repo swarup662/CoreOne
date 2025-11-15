@@ -1,8 +1,9 @@
 ﻿@using CoreOne.DOMAIN.Models
 @using CoreOne.UI.Controllers
 @using CoreOne.UI.Helper
+@using Microsoft.AspNetCore.Http;
 @inject MenuLayoutController MenuController
-@inject IHttpContextAccessor HttpContextAccessor
+
 @inject SignedCookieHelper CookieHelper
 @inject NotificationHelper NotificationHelper
 
@@ -12,8 +13,8 @@
   
 
 
-    var userId = TokenHelper.GetUserIdFromToken(HttpContextAccessor.HttpContext);
-    bool TokenExpiry = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
+    var userId = TokenHelper.GetUserIdFromToken(Context);
+    bool TokenExpiry = TokenHelper.IsTokenValid(Context);
     var menuItems = new List<MenuItem>();
     CurrentUserDetail user = new CurrentUserDetail();
     if (!userId.HasValue || !TokenExpiry)
@@ -21,12 +22,12 @@
         TempData["message"] = "Please Login again";
         TempData["messagetype"] = "error";
         // Redirect to login if userId is null
-        HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
+        Context.Response.Redirect("/Account/Login");
         // Don't return; let the layout render a minimal page
     }
     else
     {
-        var TokenUser = TokenHelper.UserFromToken(HttpContextAccessor.HttpContext, CookieHelper);
+        var TokenUser = TokenHelper.UserFromToken(Context, CookieHelper);
         // Load menu
         if (TokenUser is not null)
         {
@@ -37,7 +38,7 @@
         {
             TokenHelper.RemoveToken(Context);
             // Redirect to login if userId is null
-            HttpContextAccessor.HttpContext.Response.Redirect("/Account/Login");
+            Context.Response.Redirect("/Account/Login");
         }
 
 
@@ -52,7 +53,7 @@
 
 
     var notifications = new List<UserNotification>();
-    var userIdForNoti = TokenHelper.GetUserIdFromToken(HttpContextAccessor.HttpContext);
+    var userIdForNoti = TokenHelper.GetUserIdFromToken(Context);
 
     if (userIdForNoti.HasValue)
     {
@@ -1048,7 +1049,9 @@
                 data: JSON.stringify({ context: raw }),
                 success: function (res) {
                     if (res.success) {
-                        setTimeout(() => location.reload(), 200);
+                        setTimeout(() => {
+                    window.location.href = "/Home/UserDashboard";
+                         }, 200);
                     }
                 }
             });

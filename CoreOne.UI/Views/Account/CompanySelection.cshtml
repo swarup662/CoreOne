@@ -1,4 +1,7 @@
-﻿@model List<CoreOne.DOMAIN.Models.UserAccessViewModel>
+﻿@using CoreOne.UI.Helper
+
+@model List<CoreOne.DOMAIN.Models.UserAccessViewModel>
+
 
 @{
     Layout = "_AppLayout";
@@ -62,21 +65,42 @@
 </body>
 </html>
 @section Scripts {
-<script>
-                const csKey = "@ViewBag.CompanyKey";
 
-            async function validateCsKey() {
-                const res = await fetch(`/authapi/validate-company-selection?cs=${csKey}`);
-                if (!res.ok) {
+
+    <script>
+
+          const csKey = "@ViewBag.CompanyKey";
+
+            async function validateCompanySelection() {
+
+                try {
+                    const url = `/Account/ValidateCompanySelection?cs=${csKey}`;
+
+                    const res = await fetch(url);
+
+                    if (!res.ok) {
+                        window.location.href = "/Account/Login";
+                        return;
+                    }
+
+                    console.log("Company selection valid.");
+                }
+                catch (err) {
+                    console.error("Validation failed:", err);
                     window.location.href = "/Account/Login";
                 }
             }
 
-            // Check every 10 seconds
-            setInterval(validateCsKey, 10000);
-
             // Initial check
-            validateCsKey();
+            validateCompanySelection();
+
+            // Poll every 10 seconds
+            setInterval(validateCompanySelection, 30000);
+
+
+
+
+
 $(document).ready(function () {
     const userId = '@userId';
     const selected = new Set();
@@ -230,6 +254,7 @@ $(document).ready(function () {
             const check = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
             $('#preloader').fadeOut(200);
             showToast('Application launched successfully!', 'success');
+                    
             setTimeout(() => { window.location.href = url; }, 800);
         } catch (err) {
             $('#preloader').fadeOut(200);

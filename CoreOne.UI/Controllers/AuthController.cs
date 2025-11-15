@@ -16,23 +16,25 @@ namespace CoreOne.App.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
         private readonly SignedCookieHelper _cookie;
- 
+        private readonly EncryptionHelper EncryptionHelper;
+
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthController(IHttpClientFactory factory, IConfiguration config, SignedCookieHelper cookie, IHttpContextAccessor httpContextAccessor)
+        public AuthController(IHttpClientFactory factory, IConfiguration config, SignedCookieHelper cookie, IHttpContextAccessor httpContextAccessor, EncryptionHelper encryptionHelper)
         {
             _httpClientFactory = factory;
             _config = config;
             _cookie = cookie;
             _httpContextAccessor = httpContextAccessor;
+            EncryptionHelper = encryptionHelper;
         }
 
-       
+
         [HttpGet("consume")]
-        public async Task<IActionResult> Consume([FromQuery] string OAuth)
+        public async Task<IActionResult> Consume([FromQuery] ConsumeInputModel model)
         {
-            if (string.IsNullOrEmpty(OAuth))
-                return BadRequest("Missing cache key");
+            if (model == null || string.IsNullOrEmpty(model.OAuth))
+                return BadRequest("Invalid input model.");
 
             var client = _httpClientFactory.CreateClient();
             string authApi = _config["AuthApi:BaseUrl"];
@@ -41,7 +43,7 @@ namespace CoreOne.App.Controllers
 
             var requestBody = new
             {
-                CacheKey = OAuth,
+                CacheKey = model.OAuth,
                 ApplicationID = int.Parse(appId),
                 AppSecret = appSecret
             };
@@ -53,6 +55,7 @@ namespace CoreOne.App.Controllers
             );
 
             var response = await client.PostAsync($"{authApi}/exchange-cachekey", content);
+
             if (!response.IsSuccessStatusCode)
             {
                 var msg = await response.Content.ReadAsStringAsync();
@@ -62,7 +65,7 @@ namespace CoreOne.App.Controllers
             var data = JObject.Parse(await response.Content.ReadAsStringAsync());
             string token = data["access_token"].ToString();
 
-            // 1️⃣ Save JWT token in secure cookie
+            // Save JWT token
             Response.Cookies.Append("jwtToken", token, new CookieOptions
             {
                 HttpOnly = true,
@@ -71,37 +74,21 @@ namespace CoreOne.App.Controllers
                 Expires = DateTime.UtcNow.AddHours(1)
             });
 
-
-            if (TempData["accessList"] == null)
-                return Json(new List<object>());
-
-            var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(TempData["accessList"].ToString());
-            // 2️⃣ Extract defaults from JWT token
-            
-            
-
-            int defaultCompany = accessList?.FirstOrDefault()?.CompanyID ?? 0;
-            int defaultApp = accessList?.FirstOrDefault()?.ApplicationID ?? 0;
-            int defaultRole = accessList?.FirstOrDefault()?.RoleID ?? 0;
-
-        
-
-            string rawContext = $"{defaultCompany}|{defaultApp}|{defaultRole}";
-
-            // 4️⃣ Create signed secure cookie
+            // Build UserCtx
+            string rawContext = $"{model.CompanyID}|{model.ApplicationID}|{model.RoleID}";
             string signed = _cookie.CreateSignedValue(rawContext);
 
             Response.Cookies.Append("UserCtx", signed, new CookieOptions
             {
-                HttpOnly = true,         // SUPER SECURE – JS cannot read
+                HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTime.UtcNow.AddHours(1)
             });
 
-            // 5️⃣ Redirect after setting context
             return Redirect("/Home/UserDashboard");
         }
+
 
 
         [HttpGet("GetSwitchOptions")]
@@ -131,16 +118,20 @@ namespace CoreOne.App.Controllers
         }
 
         [HttpPost("SetUserContext")]
-        public IActionResult SetUserContext([FromBody] dynamic body, [FromServices] SignedCookieHelper cookieHelper)
+        public IActionResult SetUserContext(
+    [FromBody] ContextRequest body,
+    [FromServices] SignedCookieHelper cookieHelper)
         {
             try
             {
-                string value = (string)body.context;   // "company|app|role"
-                string signed = cookieHelper.CreateSignedValue(value);
+                if (body == null || string.IsNullOrEmpty(body.Context))
+                    return Json(new { success = false, message = "Missing context" });
+
+                string signed = cookieHelper.CreateSignedValue(body.Context);
 
                 Response.Cookies.Append("UserCtx", signed, new CookieOptions
                 {
-                    HttpOnly = true,         // ⭐ Cannot be read by JS
+                    HttpOnly = true,
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTime.UtcNow.AddHours(1)
@@ -148,11 +139,16 @@ namespace CoreOne.App.Controllers
 
                 return Json(new { success = true });
             }
-            catch
+            catch (Exception ex)
             {
-                return Json(new { success = false, message = "Failed" });
+                return Json(new { success = false, message = ex.Message });
             }
         }
+        public class ContextRequest
+        {
+            public string Context { get; set; }
+        }
+
         [HttpGet("GetCurrentContext")]
         public IActionResult GetCurrentContext([FromServices] SignedCookieHelper cookieHelper)
         {

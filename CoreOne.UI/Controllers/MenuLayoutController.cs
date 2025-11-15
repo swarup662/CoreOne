@@ -12,11 +12,16 @@ namespace CoreOne.UI.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _apiSettings;
+        private readonly SignedCookieHelper _cookieHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MenuLayoutController(IHttpClientFactory httpClientFactory, SettingsService settingsService, IConfiguration config)
+        public MenuLayoutController(IHttpClientFactory httpClientFactory, SettingsService settingsService, IConfiguration config, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
         {
             _httpClientFactory = httpClientFactory;
             _apiSettings = settingsService.ApiSettings;
+            _cookieHelper = cookieHelper;
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
         public async Task<List<MenuItem>> UserMenu(HttpContext context)
@@ -24,6 +29,7 @@ namespace CoreOne.UI.Controllers
            
 
             var menuItems = new List<MenuItem>();
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             var userId = TokenHelper.GetUserIdFromToken(context);
 
             var client = _httpClientFactory.CreateClient();
@@ -34,7 +40,7 @@ namespace CoreOne.UI.Controllers
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
 
-            var response = await client.GetAsync($"{_apiSettings.BaseUrlPermission}/GetUserMenu/{userId}");
+            var response = await client.GetAsync($"{_apiSettings.BaseUrlPermission}/GetUserMenu/{userId}/{user.CurrentApplicationID}/{user.CurrentCompanyID}/{user.CurrentRoleID}");
 
             if (response.IsSuccessStatusCode)
             {
