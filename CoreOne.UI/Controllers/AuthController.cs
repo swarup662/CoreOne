@@ -3,6 +3,7 @@ using CoreOne.UI.Helper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -26,6 +27,7 @@ namespace CoreOne.App.Controllers
             _httpContextAccessor = httpContextAccessor;
         }
 
+       
         [HttpGet("consume")]
         public async Task<IActionResult> Consume([FromQuery] string OAuth)
         {
@@ -44,7 +46,12 @@ namespace CoreOne.App.Controllers
                 AppSecret = appSecret
             };
 
-            var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestBody), System.Text.Encoding.UTF8, "application/json");
+            var content = new StringContent(
+                System.Text.Json.JsonSerializer.Serialize(requestBody),
+                System.Text.Encoding.UTF8,
+                "application/json"
+            );
+
             var response = await client.PostAsync($"{authApi}/exchange-cachekey", content);
             if (!response.IsSuccessStatusCode)
             {
@@ -55,17 +62,47 @@ namespace CoreOne.App.Controllers
             var data = JObject.Parse(await response.Content.ReadAsStringAsync());
             string token = data["access_token"].ToString();
 
-            // Save token in cookie (or session)
+            // 1️⃣ Save JWT token in secure cookie
             Response.Cookies.Append("jwtToken", token, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddHours(1)
             });
 
-            // Redirect to dashboard
+
+            if (TempData["accessList"] == null)
+                return Json(new List<object>());
+
+            var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(TempData["accessList"].ToString());
+            // 2️⃣ Extract defaults from JWT token
+            
+            
+
+            int defaultCompany = accessList?.FirstOrDefault()?.CompanyID ?? 0;
+            int defaultApp = accessList?.FirstOrDefault()?.ApplicationID ?? 0;
+            int defaultRole = accessList?.FirstOrDefault()?.RoleID ?? 0;
+
+        
+
+            string rawContext = $"{defaultCompany}|{defaultApp}|{defaultRole}";
+
+            // 4️⃣ Create signed secure cookie
+            string signed = _cookie.CreateSignedValue(rawContext);
+
+            Response.Cookies.Append("UserCtx", signed, new CookieOptions
+            {
+                HttpOnly = true,         // SUPER SECURE – JS cannot read
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddHours(1)
+            });
+
+            // 5️⃣ Redirect after setting context
             return Redirect("/Home/UserDashboard");
         }
+
 
         [HttpGet("GetSwitchOptions")]
         public IActionResult GetSwitchOptions(
@@ -93,7 +130,7 @@ namespace CoreOne.App.Controllers
             return Json(result);
         }
 
-        [HttpPost]
+        [HttpPost("SetUserContext")]
         public IActionResult SetUserContext([FromBody] dynamic body, [FromServices] SignedCookieHelper cookieHelper)
         {
             try
@@ -106,7 +143,7 @@ namespace CoreOne.App.Controllers
                     HttpOnly = true,         // ⭐ Cannot be read by JS
                     Secure = true,
                     SameSite = SameSiteMode.Strict,
-                    Expires = DateTime.UtcNow.AddHours(8)
+                    Expires = DateTime.UtcNow.AddHours(1)
                 });
 
                 return Json(new { success = true });
@@ -116,7 +153,7 @@ namespace CoreOne.App.Controllers
                 return Json(new { success = false, message = "Failed" });
             }
         }
-        [HttpGet]
+        [HttpGet("GetCurrentContext")]
         public IActionResult GetCurrentContext([FromServices] SignedCookieHelper cookieHelper)
         {
             // Read secure signed cookie

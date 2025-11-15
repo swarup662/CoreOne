@@ -35,7 +35,7 @@ namespace CoreOne.UI.Controllers
 
         {
 
-            var user = TokenHelper.UserFromToken(HttpContext);   // <-- get logged-in user
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);  // <-- get logged-in user
 
             var model = new RoleCreationsRequest
             {
