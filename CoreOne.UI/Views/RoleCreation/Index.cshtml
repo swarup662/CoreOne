@@ -487,21 +487,25 @@
                         <span asp-validation-for="RoleDescription" class="text-danger"></span>
                        
                     </div>
-                <div class="mb-3">
-                    <label class="form-label">Display On</label>
-                    <select asp-for="DisplayOn" class="form-select">
-                        <option value="1">On</option>
-                        <option value="0">Off</option>
-                    </select>
-                </div>
+                <div class="row">
+                    <!-- Display On -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Display On</label>
+                        <select asp-for="DisplayOn" class="form-select">
+                            <option value="1">On</option>
+                            <option value="0">Off</option>
+                        </select>
+                    </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Status</label>
-                    <select asp-for="ActiveFlag" class="form-select">
-                        <option value="1">Active</option>
-                        <option value="0">Deactivate</option>
-                        <option value="2">Hold</option>
-                    </select>
+                    <!-- Active Flag -->
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label fw-semibold">Status</label>
+                        <select asp-for="ActiveFlag" class="form-select">
+                            <option value="1">Active</option>
+                            <option value="0">Deactivate</option>
+                            <option value="2">Hold</option>
+                        </select>
+                    </div>
                 </div>
                 </div>
 
