@@ -118,9 +118,7 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> LaunchApp([FromBody] AppLaunchRequest request)
         {
-            // get jwt from cookie (or TempData)
-            var token = Request.Cookies["jwtToken"];
-
+            
             var client = _httpClientFactory.CreateClient();
             var url = $"{_apiSettings.BaseUrlAuth}/create-cachekey";
 
@@ -130,8 +128,6 @@ namespace CoreOne.UI.Controllers
                 Content = content
             };
 
-            if (!string.IsNullOrEmpty(token))
-                httpReq.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
             var response = await client.SendAsync(httpReq);
             var resultJson = await response.Content.ReadAsStringAsync();
@@ -231,8 +227,10 @@ namespace CoreOne.UI.Controllers
 
             if (user != null)
             {
-                
-                    var client = _httpClientFactory.CreateClient();
+                //  Clear TempData (ALL keys)
+                TempData.Clear();
+
+                var client = _httpClientFactory.CreateClient();
                     var url = _apiSettings.BaseUrlAuth + "/Logout";
 
                     var json = JsonConvert.SerializeObject(user.UserID);
@@ -258,6 +256,44 @@ namespace CoreOne.UI.Controllers
             return Json(new { success = true, redirectUrl = Url.Action("Login", "Account") });
         }
 
+
+        [HttpPost]
+        public async Task<IActionResult> CompanyLogout([FromBody] CsRequest body)
+        {
+            string csKey = body?.csKey;
+            int userID = 0;
+             userID = JsonConvert.DeserializeObject<int>(TempData["userId"].ToString());
+            if (string.IsNullOrEmpty(csKey))
+                return Json(new { success = false, message = "Cache key missing" });
+            var token = HttpContext.Request.Cookies["jwtToken"];
+           
+            _cache.Remove(csKey);
+
+            var client = _httpClientFactory.CreateClient();
+            var url = _apiSettings.BaseUrlAuth + "/LogoutFromCompanySelectionPage";
+
+            var json = JsonConvert.SerializeObject(0);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, url)
+            {
+                Content = content
+            };
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+
+            var logres=await client.SendAsync(request);
+
+
+            // Clear cookie
+            HttpContext.Response.Cookies.Delete("jwtToken");
+            //  Clear TempData (ALL keys)
+            TempData.Clear();
+            return Json(new { success = true, redirectUrl = Url.Action("Login", "Account") });
+        }
         [HttpPost]
 
         public IActionResult ClearTempData()
@@ -331,5 +367,9 @@ namespace CoreOne.UI.Controllers
 
         #endregion
 
+    }
+    public class CsRequest
+    {
+        public string csKey { get; set; }
     }
 }

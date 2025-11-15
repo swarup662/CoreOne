@@ -315,10 +315,12 @@ $(document).ready(function () {
 
         if (result.isConfirmed) {
             try {
-                let response = await fetch('/Account/Logout', {
+                      let response = await fetch('/Account/CompanyLogout', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ csKey: csKey })
                 });
+
                 let data = await response.json();
 
                 if (data.success) {

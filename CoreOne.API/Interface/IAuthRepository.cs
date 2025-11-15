@@ -8,6 +8,7 @@ namespace CoreOne.API.Interfaces
         (bool Ok, string Message, string RedirectUrl) CreateCacheKeyAndGetRedirectUrl(int userId, int companyId, int appId, int roleId, string? sourceIp, string urlType = "domain");
         (bool Ok, string Message, string Token) ExchangeCacheKeyForToken(string cacheKey, int appId, string? callerIp, string userAgent);
         int Logout(int userID, string ipAddress, string userAgent);
+        int LogoutFromCompanySelectionPage(int userID, string ipAddress, string userAgent);
         int LogHttpError(LogHttpErrorRequest request);
         int LogException(LogExceptionRequest request);
 

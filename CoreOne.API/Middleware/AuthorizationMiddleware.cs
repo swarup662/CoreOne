@@ -25,7 +25,7 @@ namespace CoreOne.API.Middleware
             var path = context.Request.Path.Value?.ToLower();
 
             // Skip public APIs
-            if (path.Contains("/auth/login") || path.Contains("/auth/forgotpassword") || path.Contains("/auth/resetpassword")
+            if (path.Contains("/auth/login") || path.Contains("/auth/logout") || path.Contains("/auth/forgotpassword") || path.Contains("/auth/resetpassword")
                || path.Contains("/auth/create-cachekey") || path.Contains("/auth/exchange-cachekey") 
                ||  path.Contains("/auth/loghttperror") || path.Contains("/account/companyselection") || path.Contains("auth/create-company-selection-key")
                  || path.Contains("/auth/validate-company-selection") || path.Contains("/auth/logexception") || path.Contains("/index"))

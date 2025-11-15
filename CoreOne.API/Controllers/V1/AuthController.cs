@@ -255,6 +255,18 @@ namespace CoreOne.API.Controllers.V1
             return Ok(result > 0 ? "Logged out successfully" : "Logout failed");
         }
 
+
+        // LOGOUT
+        [HttpPost("LogoutFromCompanySelectionPage")]
+        public IActionResult LogoutFromCompanySelectionPage([FromBody] int userID)
+        {
+
+            string userAgent = Request.Headers["User-Agent"].ToString();
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            int result = _authRepository.LogoutFromCompanySelectionPage(userID, ipAddress, userAgent);
+            return Ok(result > 0 ? "Logged out successfully" : "Logout failed");
+        }
+
         [HttpPost("LogHttpError")]
         public IActionResult LogHttpError([FromBody] LogHttpErrorRequest request)
         {
