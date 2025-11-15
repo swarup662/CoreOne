@@ -36,7 +36,7 @@ namespace CoreOne.UI.Middleware
 
             // Skip login page
             if (string.IsNullOrEmpty(token) || path.Contains("/account/login") || path.Contains("/api/FileUpload/viewPost") || path.Contains("/account/forgotpassword")
-                || path.Contains("/account/resetpassword") || path.Contains("/account/logout"))
+                || path.Contains("/account/resetpassword") || path.Contains("/auth/getswitchoptions") || path.Contains("/account/logout"))
             {
                 await _next(context);
                 return;

@@ -216,14 +216,15 @@ namespace CoreOne.API.Repositories
                 });
             }
 
-             var allowed = accessList.Where(x =>
-                                    x.CompanyID == companyId &&
-                                    x.RoleID == roleId &&
-                                    x.ApplicationID == appId
-                                );
+            var allowed = accessList
+                        .Where(x =>
+
+                            x.ApplicationID == appId
+                        )
+                        .ToList();
 
             // 4️⃣ Generate unified user token
-            string token = _tokenService.GenerateUserToken(user, accessList);
+            string token = _tokenService.GenerateUserToken(user, allowed);
 
             // 5️⃣ Remove cache key (one-time use)
             _cache.Remove(cacheKey);

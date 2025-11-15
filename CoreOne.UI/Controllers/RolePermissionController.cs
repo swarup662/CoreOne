@@ -12,11 +12,16 @@ namespace CoreOne.UI.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _apiSettings;
+        private readonly SignedCookieHelper _cookieHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public RolePermissionController(IHttpClientFactory httpClientFactory, SettingsService settingsService)
+
+        public RolePermissionController(IHttpClientFactory httpClientFactory, SettingsService settingsService, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
         {
             _httpClientFactory = httpClientFactory;
             _apiSettings = settingsService.ApiSettings;
+            _cookieHelper = cookieHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // =========================
@@ -168,7 +173,8 @@ namespace CoreOne.UI.Controllers
         {
             var client = _httpClientFactory.CreateClient();
             var content = new StringContent(JsonConvert.SerializeObject(permissions), Encoding.UTF8, "application/json");
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             // assuming userId = 1 for demo
             var response = await client.PostAsync($"{_apiSettings.BaseUrlRolePermission}/SaveRolePermission/{roleId}/{user.UserID}", content);
             if (!response.IsSuccessStatusCode)
@@ -191,7 +197,8 @@ namespace CoreOne.UI.Controllers
         public async Task<IActionResult> DeleteRolePermission(int roleId)
         {
             var client = _httpClientFactory.CreateClient();
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             var response = await client.DeleteAsync($"{_apiSettings.BaseUrlRolePermission}/DeleteRolePermission/{roleId}/{user.UserID}");
 
             if (!response.IsSuccessStatusCode)

@@ -13,14 +13,19 @@ namespace CoreOne.UI.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _api;
         private readonly ActionPermissionHtmlProcessorUiHelper _htmlProcessor;
+        private readonly SignedCookieHelper _cookieHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpClientFactory, SettingsService settingsService, ActionPermissionHtmlProcessorUiHelper htmlProcessor)
+        public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpClientFactory, SettingsService settingsService, ActionPermissionHtmlProcessorUiHelper htmlProcessor, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
         {
             _httpClientFactory = httpClientFactory;
             _api = settingsService.ApiSettings;
             _htmlProcessor = htmlProcessor;
+            _cookieHelper = cookieHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public IActionResult Index()
@@ -44,7 +49,7 @@ namespace CoreOne.UI.Controllers
         public async Task<IActionResult> MyAccount()
         {
             var client = _httpClientFactory.CreateClient();
-            var loggedUser = TokenHelper.UserFromToken(HttpContext);
+            var loggedUser = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             int userId = loggedUser.UserID;
 
             var url = _api.BaseUrlUserCreation + "/GetUserMyAccount";

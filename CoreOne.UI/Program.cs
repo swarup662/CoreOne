@@ -18,7 +18,10 @@ builder.Services.AddScoped<IMenuService, MenuService>();
 // Add this line to make ApiSettings directly injectable
 builder.Services.AddSingleton(resolver =>
     resolver.GetRequiredService<IOptions<ApiSettingsHelper>>().Value);
-
+builder.Services.Configure<SecuritySettings>(
+    builder.Configuration.GetSection("Security"));
+builder.Services.AddSingleton<EncryptionHelper>();
+builder.Services.AddSingleton<SignedCookieHelper>();
 builder.Services.Configure<FileUploadSettings>(options =>
 {
     var configPath = Path.Combine(builder.Environment.WebRootPath, "config", "FileUploadSettings.json");

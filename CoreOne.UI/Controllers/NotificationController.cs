@@ -11,11 +11,16 @@ namespace CoreOne.UI.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _api;
+        private readonly SignedCookieHelper _cookieHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public NotificationController(IHttpClientFactory httpClientFactory, SettingsService settingsService)
+
+        public NotificationController(IHttpClientFactory httpClientFactory, SettingsService settingsService, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
         {
             _httpClientFactory = httpClientFactory;
             _api = settingsService.ApiSettings;
+            _cookieHelper = cookieHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
 
@@ -183,7 +188,8 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteUserNotification([FromBody] int NotificationID)
         {
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             var client = _httpClientFactory.CreateClient();
             var url = _api.BaseUrlUserNotification + "/DeleteUserNotification";
 

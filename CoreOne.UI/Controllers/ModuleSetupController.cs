@@ -16,11 +16,16 @@ namespace CoreOne.UI.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _api;
         private readonly ActionPermissionHtmlProcessorUiHelper _htmlProcessor;
-        public ModuleSetupController(IHttpClientFactory httpClientFactory, SettingsService settingsService, ActionPermissionHtmlProcessorUiHelper htmlProcessor)
+        private readonly SignedCookieHelper _cookieHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ModuleSetupController(IHttpClientFactory httpClientFactory, SettingsService settingsService, ActionPermissionHtmlProcessorUiHelper htmlProcessor, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
         {
             _httpClientFactory = httpClientFactory;
             _api = settingsService.ApiSettings;
             _htmlProcessor = htmlProcessor;
+            _cookieHelper = cookieHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -93,7 +98,8 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveMenuWithModules([FromBody] MenuWithModulesSave model)
         {
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             model.CreatedBy = user.UserID;
 
             var client = _httpClientFactory.CreateClient();
@@ -239,7 +245,7 @@ namespace CoreOne.UI.Controllers
             if (model == null || model.Actions == null)
                 return Json(new { success = false, message = "Invalid data." });
 
-            var user = TokenHelper.UserFromToken(HttpContext);
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
 
             try
             {

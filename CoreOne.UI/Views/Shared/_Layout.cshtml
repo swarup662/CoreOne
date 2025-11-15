@@ -3,7 +3,7 @@
 @using CoreOne.UI.Helper
 @inject MenuLayoutController MenuController
 @inject IHttpContextAccessor HttpContextAccessor
-
+@inject SignedCookieHelper CookieHelper
 @inject NotificationHelper NotificationHelper
 
 
@@ -15,7 +15,7 @@
     var userId = TokenHelper.GetUserIdFromToken(HttpContextAccessor.HttpContext);
     bool TokenExpiry = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
     var menuItems = new List<MenuItem>();
-    User user = new User();
+    CurrentUserDetail user = new CurrentUserDetail();
     if (!userId.HasValue || !TokenExpiry)
     {
         TempData["message"] = "Please Login again";
@@ -26,7 +26,7 @@
     }
     else
     {
-        var TokenUser = TokenHelper.UserFromToken(Context);
+        var TokenUser = TokenHelper.UserFromToken(HttpContextAccessor.HttpContext, CookieHelper);
         // Load menu
         if (TokenUser is not null)
         {
@@ -489,6 +489,7 @@
 
 
                         </div>
+
                     </li>
 
 
@@ -497,7 +498,16 @@
                             <i class="fe-settings noti-icon"></i>
                         </a>
                     </li>
+                    <li class="dropdown">
+                        <a href="javascript:void(0);"
+                           class="nav-link "
+                           data-bs-toggle="modal"
+                           data-bs-target="#switchModal">
+                            <i class="bi bi-arrow-left-right"></i> Switch
+                        </a>
+                    </li>
 
+                  
                 </ul>
 
                 <style>
@@ -899,6 +909,36 @@
     <!-- /Right-bar -->
     <!-- Right bar overlay-->
     <div class="rightbar-overlay"></div>
+    <div class="modal fade" id="switchModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Switch Company & Role</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div id="switchLoader" class="text-center py-4">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mt-2">Loading...</p>
+                    </div>
+
+                    <div id="switchContent" style="display:none;">
+                        <div class="list-group" id="switchList"></div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button id="applySwitchBtn" class="btn btn-primary">Apply Switch</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
 
     @*  <script>
              const toggleBtn = document.querySelector('.button-menu-mobile');
@@ -937,6 +977,123 @@
 
     @*     <script src="~/js/file-upload.js"></script> *@
     <script>
+
+        // OPEN SWITCH MODAL
+        $(document).on("click", "#btnSwitch", function () {
+
+            $("#switchModal").modal("show");
+            $("#switchLoader").show();
+            $("#switchContent").hide();
+
+            // Load all company/app/role options
+            $.ajax({
+                url: "/Auth/GetSwitchOptions",
+                method: "GET",
+                success: function (data) {
+
+                    let html = "";
+
+                    $.each(data, function (i, x) {
+
+                        html += `
+                            <label class="list-group-item d-flex justify-content-between align-items-center">
+
+                                <div>
+                                    <div><strong>${x.companyName}</strong></div>
+                                    <small>${x.applicationName} — ${x.roleName}</small>
+                                </div>
+
+                                <div class="form-check form-switch">
+                                    <input type="checkbox"
+                                           class="form-check-input switch-option"
+                                           data-company="${x.companyID}"
+                                           data-app="${x.applicationID}"
+                                           data-role="${x.roleID}">
+                                </div>
+
+                            </label>
+                        `;
+                    });
+
+                    $("#switchList").html(html);
+
+                    // Now tell UI which one should be selected
+                    markActiveContext();
+
+                    $("#switchLoader").hide();
+                    $("#switchContent").show();
+                }
+            });
+        });
+
+
+        // APPLY SWITCH (Company/App/Role)
+        $(document).on("change", ".switch-option", function () {
+
+            // Unselect others
+            $(".switch-option").not(this).prop("checked", false);
+
+            let comp = $(this).data("company");
+            let app = $(this).data("app");
+            let role = $(this).data("role");
+
+            let raw = `${comp}|${app}|${role}`;
+
+            $.ajax({
+                url: "/Auth/SetUserContext",
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify({ context: raw }),
+                success: function (res) {
+                    if (res.success) {
+                        setTimeout(() => location.reload(), 200);
+                    }
+                }
+            });
+        });
+
+
+        // Highlight currently active selection in modal
+        function markActiveContext() {
+
+            $.ajax({
+                url: "/Auth/GetCurrentContext",
+                method: "GET",
+                success: function (res) {
+
+                    if (!res || !res.success) return;
+
+                    let comp = res.companyId;
+                    let app = res.applicationId;
+                    let role = res.roleId;
+
+                    $(".switch-option").each(function () {
+
+                        let c = $(this).data("company");
+                        let a = $(this).data("app");
+                        let r = $(this).data("role");
+
+                        if (c == comp && a == app && r == role)
+                            $(this).prop("checked", true);
+                        else
+                            $(this).prop("checked", false);
+                    });
+                }
+            });
+        }
+
+    </script>
+
+
+
+    <script>
+
+      
+
+
+
+
+
         async function markAsRead(id) {
             try {
                 await fetch('/Notification/MarkAsRead', {

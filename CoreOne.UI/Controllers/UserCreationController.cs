@@ -17,17 +17,22 @@ namespace CoreOne.UI.Controllers
         private readonly ApiSettingsHelper _api;
         private readonly ActionPermissionHtmlProcessorUiHelper _htmlProcessor;
         private readonly NotificationHelper _notificationHelper; // ✅ Add helper
+        private readonly SignedCookieHelper _cookieHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         public UserCreationController(
             IHttpClientFactory httpClientFactory,
             SettingsService settingsService,
             ActionPermissionHtmlProcessorUiHelper htmlProcessor,
-            NotificationHelper notificationHelper) // ✅ Inject helper
+            NotificationHelper notificationHelper, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper) // ✅ Inject helper
         {
             _httpClientFactory = httpClientFactory;
             _api = settingsService.ApiSettings;
             _htmlProcessor = htmlProcessor;
             _notificationHelper = notificationHelper; // ✅ Assign
+            _cookieHelper = cookieHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -71,7 +76,8 @@ namespace CoreOne.UI.Controllers
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortDir = sortDir;
 
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             ViewBag.RoleList = await GetRoles(user.UserID);
             ViewBag.GenderList = await GetGenders(user.UserID);
             ViewBag.MailTypeList = await GetMailTypes(user.UserID);
@@ -301,7 +307,7 @@ namespace CoreOne.UI.Controllers
                     ? _api.BaseUrlUserCreation + "/UpdateUser"
                     : _api.BaseUrlUserCreation + "/AddUser";
 
-                var user = TokenHelper.UserFromToken(HttpContext);
+                var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
                 model.CreatedBy = user.UserID;
 
                 var json = JsonConvert.SerializeObject(model);
@@ -466,7 +472,8 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> DeactivateUser([FromBody] int userId)
         {
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             var client = _httpClientFactory.CreateClient();
             var url = _api.BaseUrlUserCreation + "/ActivateDeactivateUser";
 
@@ -505,7 +512,8 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> ActivateUser([FromBody] int userId)
         {
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             var client = _httpClientFactory.CreateClient();
             var url = _api.BaseUrlUserCreation + "/ActivateDeactivateUser";
 
@@ -564,7 +572,8 @@ namespace CoreOne.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetRoleAndExtraPermissions(int userId, int roleId)
         {
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             var client = _httpClientFactory.CreateClient();
             var response = await client.GetAsync($"{_api.BaseUrlRolePermission}/GetRolePermissionByRoleId/{roleId}");
             var json = await response.Content.ReadAsStringAsync();
@@ -668,7 +677,8 @@ namespace CoreOne.UI.Controllers
         {
             var client = _httpClientFactory.CreateClient();
             var content = new StringContent(JsonConvert.SerializeObject(permissions), Encoding.UTF8, "application/json");
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             // assuming userId = 1 for demo
             var response = await client.PostAsync($"{_api.BaseUrlUserCreation}/SaveExtraPermission/{user.UserID}", content);
             if (!response.IsSuccessStatusCode)
@@ -691,8 +701,9 @@ namespace CoreOne.UI.Controllers
         public async Task<List<ExtraPermission>> GetExtraPermissionByUserId(int UserId)
         {
             var client = _httpClientFactory.CreateClient();
-      
-            var creater = TokenHelper.UserFromToken(HttpContext);
+
+
+            var creater = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             // assuming userId = 1 for demo
             var response = await client.GetAsync($"{_api.BaseUrlUserCreation}/GetExtraPermissionByUserId/{UserId}/{creater.UserID}");
             if (!response.IsSuccessStatusCode)

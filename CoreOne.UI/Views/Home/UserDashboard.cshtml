@@ -3,12 +3,13 @@
 @using CoreOne.UI.Helper
 @inject MenuLayoutController MenuController
 @inject IHttpContextAccessor HttpContextAccessor
+@inject SignedCookieHelper CookieHelper
 
 @{
     var userId = TokenHelper.GetUserIdFromToken(HttpContextAccessor.HttpContext);
     bool tokenValid = TokenHelper.IsTokenValid(HttpContextAccessor.HttpContext);
     var menuItems = new List<MenuItem>();
-    User user = new User();
+    CurrentUserDetail user = new CurrentUserDetail();
 
     // ✅ 1. Check authentication
     if (!userId.HasValue || !tokenValid)
@@ -22,7 +23,8 @@
     }
 
     // ✅ 2. Load user info
-    var tokenUser = TokenHelper.UserFromToken(Context);
+    var tokenUser = TokenHelper.UserFromToken(HttpContextAccessor.HttpContext, CookieHelper);
+
     if (tokenUser is not null)
     {
         user = tokenUser;

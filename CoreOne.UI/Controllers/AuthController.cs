@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net.Http;
-using System.Threading.Tasks;
+﻿using CoreOne.DOMAIN.Models;
+using CoreOne.UI.Helper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace CoreOne.App.Controllers
 {
@@ -11,11 +13,16 @@ namespace CoreOne.App.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _config;
+        private readonly SignedCookieHelper _cookie;
+ 
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthController(IHttpClientFactory factory, IConfiguration config)
+        public AuthController(IHttpClientFactory factory, IConfiguration config, SignedCookieHelper cookie, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = factory;
             _config = config;
+            _cookie = cookie;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet("consume")]
@@ -58,5 +65,103 @@ namespace CoreOne.App.Controllers
             // Redirect to dashboard
             return Redirect("/Home/UserDashboard");
         }
+
+        [HttpGet("GetSwitchOptions")]
+        public IActionResult GetSwitchOptions(
+            [FromServices] IHttpContextAccessor accessor,
+            [FromServices] SignedCookieHelper cookieHelper)
+        {
+            var user = TokenHelper.UserFromToken(accessor.HttpContext, cookieHelper);
+            if (user == null)
+                return Json(new List<object>());
+
+            var access = user.UserAccessList ?? new List<UserAccessViewModel>();
+
+            var result = access.Select(a => new
+            {
+                companyID = a.CompanyID,
+                companyName = a.CompanyName,
+                applicationID = a.ApplicationID,
+                applicationName = a.ApplicationName,
+                roleID = a.RoleID,
+                roleName = a.RoleName,
+                colorCode = a.ColorCode,
+                icon = a.Icon
+            }).ToList();
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        public IActionResult SetUserContext([FromBody] dynamic body, [FromServices] SignedCookieHelper cookieHelper)
+        {
+            try
+            {
+                string value = (string)body.context;   // "company|app|role"
+                string signed = cookieHelper.CreateSignedValue(value);
+
+                Response.Cookies.Append("UserCtx", signed, new CookieOptions
+                {
+                    HttpOnly = true,         // ⭐ Cannot be read by JS
+                    Secure = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTime.UtcNow.AddHours(8)
+                });
+
+                return Json(new { success = true });
+            }
+            catch
+            {
+                return Json(new { success = false, message = "Failed" });
+            }
+        }
+        [HttpGet]
+        public IActionResult GetCurrentContext([FromServices] SignedCookieHelper cookieHelper)
+        {
+            // Read secure signed cookie
+            if (!Request.Cookies.TryGetValue("UserCtx", out string? signed))
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "No active context found"
+                });
+            }
+
+            // Validate + decrypt signed cookie
+            var raw = cookieHelper.ValidateAndGet(signed);
+
+            if (raw == null)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid or tampered cookie"
+                });
+            }
+
+            // raw = "CompanyID|ApplicationID|RoleID"
+            var parts = raw.Split('|');
+            if (parts.Length != 3)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = "Invalid context format"
+                });
+            }
+
+            return Json(new
+            {
+                success = true,
+                companyId = int.Parse(parts[0]),
+                applicationId = int.Parse(parts[1]),
+                roleId = int.Parse(parts[2])
+            });
+        }
+
+
+
+
     }
 }

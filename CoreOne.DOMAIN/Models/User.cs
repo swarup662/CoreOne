@@ -27,26 +27,33 @@ namespace CoreOne.DOMAIN.Models
 
     }
 
+;
+
     public class CurrentUserDetail
     {
-        public int CurrentUserID { get; set; }
-        public string CurrentUserName { get; set; }
-        public int CurrentApplicationId { get; set; }
-        public int CurrentCompanyID { get; set; }
-        public int CurrentRoleId { get; set; }
-        public string CurrentEmail { get; set; }
-        public int? CurrentMailTypeID { get; set; }
-        public string CurrentPhoneNumber { get; set; }
+        // Basic user info
+        public int UserID { get; set; }
+        public string UserName { get; set; }
+        public string Email { get; set; }
+        public int? MailTypeID { get; set; }
+        public string PhoneNumber { get; set; }
+        public bool IsInternal { get; set; }
 
-        public Boolean IsInternal { get; set; }
-
-        public List<Roles>? Roles { get; set; }
+        // Account info
         public bool ActiveFlag { get; set; }
         public int CreatedBy { get; set; }
+
+        // Current selection
+        public int CurrentCompanyID { get; set; }
+        public int CurrentApplicationID { get; set; }
+        public int CurrentRoleID { get; set; }
+
+        // From token
+        public List<Roles>? Roles { get; set; }
         public List<UserAccessViewModel>? UserAccessList { get; set; }
-
-
     }
+
+
 
     public class Roles
 {
@@ -95,5 +102,12 @@ public class LoginRequest
         public int RoleID { get; set; }
         // NEW: Choose which app URL type to use ("domain" or "port")
         public string UrlType { get; set; } = "domain";
+    }
+
+    public class UserContextModel
+    {
+        public int CompanyID { get; set; }
+        public int ApplicationID { get; set; }
+        public int RoleID { get; set; }
     }
 }

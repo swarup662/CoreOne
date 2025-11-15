@@ -1,12 +1,13 @@
 ﻿using CoreOne.DOMAIN.Models;
 using CoreOne.UI.Helper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CoreOne.UI.Controllers
 {
@@ -15,11 +16,18 @@ namespace CoreOne.UI.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _api;
         private readonly ActionPermissionHtmlProcessorUiHelper _htmlProcessor;
-        public RoleCreationController(IHttpClientFactory httpClientFactory, SettingsService settingsService, ActionPermissionHtmlProcessorUiHelper htmlProcessor)
+        private readonly SignedCookieHelper _cookieHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+
+        public RoleCreationController(IHttpClientFactory httpClientFactory, SettingsService settingsService, ActionPermissionHtmlProcessorUiHelper htmlProcessor, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
         {
             _httpClientFactory = httpClientFactory;
             _api = settingsService.ApiSettings;
-            _htmlProcessor = htmlProcessor; 
+            _htmlProcessor = htmlProcessor;
+            _cookieHelper = cookieHelper;
+            _httpContextAccessor = httpContextAccessor;
+
         }
 
         [HttpGet]
@@ -86,7 +94,8 @@ namespace CoreOne.UI.Controllers
 
                 var client = _httpClientFactory.CreateClient();
                 var url = model.RoleID > 0 ? _api.BaseUrlRoleCreation + "/UpdateRole" : _api.BaseUrlRoleCreation + "/AddRole";
-                var user = TokenHelper.UserFromToken(HttpContext);
+
+                var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
 
                 model.CreatedBy = user.UserID;
 
@@ -165,7 +174,8 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteRole([FromBody]int RoleID)
         {
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             var client = _httpClientFactory.CreateClient();
             var url = _api.BaseUrlRoleCreation + "/DeleteRole";
 

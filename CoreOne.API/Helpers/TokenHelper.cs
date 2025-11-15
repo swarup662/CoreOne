@@ -7,82 +7,89 @@ namespace CoreOne.API.Helper
 {
     public static class TokenHelper
     {
-        // Returns user id or null
-        public static int? GetUserIdFromCookie(HttpContext context)
+        // -------- 1. Get user id --------
+        public static int? GetUserIdFromToken(HttpContext context)
         {
             var token = context.Request.Cookies["jwtToken"];
             if (string.IsNullOrEmpty(token)) return null;
-            var handler = new JwtSecurityTokenHandler();
+
             try
             {
-                var jwt = handler.ReadJwtToken(token);
+                var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
                 var claim = jwt.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
-                if (int.TryParse(claim, out var id)) return id;
+                return int.TryParse(claim, out var id) ? id : null;
             }
-            catch { }
-            return null;
+            catch { return null; }
         }
 
-        // Return User object if you have the claims in token
-        public static User? UserFromToken(HttpContext context)
+        // -------- 2. Remove token --------
+        public static void RemoveToken(HttpContext context)
+        {
+            if (context.Request.Cookies.ContainsKey("jwtToken"))
+                context.Response.Cookies.Delete("jwtToken");
+        }
+
+        // -------- 3. Extract CurrentUserDetail --------
+        public static CurrentUserDetail? CurrentUserFromToken(HttpContext context)
         {
             var token = context.Request.Cookies["jwtToken"];
             if (string.IsNullOrEmpty(token)) return null;
 
-            var handler = new JwtSecurityTokenHandler();
             JwtSecurityToken jwt;
-
             try
             {
-                jwt = handler.ReadJwtToken(token);
+                jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
             }
-            catch
-            {
-                return null;
-            }
+            catch { return null; }
 
-            // Extract claims
-            var userIdClaim = jwt.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
-            var userNameClaim = jwt.Claims.FirstOrDefault(c => c.Type == "UserName")?.Value;
-            var emailClaim = jwt.Claims.FirstOrDefault(c => c.Type == "Email")?.Value;
-            var mailTypeIdClaim = jwt.Claims.FirstOrDefault(c => c.Type == "EmailType")?.Value;
+            // Basic claims
+            int userId = int.Parse(jwt.Claims.First(x => x.Type == "UserID").Value);
+            string userName = jwt.Claims.FirstOrDefault(x => x.Type == "UserName")?.Value ?? "";
+            string email = jwt.Claims.FirstOrDefault(x => x.Type == "Email")?.Value ?? "";
+            string phone = jwt.Claims.FirstOrDefault(x => x.Type == "PhoneNumber")?.Value ?? "";
+            string mailTypeStr = jwt.Claims.FirstOrDefault(x => x.Type == "EmailType")?.Value;
 
-            var rolesClaim = jwt.Claims.FirstOrDefault(c => c.Type == "RoleList")?.Value;
-            var phoneClaim = jwt.Claims.FirstOrDefault(c => c.Type == "PhoneNumber")?.Value;
-            var accessListClaim = jwt.Claims.FirstOrDefault(c => c.Type == "AccessMatrix")?.Value;
-            // Parse and assign to user model
-            if (!int.TryParse(userIdClaim, out int userId)) return null;
+            int? mailTypeID = null;
+            if (int.TryParse(mailTypeStr, out int m)) mailTypeID = m;
 
+            bool isInternal = jwt.Claims.First(x => x.Type == "IsInternal").Value == "true";
 
-            int? mailTypeId = null;
-            if (int.TryParse(mailTypeIdClaim, out int parsedMailTypeId))
-            {
-                mailTypeId = parsedMailTypeId;
-            }
-            var AccessMatrixJson = CompressionHelper.DecompressFromBase64(accessListClaim);
-            List<UserAccessViewModel> AccessMatrix = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(AccessMatrixJson);
-            var RolesJson = CompressionHelper.DecompressFromBase64(rolesClaim);
-            List<Roles> Roles = JsonConvert.DeserializeObject<List<Roles>>(AccessMatrixJson);
-            var user = new User
+            // Defaults
+            int defaultCompany = int.Parse(jwt.Claims.First(x => x.Type == "DefaultCompanyID").Value);
+            int defaultApp = int.Parse(jwt.Claims.First(x => x.Type == "DefaultApplicationID").Value);
+            int defaultRole = int.Parse(jwt.Claims.First(x => x.Type == "DefaultRoleID").Value);
+
+            // AccessMatrix
+            string matrixJson = CompressionHelper.DecompressFromBase64(
+                jwt.Claims.First(x => x.Type == "AccessMatrix").Value
+            );
+            var accessList = JsonConvert.DeserializeObject<List<UserAccessViewModel>>(matrixJson);
+
+            // Roles
+            string rolesJson = CompressionHelper.DecompressFromBase64(
+                jwt.Claims.First(x => x.Type == "RoleList").Value
+            );
+            var roles = JsonConvert.DeserializeObject<List<Roles>>(rolesJson);
+
+            return new CurrentUserDetail
             {
                 UserID = userId,
-                UserName = userNameClaim ?? string.Empty,
-                Email = emailClaim ?? string.Empty,
-                MailTypeID = mailTypeId,
+                UserName = userName,
+                Email = email,
+                MailTypeID = mailTypeID,
+                PhoneNumber = phone,
+                IsInternal = isInternal,
 
-                PhoneNumber = phoneClaim ?? string.Empty,
+                ActiveFlag = true,
+                CreatedBy = userId,
 
-                // Defaulting unset fields as they are not in token
-                PasswordHash = string.Empty,
+                CurrentCompanyID = defaultCompany,
+                CurrentApplicationID = defaultApp,
+                CurrentRoleID = defaultRole,
 
-                ActiveFlag = true,  // Or false depending on your needs
-
-                UserAccessList = AccessMatrix,
-                Roles = Roles,
+                UserAccessList = accessList,
+                Roles = roles
             };
-
-
-            return user;
         }
     }
 }

@@ -13,14 +13,17 @@ namespace CoreOne.UI.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _apiSettings;
         private readonly IDistributedCache _cache;
+        private readonly SignedCookieHelper _cookieHelper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AccountController(IConfiguration config, IHttpClientFactory httpClientFactory, SettingsService settingsService, IDistributedCache cache)
+        public AccountController(IConfiguration config, IHttpClientFactory httpClientFactory, SettingsService settingsService, IDistributedCache cache, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
         {
 
             _httpClientFactory = httpClientFactory;
             _apiSettings = settingsService.ApiSettings;
             _cache = cache;
-
+            _cookieHelper = cookieHelper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -222,15 +225,17 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            var token = HttpContext.Request.Cookies["jwtToken"];
-            var user = TokenHelper.UserFromToken(HttpContext);
-
-            if (user != null)
             {
-                //  Clear TempData (ALL keys)
-                TempData.Clear();
+                var token = HttpContext.Request.Cookies["jwtToken"];
+               
+                var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
 
-                var client = _httpClientFactory.CreateClient();
+                if (user != null)
+                {
+                    //  Clear TempData (ALL keys)
+                    TempData.Clear();
+
+                    var client = _httpClientFactory.CreateClient();
                     var url = _apiSettings.BaseUrlAuth + "/Logout";
 
                     var json = JsonConvert.SerializeObject(user.UserID);
@@ -247,53 +252,57 @@ namespace CoreOne.UI.Controllers
                     }
 
                     await client.SendAsync(request);
-                
+
+                }
+
+                // Clear cookie
+                HttpContext.Response.Cookies.Delete("jwtToken");
+
+                return Json(new { success = true, redirectUrl = Url.Action("Login", "Account") });
             }
-
-            // Clear cookie
-            HttpContext.Response.Cookies.Delete("jwtToken");
-
-            return Json(new { success = true, redirectUrl = Url.Action("Login", "Account") });
         }
 
 
-        [HttpPost]
-        public async Task<IActionResult> CompanyLogout([FromBody] CsRequest body)
-        {
-            string csKey = body?.csKey;
-            int userID = 0;
-             userID = JsonConvert.DeserializeObject<int>(TempData["userId"].ToString());
-            if (string.IsNullOrEmpty(csKey))
-                return Json(new { success = false, message = "Cache key missing" });
-            var token = HttpContext.Request.Cookies["jwtToken"];
-           
-            _cache.Remove(csKey);
-
-            var client = _httpClientFactory.CreateClient();
-            var url = _apiSettings.BaseUrlAuth + "/LogoutFromCompanySelectionPage";
-
-            var json = JsonConvert.SerializeObject(0);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var request = new HttpRequestMessage(HttpMethod.Post, url)
+            [HttpPost]
+            public async Task<IActionResult> CompanyLogout([FromBody] CsRequest body)
             {
-                Content = content
-            };
+                string csKey = body?.csKey;
+                int userID = 0;
+                userID = JsonConvert.DeserializeObject<int>(TempData["userId"].ToString());
+                if (string.IsNullOrEmpty(csKey))
+                    return Json(new { success = false, message = "Cache key missing" });
+                var token = HttpContext.Request.Cookies["jwtToken"];
 
-            if (!string.IsNullOrEmpty(token))
-            {
-                request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-            }
+                _cache.Remove(csKey);
 
-            var logres=await client.SendAsync(request);
+                var client = _httpClientFactory.CreateClient();
+                var url = _apiSettings.BaseUrlAuth + "/LogoutFromCompanySelectionPage";
+
+                var json = JsonConvert.SerializeObject(0);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var request = new HttpRequestMessage(HttpMethod.Post, url)
+                {
+                    Content = content
+                };
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                }
+
+                var logres = await client.SendAsync(request);
 
 
-            // Clear cookie
-            HttpContext.Response.Cookies.Delete("jwtToken");
+                // Clear cookie
+                HttpContext.Response.Cookies.Delete("jwtToken");
+                  TokenHelper.RemoveToken(_httpContextAccessor.HttpContext);
             //  Clear TempData (ALL keys)
             TempData.Clear();
-            return Json(new { success = true, redirectUrl = Url.Action("Login", "Account") });
-        }
+                return Json(new { success = true, redirectUrl = Url.Action("Login", "Account") });
+            } 
+
+
         [HttpPost]
 
         public IActionResult ClearTempData()
@@ -353,7 +362,8 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest req)
         {
-            var user = TokenHelper.UserFromToken(HttpContext);
+
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             req.UserID = user.UserID;
 
             var client = _httpClientFactory.CreateClient();

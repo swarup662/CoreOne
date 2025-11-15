@@ -26,61 +26,66 @@ namespace CoreOne.API.Infrastructure.Services
         private SymmetricSecurityKey GetKey() =>
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_privateKey));
 
-        /// <summary>
-        /// Generates a single JWT for the user that includes all access info
-        /// </summary>
         public string GenerateUserToken(User user, List<UserAccessViewModel> accessList)
         {
-          
+            // Security: DO NOT issue token with empty list
+            if (accessList == null || accessList.Count == 0)
+                throw new Exception("Access list cannot be empty");
 
-            List<Roles> roles = accessList
-                .DistinctBy(a => a.RoleID) // keeps only first unique RoleID
+            // Build roles
+            var roles = accessList
+                .DistinctBy(a => a.RoleID)
                 .Select(a => new Roles
                 {
                     RoleID = a.RoleID,
                     RoleName = a.RoleName
                 })
                 .ToList();
-            // pick defaults from accessList (first item) — ensure list non-empty
-            int defaultCompany = accessList.FirstOrDefault()?.CompanyID ?? 0;
-            int defaultApp = accessList.FirstOrDefault()?.ApplicationID ?? 0;
-            int defaultRole = accessList.FirstOrDefault()?.RoleID ?? 0;
 
-            var compressedAccessList = CompressionHelper.CompressToBase64(JsonConvert.SerializeObject(accessList));
-            var compressedroles = CompressionHelper.CompressToBase64(JsonConvert.SerializeObject(roles));
+            // Defaults
+            int defaultCompany = accessList[0].CompanyID;
+            int defaultApp = accessList[0].ApplicationID;
+            int defaultRole = accessList[0].RoleID;
+
+            // Compress AccessMatrix + Roles
+            string compressedAccess = CompressionHelper.CompressToBase64(JsonConvert.SerializeObject(accessList));
+            string compressedRoles = CompressionHelper.CompressToBase64(JsonConvert.SerializeObject(roles));
+
             var claims = new List<Claim>
             {
                 new Claim("UserID", user.UserID.ToString()),
-                new Claim("UserName", user.UserName ?? ""),
-                    new Claim("RoleList", compressedroles ?? ""),
-                  new Claim("PhoneNumber", user.PhoneNumber ?? ""),
+                new Claim("UserName", user.UserName),
                 new Claim("Email", user.Email ?? ""),
-                new Claim("EmailType", user.MailTypeID.ToString() ?? ""),
+                new Claim("PhoneNumber", user.PhoneNumber ?? ""),
+                new Claim("EmailType", user.MailTypeID?.ToString() ?? ""),
                 new Claim("IsInternal", user.IsInternal ? "true" : "false"),
-                // full list of access as JSON
-                 new Claim("DefaultCompanyID", defaultCompany.ToString()),
-                    new Claim("DefaultApplicationID", defaultApp.ToString()),
-                    new Claim("DefaultRoleID", defaultRole.ToString()),
-                new Claim("AccessMatrix",compressedAccessList ),
-                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+
+                // DEFAULTS
+                new Claim("DefaultCompanyID", defaultCompany.ToString()),
+                new Claim("DefaultApplicationID", defaultApp.ToString()),
+                new Claim("DefaultRoleID", defaultRole.ToString()),
+
+                // FULL ACCESS MATRIX + ROLES
+                new Claim("AccessMatrix", compressedAccess),
+                new Claim("RoleList", compressedRoles),
+
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var creds = new SigningCredentials(GetKey(), SecurityAlgorithms.HmacSha256);
+
             var token = new JwtSecurityToken(
                 issuer: _issuer,
                 audience: _audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1), // long enough for full session
+                expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: creds
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        /// <summary>
-        /// Validates a JWT and returns ClaimsPrincipal
-        /// </summary>
-        public ClaimsPrincipal ValidateToken(string token)
+        public ClaimsPrincipal? ValidateToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();
             var key = GetKey();
@@ -89,12 +94,15 @@ namespace CoreOne.API.Infrastructure.Services
             {
                 ValidateIssuer = true,
                 ValidIssuer = _issuer,
+
                 ValidateAudience = true,
                 ValidAudience = _audience,
+
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.FromSeconds(10),
+
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = key,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.FromSeconds(30)
             };
 
             try
