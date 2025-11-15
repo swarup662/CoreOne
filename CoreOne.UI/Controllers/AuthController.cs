@@ -1,5 +1,6 @@
 ﻿using CoreOne.DOMAIN.Models;
 using CoreOne.UI.Helper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
@@ -71,7 +72,7 @@ namespace CoreOne.App.Controllers
             [FromServices] IHttpContextAccessor accessor,
             [FromServices] SignedCookieHelper cookieHelper)
         {
-            var user = TokenHelper.UserFromToken(accessor.HttpContext, cookieHelper);
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, cookieHelper);
             if (user == null)
                 return Json(new List<object>());
 
