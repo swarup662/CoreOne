@@ -25,25 +25,27 @@ namespace CoreOne.UI.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 10, string search = null, string searchCol = "", string sortColumn = "", string sortDir = null)
 
-        { 
+        {
 
-
+            var user = TokenHelper.UserFromToken(HttpContext);   // <-- get logged-in user
 
             var model = new RoleCreationsRequest
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 Search = search,
-                SearchCol = searchCol, // <-- Added
+                SearchCol = searchCol,
                 SortColumn = sortColumn,
-                SortDir = sortDir
+                SortDir = sortDir,
+                CurrentUserID = user.UserID     // <-- IMPORTANT: send to API
             };
+
             var client = _httpClientFactory.CreateClient();
             var url = _api.BaseUrlRoleCreation + "/GetRoles";
             var json = JsonConvert.SerializeObject(model);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var resp = await client.PostAsync(url, content); ;
+            var resp = await client.PostAsync(url, content);
             if (!resp.IsSuccessStatusCode)
             {
                 ViewBag.Roles = new List<RoleCreation>();
@@ -61,15 +63,16 @@ namespace CoreOne.UI.Controllers
             ViewBag.PageNumber = pageNumber;
             ViewBag.PageSize = pageSize;
             ViewBag.Search = search;
-            ViewBag.SearchCol = searchCol; // <-- Set in ViewBag
+            ViewBag.SearchCol = searchCol;
             ViewBag.SortColumn = sortColumn;
             ViewBag.SortDir = sortDir;
 
             return View();
+
         }
 
 
-       
+
         [HttpPost]
         public async Task<IActionResult> SaveRole([FromBody] RoleCreation model)
         {

@@ -20,7 +20,8 @@ namespace CoreOne.API.Controllers.V1
         [HttpPost("GetRoles")]
         public IActionResult GetRoles([FromBody] RoleCreationsRequest request)
         {
-            if (request == null) return BadRequest("Request is required.");
+            if (request == null)
+                return BadRequest("Request is required.");
 
             var dt = _roleRepo.GetRoles(
                 request.PageSize,
@@ -28,7 +29,8 @@ namespace CoreOne.API.Controllers.V1
                 request.Search,
                 request.SortColumn,
                 request.SortDir,
-                request.SearchCol
+                request.SearchCol,
+                request.CurrentUserID     // <-- NEW PARAMETER
             );
 
             var roles = new List<RoleCreation>();
@@ -44,7 +46,6 @@ namespace CoreOne.API.Controllers.V1
                     UpdatedBy = row["UpdatedBy"] == DBNull.Value ? null : Convert.ToInt32(row["UpdatedBy"]),
                     UpdatedDate = row["UpdatedDate"] == DBNull.Value ? null : Convert.ToDateTime(row["UpdatedDate"]),
                     ActiveFlag = row["ActiveFlag"] == DBNull.Value ? null : Convert.ToInt32(row["ActiveFlag"]),
-
                 });
             }
 
@@ -66,6 +67,7 @@ namespace CoreOne.API.Controllers.V1
 
             return Ok(response);
         }
+
 
         [HttpPost("AddRole")]
         public IActionResult AddRole([FromBody] RoleCreation role)
