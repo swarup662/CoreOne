@@ -114,6 +114,7 @@ namespace CoreOne.API.Repositories
                 CreatedBy = row["CreatedBy"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["CreatedBy"]),
                 CreatedDate = row["CreatedDate"] == DBNull.Value ? null : (DateTime?)Convert.ToDateTime(row["CreatedDate"]),
                  ActiveFlag = row["ActiveFlag"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["ActiveFlag"]),
+                DisplayOn = row["DisplayOn"] == DBNull.Value ? null : (int?)Convert.ToInt32(row["DisplayOn"]),
             };
         }
 

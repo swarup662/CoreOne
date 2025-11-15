@@ -98,7 +98,7 @@ function loadRole(roleId) {
     $('#roleModal').attr('aria-labelledby', 'roleModalLabel');
 
     $.ajax({
-        url: '/RoleCreation/GetRoleById', // UI controller action
+        url: '/RoleCreation/GetRoleById',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify(roleId),
@@ -106,6 +106,11 @@ function loadRole(roleId) {
             $('#RoleID').val(role.roleID);
             $('#RoleName').val(role.roleName);
             $('#RoleDescription').val(role.roleDescription);
+
+            // >>> ADD THESE LINES <<<
+            $('#ActiveFlag').val(role.activeFlag);
+            $('#DisplayOn').val(role.displayOn);
+
             $('#roleModal').modal('show');
         },
         error: function () {
@@ -114,6 +119,7 @@ function loadRole(roleId) {
         }
     });
 }
+
 function deleteRole(roleId) {
     Swal.fire({
         title: 'Are you sure?',

@@ -304,15 +304,24 @@
                                 <td>@r.RoleDescription</td>
                                 <td>@(r.CreatedDate?.ToString("dd-MM-yyyy"))</td>
                                 <td>
-                                    @if ((r.ActiveFlag ?? 0) == 1)
+                                    @if (r.ActiveFlag == 1)
                                     {
                                         <span class="badge bg-success">Active</span>
                                     }
+                                    else if (r.ActiveFlag == 0)
+                                    {
+                                        <span class="badge bg-danger">Deactivate</span>
+                                    }
+                                    else if (r.ActiveFlag == 2)
+                                    {
+                                        <span class="badge bg-warning text-dark">Hold</span>
+                                    }
                                     else
                                     {
-                                        <span class="badge bg-danger">Inactive</span>
+                                        <span class="badge bg-secondary">Unknown</span>
                                     }
                                 </td>
+
 
 
                                 <td>
