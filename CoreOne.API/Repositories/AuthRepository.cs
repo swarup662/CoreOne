@@ -216,7 +216,11 @@ namespace CoreOne.API.Repositories
                 });
             }
 
-
+             var allowed = accessList.Where(x =>
+                                    x.CompanyID == companyId &&
+                                    x.RoleID == roleId &&
+                                    x.ApplicationID == appId
+                                );
 
             // 4️⃣ Generate unified user token
             string token = _tokenService.GenerateUserToken(user, accessList);
@@ -258,7 +262,25 @@ namespace CoreOne.API.Repositories
                 {"@UserID", userID }
             });
         }
+        public int LogoutFromCompanySelectionPage(int userID, string ipAddress, string userAgent)
+        {
+            // Insert logout activity
+            _dbHelper.ExecuteSP_ReturnInt("sp_InsertActivityLog", new Dictionary<string, object>
+            {
+                {"@UserID", userID },
+                  {"@RoleID", 0},
+                {"@ActivityDescription", "Logout for company selection page" },
+                {"@IPAddress", ipAddress },
+                {"@DeviceInfo", userAgent},  // ✅ New field
+                {"@CreatedBy", userID }
+            });
 
+            // Delete session
+            return _dbHelper.ExecuteSP_ReturnInt("sp_Auth_DeleteUserSession", new Dictionary<string, object>
+            {
+                {"@UserID", userID }
+            });
+        }
 
 
         public int LogHttpError(LogHttpErrorRequest request)

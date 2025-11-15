@@ -2,6 +2,7 @@
 using CoreOne.API.Interfaces;
 using CoreOne.DOMAIN.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 
 namespace CoreOne.API.Controllers.V1
@@ -12,11 +13,12 @@ namespace CoreOne.API.Controllers.V1
     public class AuthController : ControllerBase
     {
         private readonly IAuthRepository _authRepository;
+        private readonly IDistributedCache _cache;
 
-
-        public AuthController(IAuthRepository authRepository)
+        public AuthController(IAuthRepository authRepository, IDistributedCache cache)
         {
             _authRepository = authRepository;
+            _cache = cache;
         }
 
         [HttpPost("login")]
@@ -150,15 +152,32 @@ namespace CoreOne.API.Controllers.V1
 
             return Ok(new { redirectUrl = redirect });
         }
-
         [HttpPost("exchange-cachekey")]
         public IActionResult ExchangeCacheKey([FromBody] ExchangeCacheKeyRequest req)
         {
-
             string userAgent = Request.Headers["User-Agent"].ToString();
             string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
-            var exchangeResult = _authRepository.ExchangeCacheKeyForToken(req.CacheKey, req.ApplicationID, ipAddress, userAgent);
 
+            // Priority: Authorization header value "OAuth <cacheKey>"
+            string authHeader = Request.Headers["Authorization"].ToString();
+            string cacheKey = null;
+            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("OAuth ", StringComparison.OrdinalIgnoreCase))
+            {
+                cacheKey = authHeader.Substring(6).Trim();
+            }
+            else if (req != null && !string.IsNullOrEmpty(req.CacheKey))
+            {
+                cacheKey = req.CacheKey;
+            }
+            else
+            {
+                return BadRequest(new { message = "Cache key missing" });
+            }
+
+            // call repository - note we pass cacheKey and application id
+            var exchangeResult = _authRepository.ExchangeCacheKeyForToken(cacheKey, req.ApplicationID, ipAddress, userAgent);
+
+            // same robust extraction as original (to handle tuples/named tuples)
             bool ok = false;
             string msg = "Unknown error";
             string token = null;
@@ -198,6 +217,32 @@ namespace CoreOne.API.Controllers.V1
 
             return Ok(new { access_token = token, token_type = "Bearer", expires_in = 900 });
         }
+        [HttpPost("create-company-selection-key")]
+        public IActionResult CreateCompanySelectionKey()
+        {
+            string cacheKey = Guid.NewGuid().ToString("N");
+
+            _cache.SetString(cacheKey, "valid", new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5)
+            });
+
+            return Ok(new { key = cacheKey });
+        }
+        [HttpGet("validate-company-selection")]
+        public IActionResult ValidateCompanySelection(string cs)
+        {
+            if (string.IsNullOrEmpty(cs))
+                return Unauthorized(new { message = "Missing key" });
+
+            var val = _cache.GetString(cs);
+
+            if (val == null)
+                return Unauthorized(new { message = "Expired" });
+
+            return Ok(new { valid = true });
+        }
+
 
         // LOGOUT
         [HttpPost("Logout")]
@@ -207,6 +252,18 @@ namespace CoreOne.API.Controllers.V1
             string userAgent = Request.Headers["User-Agent"].ToString();
             string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
             int result = _authRepository.Logout(userID, ipAddress, userAgent);
+            return Ok(result > 0 ? "Logged out successfully" : "Logout failed");
+        }
+
+
+        // LOGOUT
+        [HttpPost("LogoutFromCompanySelectionPage")]
+        public IActionResult LogoutFromCompanySelectionPage([FromBody] int userID)
+        {
+
+            string userAgent = Request.Headers["User-Agent"].ToString();
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            int result = _authRepository.LogoutFromCompanySelectionPage(userID, ipAddress, userAgent);
             return Ok(result > 0 ? "Logged out successfully" : "Logout failed");
         }
 

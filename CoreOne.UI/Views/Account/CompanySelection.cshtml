@@ -63,6 +63,20 @@
 </html>
 @section Scripts {
 <script>
+                const csKey = "@ViewBag.CompanyKey";
+
+            async function validateCsKey() {
+                const res = await fetch(`/authapi/validate-company-selection?cs=${csKey}`);
+                if (!res.ok) {
+                    window.location.href = "/Account/Login";
+                }
+            }
+
+            // Check every 10 seconds
+            setInterval(validateCsKey, 10000);
+
+            // Initial check
+            validateCsKey();
 $(document).ready(function () {
     const userId = '@userId';
     const selected = new Set();
@@ -301,10 +315,12 @@ $(document).ready(function () {
 
         if (result.isConfirmed) {
             try {
-                let response = await fetch('/Account/Logout', {
+                      let response = await fetch('/Account/CompanyLogout', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ csKey: csKey })
                 });
+
                 let data = await response.json();
 
                 if (data.success) {

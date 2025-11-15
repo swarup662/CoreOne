@@ -41,7 +41,10 @@ namespace CoreOne.API.Infrastructure.Services
                     RoleName = a.RoleName
                 })
                 .ToList();
-
+            // pick defaults from accessList (first item) — ensure list non-empty
+            int defaultCompany = accessList.FirstOrDefault()?.CompanyID ?? 0;
+            int defaultApp = accessList.FirstOrDefault()?.ApplicationID ?? 0;
+            int defaultRole = accessList.FirstOrDefault()?.RoleID ?? 0;
 
             var compressedAccessList = CompressionHelper.CompressToBase64(JsonConvert.SerializeObject(accessList));
             var compressedroles = CompressionHelper.CompressToBase64(JsonConvert.SerializeObject(roles));
@@ -55,8 +58,11 @@ namespace CoreOne.API.Infrastructure.Services
                 new Claim("EmailType", user.MailTypeID.ToString() ?? ""),
                 new Claim("IsInternal", user.IsInternal ? "true" : "false"),
                 // full list of access as JSON
+                 new Claim("DefaultCompanyID", defaultCompany.ToString()),
+                    new Claim("DefaultApplicationID", defaultApp.ToString()),
+                    new Claim("DefaultRoleID", defaultRole.ToString()),
                 new Claim("AccessMatrix",compressedAccessList ),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
             var creds = new SigningCredentials(GetKey(), SecurityAlgorithms.HmacSha256);
