@@ -67,19 +67,31 @@ namespace CoreOne.API.Repositories
             return 0;
         }
 
-        public int SaveRole(string recType, int? roleId, string roleName, string roleDescription, int userId)
+
+        public int SaveRole(
+            string recType,
+            int? roleId,
+            string roleName,
+            string roleDescription,
+            int userId,
+            int? activeFlag,     // <-- nullable
+            int? displayOn       // <-- nullable
+        )
         {
             var parameters = new Dictionary<string, object>
-            {
-                { "@RecType", recType },          // "INSERT" | "UPDATE" | "DELETE"
-                { "@RoleID", roleId },            // NULL for insert
-                { "@RoleName", roleName },        // required for insert/update
-                { "@RoleDescription", roleDescription },
-                { "@UserID", userId }
-            };
+        {
+            { "@RecType", recType },
+            { "@RoleID", roleId },
+            { "@RoleName", (object?)roleName ?? DBNull.Value },
+            { "@RoleDescription", (object?)roleDescription ?? DBNull.Value },
+            { "@UserID", userId },
+            { "@ActiveFlag", (object?)activeFlag ?? DBNull.Value },
+            { "@DisplayOn", (object?)displayOn ?? DBNull.Value }
+        };
 
             return _dbHelper.ExecuteSP_ReturnInt("[sp_RoleCreation_InsertUpdateDelete]", parameters);
         }
+
 
 
 

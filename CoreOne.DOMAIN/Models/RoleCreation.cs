@@ -25,6 +25,9 @@ namespace CoreOne.DOMAIN.Models
         public int? UpdatedBy { get; set; }
 
         public int? ActiveFlag { get; set; }
+
+        public int? DisplayOn { get; set; }
+
         public DateTime? UpdatedDate { get; set; }
 
     }

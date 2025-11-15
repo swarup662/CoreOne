@@ -3,7 +3,9 @@
     var payload = {
         RoleID: $("#RoleID").val() || 0,
         RoleName: $("#RoleName").val().trim(),
-        RoleDescription: $("#RoleDescription").val().trim()
+        RoleDescription: $("#RoleDescription").val().trim(),
+        DisplayOn: $("#DisplayOn").val(),     // <-- Added
+        ActiveFlag: $("#ActiveFlag").val()
     };
 
     // Clear old errors
