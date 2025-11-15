@@ -104,6 +104,14 @@ public class LoginRequest
         public string UrlType { get; set; } = "domain";
     }
 
+    public class ConsumeInputModel
+    {
+        public string OAuth { get; set; }
+        public int UserID { get; set; }
+        public int CompanyID { get; set; }
+        public int ApplicationID { get; set; }
+        public int RoleID { get; set; }
+    }
     public class UserContextModel
     {
         public int CompanyID { get; set; }

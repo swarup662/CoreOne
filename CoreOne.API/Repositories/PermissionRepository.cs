@@ -17,9 +17,16 @@ namespace CoreOne.API.Repositories
             _dbHelper = dbHelper;
         }
 
-        public List<MenuItem> GetUserMenu(int userID)
+        public List<MenuItem> GetUserMenu(int userID, int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID)
         {
-            var parameters = new Dictionary<string, object> { { "@UserID", userID } };
+            var parameters = new Dictionary<string, object> 
+            {
+                        { "@UserID", userID },
+                        { "@CurrentApplicationID", CurrentApplicationID },
+                        { "@CurrentCompanyID", CurrentCompanyID },
+                        { "@CurrentRoleID", CurrentRoleID }
+
+            };
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Permission_GetUserMenuandModules", parameters);
             if (dt.Rows.Count > 0)
             {

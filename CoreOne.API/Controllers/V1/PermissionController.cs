@@ -34,10 +34,10 @@ public class PermissionController : ControllerBase
     }
 
     // KEEP: GetUserMenu (unchanged)
-    [HttpGet("GetUserMenu/{userID}")]
-    public IActionResult GetUserMenu(int userID)
+    [HttpGet("GetUserMenu/{userID}/{CurrentApplicationID}/{CurrentCompanyID}/{CurrentRoleID}")]
+    public IActionResult GetUserMenu(int userID , int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID)
     {
-        var menuList = _permissionRepo.GetUserMenu(userID);
+        var menuList = _permissionRepo.GetUserMenu(userID, CurrentApplicationID , CurrentCompanyID, CurrentRoleID);
         return Ok(menuList);
     }
 

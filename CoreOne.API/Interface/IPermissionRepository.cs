@@ -6,7 +6,7 @@ namespace CoreOne.API.Interfaces
 { 
 public interface IPermissionRepository
 {
-    List<MenuItem> GetUserMenu(int userID);
+        List<MenuItem> GetUserMenu(int userID, int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID);
 
     // NEW:
     List<ActionDto> GetUserAllowedActions(int userID);
