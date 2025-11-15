@@ -25,6 +25,9 @@ namespace CoreOne.DOMAIN.Models
         public int? UpdatedBy { get; set; }
 
         public int? ActiveFlag { get; set; }
+
+        public int? DisplayOn { get; set; }
+
         public DateTime? UpdatedDate { get; set; }
 
     }
@@ -58,10 +61,12 @@ namespace CoreOne.DOMAIN.Models
         public int PageSize { get; set; }
         public int PageNumber { get; set; }
         public string? Search { get; set; }
-        public string? SearchCol { get; set; }
         public string? SortColumn { get; set; }
         public string? SortDir { get; set; }
-        public int ApplicationID { get; set; } = 1;  // ✔ default
+        public string? SearchCol { get; set; }
+        public int ApplicationID { get; set; } = 1;
+        public int CurrentUserID { get; set; }   // <-- NEW
     }
+
 
 }

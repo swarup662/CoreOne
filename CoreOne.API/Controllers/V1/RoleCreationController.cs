@@ -20,7 +20,8 @@ namespace CoreOne.API.Controllers.V1
         [HttpPost("GetRoles")]
         public IActionResult GetRoles([FromBody] RoleCreationsRequest request)
         {
-            if (request == null) return BadRequest("Request is required.");
+            if (request == null)
+                return BadRequest("Request is required.");
 
             var dt = _roleRepo.GetRoles(
                 request.PageSize,
@@ -28,7 +29,8 @@ namespace CoreOne.API.Controllers.V1
                 request.Search,
                 request.SortColumn,
                 request.SortDir,
-                request.SearchCol
+                request.SearchCol,
+                request.CurrentUserID     // <-- NEW PARAMETER
             );
 
             var roles = new List<RoleCreation>();
@@ -44,7 +46,6 @@ namespace CoreOne.API.Controllers.V1
                     UpdatedBy = row["UpdatedBy"] == DBNull.Value ? null : Convert.ToInt32(row["UpdatedBy"]),
                     UpdatedDate = row["UpdatedDate"] == DBNull.Value ? null : Convert.ToDateTime(row["UpdatedDate"]),
                     ActiveFlag = row["ActiveFlag"] == DBNull.Value ? null : Convert.ToInt32(row["ActiveFlag"]),
-
                 });
             }
 
@@ -67,16 +68,26 @@ namespace CoreOne.API.Controllers.V1
             return Ok(response);
         }
 
+
         [HttpPost("AddRole")]
         public IActionResult AddRole([FromBody] RoleCreation role)
         {
             if (role == null || string.IsNullOrWhiteSpace(role.RoleName))
                 return BadRequest("Role name is required.");
 
-            int newId = _roleRepo.SaveRole("INSERT", null, role.RoleName, role.RoleDescription, role.CreatedBy ?? 0);
+            int newId = _roleRepo.SaveRole(
+                "INSERT",
+                null,
+                role.RoleName,
+                role.RoleDescription,
+                role.CreatedBy ?? 0,
+                role.ActiveFlag,     // nullable
+                role.DisplayOn       // nullable
+            );
 
             return Ok(new { RoleID = newId, Message = "Role created successfully." });
         }
+
 
         [HttpPost("UpdateRole")]
         public IActionResult UpdateRole([FromBody] RoleCreation role)
@@ -84,7 +95,15 @@ namespace CoreOne.API.Controllers.V1
             if (role == null || role.RoleID <= 0)
                 return BadRequest("Valid Role is required.");
 
-            int result = _roleRepo.SaveRole("UPDATE", role.RoleID, role.RoleName, role.RoleDescription, role.CreatedBy ?? 0);
+            int result = _roleRepo.SaveRole(
+                "UPDATE",
+                role.RoleID,
+                role.RoleName,
+                role.RoleDescription,
+                role.CreatedBy ?? 0,
+                role.ActiveFlag,
+                role.DisplayOn
+            );
 
             if (result > 0)
                 return Ok(new { RoleID = result, Message = "Role updated successfully." });
@@ -96,15 +115,25 @@ namespace CoreOne.API.Controllers.V1
         [HttpPost("DeleteRole")]
         public IActionResult DeleteRole([FromBody] DeleteRoleCreation role)
         {
-            if (role.RoleID <= 0) return BadRequest("Invalid RoleID.");
+            if (role.RoleID <= 0)
+                return BadRequest("Invalid RoleID.");
 
-            int result = _roleRepo.SaveRole("DELETE", role.RoleID, null, null, 0);
+            int result = _roleRepo.SaveRole(
+                "DELETE",
+                role.RoleID,
+                null,
+                null,
+                0,
+                null,   // ActiveFlag nullable
+                null    // DisplayOn nullable
+            );
 
             if (result > 0)
                 return Ok(new { RoleID = result, Message = "Role deleted successfully." });
 
             return NotFound(new { RoleID = result, Message = "Role not found or already deleted." });
         }
+
 
         [HttpPost("GetRoleById")]
         public IActionResult GetRoleById([FromBody] int roleId)
