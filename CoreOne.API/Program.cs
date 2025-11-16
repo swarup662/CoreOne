@@ -27,6 +27,7 @@ builder.Services.AddDistributedMemoryCache(); // For IDistributedCache
 // --- Custom Dependencies ---
 builder.Services.AddSingleton<DBContext>();
 builder.Services.AddSingleton<TokenService>();
+builder.Services.AddSingleton<PasswordHelper>();
 
 // --- Repository and Helper Injections ---
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();

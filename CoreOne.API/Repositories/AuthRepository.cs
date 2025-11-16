@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Distributed;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Data;
+using System.Security.Cryptography;
 
 
 namespace CoreOne.API.Repositories
@@ -20,13 +21,15 @@ namespace CoreOne.API.Repositories
         private readonly IConfiguration _config;
         private readonly IEmailHelper _email;
         private readonly IDistributedCache _cache;
-        public AuthRepository(DBContext dbHelper, TokenService tokenService, IConfiguration config, IEmailHelper email, IDistributedCache cache)
+        private readonly PasswordHelper _PasswordHelper;
+        public AuthRepository(DBContext dbHelper, TokenService tokenService, IConfiguration config, IEmailHelper email, IDistributedCache cache, PasswordHelper passwordHelper)
         {
             _dbHelper = dbHelper;
             _tokenService = tokenService;
             _config = config;
             _email = email;
-            _cache = cache; 
+            _cache = cache;
+            _PasswordHelper = passwordHelper;
         }
 
         public (bool Success, string Message, User User, string Token, List<UserAccessViewModel> AccessList)
@@ -39,7 +42,10 @@ namespace CoreOne.API.Repositories
                 return (false, "Invalid username or password", null, null, null);
 
             var row = dt.Rows[0];
-            if (!PasswordHelper.VerifyPassword(password, row["PasswordHash"].ToString()))
+            string saltKey = row["SaltKey"]?.ToString() ?? "";
+           
+
+            if (!_PasswordHelper.VerifyPassword(password, row["PasswordHash"].ToString(), saltKey))
                 return (false, "Invalid username or password", null, null, null);
 
             var user = new User
@@ -327,20 +333,22 @@ namespace CoreOne.API.Repositories
                 return new PasswordValidationResponse { Success = false, Message = "User not found" };
 
             string storedHash = dt.Rows[0]["PasswordHash"].ToString();
+            string saltKey = dt.Rows[0]["SaltKey"].ToString();
 
-            if (!PasswordHelper.VerifyPassword(currentPwd, storedHash))
+            if (!_PasswordHelper.VerifyPassword(currentPwd, storedHash, saltKey))
                 return new PasswordValidationResponse { Success = false, Message = "Invalid current password" };
 
-            if (PasswordHelper.VerifyPassword(newPwd, storedHash))
+            if (_PasswordHelper.VerifyPassword(newPwd, storedHash, saltKey))
                 return new PasswordValidationResponse { Success = false, Message = "New password cannot be same as old one" };
 
-            string newHash = PasswordHelper.HashPassword(newPwd);
+            string newHash = _PasswordHelper.EncryptPassword(newPwd, saltKey);
 
             var p = new Dictionary<string, object>
         {
             { "@UserID", userId },
             { "@CurrentPassword", storedHash },
-            { "@NewPassword", newHash }
+            { "@NewPassword", newHash },
+             { "@SaltKey", saltKey }
         };
 
             int res = _dbHelper.ExecuteSP_ReturnInt("[sp_Auth_ChangePassword_PasswordChange]", p);
@@ -424,15 +432,21 @@ namespace CoreOne.API.Repositories
         }
 
         // 🔹 Reset Password
+        public string Generate4DigitCode()
+        {
+            return RandomNumberGenerator.GetInt32(0, 10000).ToString("D4");
+        }
         public PasswordValidationResponse ResetPassword(int? userId, string newPwd, string token)
         {
-            string hash = PasswordHelper.HashPassword(newPwd);
-
+            string saltKey = Generate4DigitCode();
+            string hash = _PasswordHelper.EncryptPassword(newPwd, saltKey);
+           
             var p = new Dictionary<string, object>
         {
             { "@UserID", userId },
             { "@NewPassword", hash },
-            { "@Token", token }
+            { "@Token", token },
+             { "@Saltkey", saltKey }
         };
 
             int res = _dbHelper.ExecuteSP_ReturnInt("[sp_Auth_ResetPassword_PasswordReset]", p);

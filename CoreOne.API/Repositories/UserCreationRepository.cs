@@ -11,10 +11,12 @@ namespace CoreOne.API.Repositories
     public class UserCreationRepository : IUserCreationRepository
     {
         private readonly DBContext _dbHelper;
+        private PasswordHelper _PasswordHelper;
 
-        public UserCreationRepository(DBContext dbHelper)
+        public UserCreationRepository(DBContext dbHelper, PasswordHelper passwordHelper)
         {
             _dbHelper = dbHelper;
+            _PasswordHelper = passwordHelper;
         }
 
         public DataTable GetUsers(int pageSize, int pageNumber, string? search, string? sortColumn, string? sortDir, string? searchCol, string status)
@@ -38,13 +40,26 @@ namespace CoreOne.API.Repositories
 
             return _dbHelper.ExecuteSP_ReturnDataTable("sp_UserCreation_PagedSortedSearched", parameters);
         }
+        public  string GetLast4Digits(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                return "";
+
+            phoneNumber = new string(phoneNumber.Where(char.IsDigit).ToArray()); // keep only digits
+
+            if (phoneNumber.Length < 4)
+                return phoneNumber;
+
+            return phoneNumber.Substring(phoneNumber.Length - 4);
+        }
 
         public int SaveUser(string recType, UserCreation user)
         {
             string newHash = "";
             if (!String.IsNullOrEmpty(user.PasswordHash))
             {
-                newHash=PasswordHelper.HashPassword(user.PasswordHash);
+                string saltKey = GetLast4Digits(user.PhoneNumber);
+                newHash = _PasswordHelper.EncryptPassword(user.PasswordHash, saltKey);
                 
             }
 
@@ -73,7 +88,8 @@ namespace CoreOne.API.Repositories
             string newHash = "";
             if (!String.IsNullOrEmpty(user.PasswordHash))
             {
-                newHash = PasswordHelper.HashPassword(user.PasswordHash);
+                string saltKey = GetLast4Digits(user.PhoneNumber);
+                newHash = _PasswordHelper.EncryptPassword(user.PasswordHash, saltKey);
 
             }
 
