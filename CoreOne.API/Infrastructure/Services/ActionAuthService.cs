@@ -22,7 +22,7 @@ public class ActionAuthService
     /// <summary>
     /// Returns true if the current user has permission for the given ModuleId + ActionId
     /// </summary>
-    public async Task<bool> HasPermissionAsync(int moduleId, int actionId)
+    public async Task<bool> HasPermissionAsync(int UserID, int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID,int moduleId, int actionId)
     {
         var httpCtx = _httpContextAccessor.HttpContext;
         if (httpCtx == null) return false;
@@ -43,7 +43,7 @@ public class ActionAuthService
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
 
-                List<ActionDto> res = (List<ActionDto>)_permissionController.GetUserPermissions();
+                List<ActionDto> res = (List<ActionDto>)_permissionController.GetUserPermissions(UserID, CurrentApplicationID, CurrentCompanyID, CurrentRoleID);
 
                 if (res==null)
                 {

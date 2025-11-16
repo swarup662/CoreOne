@@ -30,6 +30,14 @@ namespace CoreOne.UI.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
+            var firtstpath = context.Request.Path.Value?.Trim().ToLower();
+
+            // Redirect only if path is "/" or empty
+            if (firtstpath == "/" || string.IsNullOrEmpty(firtstpath))
+            {
+                context.Response.Redirect("/Account/Login");
+                return;  // IMPORTANT: Stop pipeline
+            }
             var token = context.Request.Cookies["jwtToken"];
             var path = context.Request.Path.Value?.Split('?')[0].ToLower() ?? "";
             

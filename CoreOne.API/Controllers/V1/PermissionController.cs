@@ -18,20 +18,7 @@ public class PermissionController : ControllerBase
         _permissionRepo = permissionRepo;
     }
 
-    private int? GetUserIdFromBearer()
-    {
-        var auth = Request.Headers["Authorization"].FirstOrDefault();
-        if (string.IsNullOrEmpty(auth) || !auth.StartsWith("Bearer ")) return null;
-        var token = auth.Substring("Bearer ".Length).Trim();
-        var handler = new JwtSecurityTokenHandler();
-        try
-        {
-            var jwt = handler.ReadJwtToken(token);
-            var claim = jwt.Claims.FirstOrDefault(c => c.Type == "UserID")?.Value;
-            return int.TryParse(claim, out var uid) ? uid : (int?)null;
-        }
-        catch { return null; }
-    }
+ 
 
     // KEEP: GetUserMenu (unchanged)
     [HttpGet("GetUserMenu/{userID}/{CurrentApplicationID}/{CurrentCompanyID}/{CurrentRoleID}")]
@@ -42,12 +29,11 @@ public class PermissionController : ControllerBase
     }
 
     // NEW: Allowed actions for current caller for a module
-    [HttpGet("GetUserPermissions")]
-    public IActionResult GetUserPermissions()
+    [HttpGet("GetUserPermissions/{UserID}/{CurrentApplicationID}/{CurrentCompanyID}/{CurrentRoleID}")]
+    public IActionResult GetUserPermissions(int UserID, int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID)
     {
-        var caller = GetUserIdFromBearer();
-        if (caller == null) return Unauthorized();
-        var list = _permissionRepo.GetUserAllowedActions(caller.Value);
+        
+        var list = _permissionRepo.GetUserAllowedActions(UserID, CurrentApplicationID, CurrentCompanyID, CurrentRoleID);
         return Ok(list);
     }
 
@@ -55,10 +41,7 @@ public class PermissionController : ControllerBase
     [HttpPost("HasPermission")]
     public IActionResult HasPermission([FromBody] HasPermissionRequest req)
     {
-        var caller = GetUserIdFromBearer();
-        if (caller == null) return Unauthorized();
-
-        var allowed = _permissionRepo.HasPermission(caller.Value, req.MenuModuleID, req.ActionID);
+        var allowed = _permissionRepo.HasPermission(req,req.MenuModuleID, req.ActionID);
         return Ok(new { allowed });
     }
 

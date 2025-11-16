@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using CoreOne.DOMAIN.Models;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 
@@ -19,7 +20,7 @@ namespace CoreOne.API.Helpers
         /// Processes HTML string and removes <has-permission module-id="x" action-id="y"> blocks
         /// if the user doesn't have permission
         /// </summary>
-        public async Task<string> ProcessAsync(string html)
+        public async Task<string> ProcessAsync(string html, int UserID, int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID)
         {
             if (string.IsNullOrEmpty(html)) return html;
 
@@ -36,7 +37,7 @@ namespace CoreOne.API.Helpers
                 var actionId = int.Parse(match.Groups["action"].Value);
                 var innerHtml = match.Groups["inner"].Value;
 
-                var hasPerm = await _permissionService.HasPermissionAsync(moduleId, actionId);
+                var hasPerm = await _permissionService.HasPermissionAsync( UserID,  CurrentApplicationID,  CurrentCompanyID,  CurrentRoleID, moduleId, actionId);
 
                 if (hasPerm)
                 {

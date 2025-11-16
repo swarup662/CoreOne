@@ -24,6 +24,10 @@ namespace CoreOne.DOMAIN.Models
 
     public class HasPermissionRequest
     {
+        public int? UserID { get; set; }
+        public int? CurrentApplicationID { get; set; }
+        public int? CurrentCompanyID { get; set; }
+        public int? CurrentRoleID { get; set; }
         public int MenuModuleID { get; set; }
         public int ActionID { get; set; }
     }

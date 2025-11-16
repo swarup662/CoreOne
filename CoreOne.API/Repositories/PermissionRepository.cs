@@ -57,11 +57,14 @@ namespace CoreOne.API.Repositories
 
     
 
-        public List<ActionDto> GetUserAllowedActions(int userID)
+        public List<ActionDto> GetUserAllowedActions(int userID, int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID)
         {
             var parameters = new Dictionary<string, object>
         {
             { "@UserID", userID },
+            { "@CurrentApplicationID", CurrentApplicationID },
+            { "@CurrentCompanyID", CurrentCompanyID },
+             { "@CurrentRoleID", CurrentRoleID },
             { "@MenuModuleID", 0 }
         };
 
@@ -80,13 +83,17 @@ namespace CoreOne.API.Repositories
             return list;
         }
 
-        public bool HasPermission(int userID, int menuModuleId, int actionId)
+        public bool HasPermission(HasPermissionRequest req, int menuModuleId, int actionId)
         {
             var parameters = new Dictionary<string, object>
         {
-            { "@UserID", userID },
+            { "@UserID", req.UserID },
+            { "@CurrentApplicationID", req.CurrentApplicationID },
+            { "@CurrentCompanyID",  req.CurrentCompanyID },
+             { "@CurrentRoleID",  req.CurrentRoleID },
             { "@MenuModuleID", menuModuleId },
             { "@ActionID", actionId }
+
         };
 
             var dt = _dbHelper.ExecuteSP_ReturnDataTable("sp_Permission_CheckUserPermission", parameters);
@@ -97,5 +104,7 @@ namespace CoreOne.API.Repositories
             if (val == DBNull.Value) return false;
             return Convert.ToInt32(val) == 1;
         }
+
+        
     }
 }

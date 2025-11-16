@@ -18,12 +18,14 @@ public class PermissionTagHelper : TagHelper
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ApiSettingsHelper _apiSettings;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly SignedCookieHelper _cookieHelper;
 
-    public PermissionTagHelper(IHttpClientFactory httpClientFactory, SettingsService settingsService, IHttpContextAccessor httpContextAccessor)
+    public PermissionTagHelper(IHttpClientFactory httpClientFactory, SettingsService settingsService, IHttpContextAccessor httpContextAccessor, SignedCookieHelper cookieHelper)
     {
         _httpClientFactory = httpClientFactory;
         _apiSettings = settingsService.ApiSettings;
         _httpContextAccessor = httpContextAccessor;
+        _cookieHelper = cookieHelper;
     }
 
     [HtmlAttributeName("module-id")]
@@ -54,9 +56,9 @@ public class PermissionTagHelper : TagHelper
             {
                 var client = _httpClientFactory.CreateClient();
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
+                var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
                 // Fetch ALL allowed actions for user in one call
-                var url = $"{_apiSettings.BaseUrlPermission}/GetUserPermissions/";
+                var url = $"{_apiSettings.BaseUrlPermission}/GetUserPermissions/{user.UserID}/{user.CurrentApplicationID}/{user.CurrentCompanyID}/{user.CurrentRoleID}";
                 var res = await client.GetAsync(url);
                 if (!res.IsSuccessStatusCode)
                 {

@@ -8,14 +8,16 @@ public class PermissionHelper
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ApiSettingsHelper _apiSettings;
+    private readonly SignedCookieHelper _cookieHelper;
 
     private const string CacheKey = "__AllAllowedActions";
 
-    public PermissionHelper(IHttpContextAccessor httpContextAccessor, IHttpClientFactory httpClientFactory, SettingsService settingsService)
+    public PermissionHelper(IHttpContextAccessor httpContextAccessor, IHttpClientFactory httpClientFactory, SettingsService settingsService, SignedCookieHelper cookieHelper)
     {
         _httpContextAccessor = httpContextAccessor;
         _httpClientFactory = httpClientFactory;
         _apiSettings = settingsService.ApiSettings;
+        _cookieHelper = cookieHelper;
     }
 
     /// <summary>
@@ -25,7 +27,7 @@ public class PermissionHelper
     {
         var httpCtx = _httpContextAccessor.HttpContext;
         if (httpCtx == null) return false;
-
+        var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
         // Cache permissions in HttpContext.Items for the lifetime of the request
         if (!httpCtx.Items.ContainsKey(CacheKey))
         {
@@ -41,7 +43,7 @@ public class PermissionHelper
                 var client = _httpClientFactory.CreateClient();
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var url = $"{_apiSettings.BaseUrlPermission}/GetUserPermissions/";
+                var url = $"{_apiSettings.BaseUrlPermission}/GetUserPermissions/{user.UserID}/{user.CurrentApplicationID}/{user.CurrentCompanyID}/{user.CurrentRoleID}";
                 var res = await client.GetAsync(url);
 
                 if (!res.IsSuccessStatusCode)

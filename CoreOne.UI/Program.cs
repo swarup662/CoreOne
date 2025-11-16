@@ -109,7 +109,11 @@ app.UseMiddleware<AuthorizationMiddleware>(); // Your token expiry middleware
 app.UseAuthorization();
 
 app.MapStaticAssets();
-
+app.MapGet("/", context =>
+{
+    context.Response.Redirect("/Account/Login");
+    return Task.CompletedTask;
+});
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Account}/{action=Login}");

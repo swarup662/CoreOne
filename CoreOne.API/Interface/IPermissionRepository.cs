@@ -9,7 +9,7 @@ public interface IPermissionRepository
         List<MenuItem> GetUserMenu(int userID, int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID);
 
     // NEW:
-    List<ActionDto> GetUserAllowedActions(int userID);
-    bool HasPermission(int userID, int menuModuleId, int actionId);
+    List<ActionDto> GetUserAllowedActions(int userID, int CurrentApplicationID, int CurrentCompanyID, int CurrentRoleID);
+        bool HasPermission(HasPermissionRequest req, int menuModuleId, int actionId);
 }
 }
