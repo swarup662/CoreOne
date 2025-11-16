@@ -5,10 +5,10 @@
 }
 <style>
     body.authentication-bg-pattern {
-        background-image: url('@Url.Content("~/assets/images/bg-material1.jpg")');
-        background-attachment: fixed;
-        background-size: cover;
-        background-repeat: no-repeat;
+    background-image: url('@Url.Content("~/assets/images/bg-material1.jpg")');
+    background-attachment: fixed;
+    background-size: cover;
+    background-repeat: no-repeat;
     }
 </style>
 <link href="~/css/login.css" rel="stylesheet" />
@@ -97,11 +97,86 @@
         </div>
     </div>
 
-    <!-- 🔔 Toast handling -->
+    <!-- ✅ Toast Notifications -->
+    @{
+        var message = TempData["message"];
+        var messagetype = TempData["messagetype"];
+        TempData.Remove("message");
+        TempData.Remove("messagetype");
+
+
+    }
+
+    @if (message != null)
+    {
+    
+        string messageType = messagetype?.ToString() ?? "";
+
+        if (string.Equals(messageType, "error", StringComparison.OrdinalIgnoreCase))
+        {
+            <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;margin-right: -18px;">
+                <div class="toast show border border-danger rounded shadow-sm"
+                     style="background-color: #dc3545; color:white;"
+                     role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body d-flex align-items-center" style="color:white;">
+                            <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                            @message
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        }
+        else if (string.Equals(messageType, "success", StringComparison.OrdinalIgnoreCase))
+        {
+            <div aria-live="polite" aria-atomic="true"
+                 class="toast-container-fixed p-3" style="z-index: 1080;margin-right: -18px;">
+                <div class="toast show border border-success rounded shadow-sm"
+                     style="background-color: #28a745; color:white;"
+                     role="alert" aria-live="assertive" aria-atomic="true">
+
+                    <div class="d-flex">
+                        <div class="toast-body d-flex align-items-center" style="color:white;">
+                            <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                            @message
+                        </div>
+                        <button type="button"
+                                class="btn-close btn-close-white me-2 m-auto"
+                                data-bs-dismiss="toast" aria-label="Close">
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+        }
+        else
+        {
+            <div aria-live="polite" aria-atomic="true" class="position-fixed top-0 end-0 p-3" style="z-index: 1080;">
+                <div class="toast show border border-warning rounded shadow-sm"
+                     style="background-color: #ffc107; color:#212529;"
+                     role="alert" aria-live="assertive" aria-atomic="true">
+
+                    <div class="d-flex">
+                        <div class="toast-body d-flex align-items-center" style="color:#212529;">
+                            <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                            @message
+                        </div>
+                        <button type="button" class="btn-close me-2 m-auto"
+                                data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+
     @* (unchanged) *@
 
     <script src="~/assets/js/vendor.min.js"></script>
     <script src="~/assets/js/app.min.js"></script>
+    
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {

@@ -36,7 +36,12 @@ namespace CoreOne.UI.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                TempData["message"] =  "Login failed";
+                TempData["messagetype"] = "error";
+                return View();
+            }
 
             var client = _httpClientFactory.CreateClient();
             var url = $"{_apiSettings.BaseUrlAuth}/login";
@@ -51,7 +56,7 @@ namespace CoreOne.UI.Controllers
                 var result = JsonConvert.DeserializeObject<dynamic>(resultJson);
                 TempData["message"] = result?.message ?? "Login failed";
                 TempData["messagetype"] = "error";
-                return View(model);
+                return View();
             }
 
             var data = JsonConvert.DeserializeObject<dynamic>(resultJson);
@@ -88,10 +93,13 @@ namespace CoreOne.UI.Controllers
                 var keyJson = await companyKeyRes.Content.ReadAsStringAsync();
                 var keyObj = JsonConvert.DeserializeObject<dynamic>(keyJson);
                 string csKey = keyObj.key;
-
+                TempData["message"] = "Login successfull";
+                TempData["messagetype"] = "success";
                 // 2. Redirect company selection with cache key
                 return Redirect($"/Account/CompanySelection?cs={csKey}");
             }
+            TempData["message"] = "Login successfull";
+            TempData["messagetype"] = "success";
             return Redirect($"/Account/CompanySelection");
         }
 
