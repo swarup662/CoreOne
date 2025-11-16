@@ -248,19 +248,25 @@ $(document).ready(function () {
     });
 
     // === Verify Application URL ===
-    async function verifyApplicationUrl(url) {
-        $('#preloader').find('.loading-text').text('Connecting to application...');
-        try {
-            const check = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
-            $('#preloader').fadeOut(200);
-            showToast('Application launched successfully!', 'success');
-                    
-            setTimeout(() => { window.location.href = url; }, 800);
-        } catch (err) {
-            $('#preloader').fadeOut(200);
-            showToast('Failed to connect. The application server is not responding.', 'error');
+         async function verifyApplicationUrl(url) {
+            $('#preloader').find('.loading-text').text('Connecting to application...');
+
+            try {
+                const baseUrl = new URL(url).origin;
+
+                const check = await fetch(baseUrl, { method: 'GET', mode: 'no-cors' });
+
+                $('#preloader').fadeOut(200);
+                showToast('Application launched successfully!', 'success');
+
+                setTimeout(() => { window.location.href = url; }, 800);
+
+            } catch (err) {
+                $('#preloader').fadeOut(200);
+                showToast('Failed to connect. The application server is not responding.', 'error');
+            }
         }
-    }
+
 
     // === Compact Toast (Success & Error) ===
     function showToast(message, type = 'error') {

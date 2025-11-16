@@ -10,6 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddSingleton<SettingsService>();
 builder.Services.AddScoped<MenuLayoutController>();
 builder.Services.Configure<ApiSettingsHelper>(builder.Configuration.GetSection("ApiSettings"));
@@ -30,7 +32,6 @@ builder.Services.Configure<FileUploadSettings>(options =>
     options.UploadModules = settings.UploadModules;
 });
 
-builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<TokenHandler>();
 
 // Register a "true" default HttpClient pipeline that includes TokenHandler

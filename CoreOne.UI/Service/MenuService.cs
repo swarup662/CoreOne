@@ -10,18 +10,23 @@ namespace CoreOne.UI.Service
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ApiSettingsHelper _apiSettings;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MenuService(IHttpClientFactory httpClientFactory, SettingsService settingsService)
+        private readonly SignedCookieHelper _cookieHelper;
+
+        public MenuService(IHttpClientFactory httpClientFactory, SettingsService settingsService, SignedCookieHelper cookieHelper, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = httpClientFactory;
             _apiSettings = settingsService.ApiSettings;
+            _cookieHelper= cookieHelper;
+            _httpContextAccessor= httpContextAccessor;
         }
 
         public async Task<List<MenuItem>> GetUserMenu(HttpContext context)
         {
             var menuItems = new List<MenuItem>();
 
-            var userId = TokenHelper.GetUserIdFromToken(context);
+            var user = TokenHelper.UserFromToken(_httpContextAccessor.HttpContext, _cookieHelper);
             var token = context.Request.Cookies["jwtToken"];
 
             var client = _httpClientFactory.CreateClient();
@@ -32,7 +37,9 @@ namespace CoreOne.UI.Service
                     new AuthenticationHeaderValue("Bearer", token);
             }
 
-            var response = await client.GetAsync($"{_apiSettings.BaseUrlPermission}/GetUserMenu/{userId}");
+            var response = await client.GetAsync($"{_apiSettings.BaseUrlPermission}/GetUserMenu/{user.UserID}/{user.CurrentApplicationID}/{user.CurrentCompanyID}/{user.CurrentRoleID}");
+
+
 
             if (response.IsSuccessStatusCode)
             {

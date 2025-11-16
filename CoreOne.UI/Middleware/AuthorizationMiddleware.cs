@@ -32,17 +32,51 @@ namespace CoreOne.UI.Middleware
         {
             var token = context.Request.Cookies["jwtToken"];
             var path = context.Request.Path.Value?.Split('?')[0].ToLower() ?? "";
+            
+            var existendpoint = context.GetEndpoint();
 
-
-            // Skip login page
-            if (string.IsNullOrEmpty(token) || path.Contains("/account/login") || path.Contains("/api/FileUpload/viewPost") || path.Contains("/account/forgotpassword")
-                || path.Contains("/account/resetpassword") || path.Contains("/auth/getswitchoptions") || path.Contains("/account/logout"))
+            // ❌ If endpoint is null → route does not exist → return 404
+            if (existendpoint == null)
             {
+                context.Response.Redirect("/Home/Error?statusCode=404&errorMessage=Page not found");
+                return;
+            }
+
+            // Skip login-related and public pages
+            if (path.Contains("/account/login")
+                || path.Contains("/api/fileupload/viewpost")
+                || path.Contains("/account/forgotpassword")
+                || path.Contains("/account/resetpassword")
+                || path.Contains("/auth/getswitchoptions")
+                || path.Contains("/account/logout")
+                      || path.Contains("/account/companyselection")
+                      || path.Contains("/account/getapplicationsbycompany")
+                      || path.Contains("/account/getcompanies")
+                      || path.Contains("/account/urlexistsasync")
+                      || path.Contains("/account/launchApp")
+                      || path.Contains("/account/validatecompanyselection")
+                          || path.Contains("/account/launchapp")
+                      || path.Contains("/account/companylogout")
+                         || path.Contains("/account/cleartempData")
+                          || path.Contains("/auth/consume")
+                             || path.Contains("/auth/setusercontext")
+                                || path.Contains("/auth/getcurrentcontext")
+                                      || path.Contains("/notification/clearall")
+                                            || path.Contains("/notification/Markasread")
+                )
+            { 
                 await _next(context);
                 return;
             }
             else
             {
+                bool IsTokenValid = TokenHelper.IsTokenValid(context);
+                if (!IsTokenValid)
+                {
+                    context.Response.Redirect("/Account/Login");
+                    return;
+                }
+
                 string[] alwaysAllowedViews =
                                 {
                     "/dashboard",
@@ -59,29 +93,7 @@ namespace CoreOne.UI.Middleware
                     return;
                 }
 
-                // ✅ Fetch menu and capture MenuID early
-
-                bool TokenValid = TokenHelper.IsTokenValid(context);
-
-                MenuItem matchedMenu = new MenuItem();
-                List<MenuItem> menuList = new List<MenuItem>();
-                if (TokenValid)
-                {
-
-                    var menuService = context.RequestServices.GetRequiredService<IMenuService>();
-                     menuList = await menuService.GetUserMenu(context);
-                    matchedMenu = menuList.FirstOrDefault(m =>
-                       !string.IsNullOrEmpty(m.Url) &&
-                       path.StartsWith(m.Url.ToLower())
-                   );
-                }
-                // ✅ Store MenuID and full menulist (for layout)
-                if (matchedMenu != null)
-                {
-                    context.Items["MenuID"] = matchedMenu.MenuID;
-                    context.Items["UserMenu"] = menuList;
-                }
-
+              
                 var endpoint = context.GetEndpoint();
 
                 // Get MVC action descriptor (if MVC)
@@ -94,11 +106,11 @@ namespace CoreOne.UI.Middleware
                 // ✅ Detect API endpoint based on ApiController attribute
                 bool isApiEndpoint = endpoint?.Metadata
                     .Any(m => m.GetType().Name == "ApiControllerAttribute") == true;
+          ;
 
                 // ✅ Detect real view rendering (ViewResult or PartialViewResult)
-                bool isViewAction =
-                     typeof(ViewResult).IsAssignableFrom(action?.MethodInfo.ReturnType) ||
-                     typeof(PartialViewResult).IsAssignableFrom(action?.MethodInfo.ReturnType);
+
+                bool isViewAction = IsRealViewAction(action);
 
 
                 // ------------------------------------
@@ -125,7 +137,39 @@ namespace CoreOne.UI.Middleware
                     await _next(context);
                     return;
                 }
+                // ✅ Fetch menu and capture MenuID early
 
+                bool TokenValid = TokenHelper.IsTokenValid(context);
+
+                MenuItem matchedMenu = new MenuItem();
+                List<MenuItem> menuList = new List<MenuItem>();
+                if (TokenValid)
+                {
+
+                    var menuService = context.RequestServices.GetRequiredService<IMenuService>();
+                    menuList = await menuService.GetUserMenu(context);
+                    if (menuList is null || menuList.Count == 0)
+                    {
+                        context.Response.Redirect("/Home/Error?statusCode=403&errorMessage=Access Denied");
+                        return;
+                    }
+                    matchedMenu = menuList.FirstOrDefault(m =>
+                       !string.IsNullOrEmpty(m.Url) &&
+                       path.StartsWith(m.Url.ToLower())
+                   );
+                }
+                // ✅ Store MenuID and full menulist (for layout)
+                if (matchedMenu != null)
+                {
+                    context.Items["MenuID"] = matchedMenu.MenuID;
+                    context.Items["UserMenu"] = menuList;
+                }
+                else if (matchedMenu == null)
+                {
+                    context.Response.Redirect("/Home/Error?statusCode=403&errorMessage=Access Denied");
+                    return;
+
+                }
                 // ✅ If it's a full View (ViewResult) and NOT in menu → Access Denied
                 if (matchedMenu == null)
                 {
@@ -173,7 +217,41 @@ namespace CoreOne.UI.Middleware
             // Token is valid → let [Authorize] handle role/claim access
             await _next(context);
         }
-    
+
+        private bool IsRealViewAction(ControllerActionDescriptor action)
+        {
+            if (action == null) return false;
+
+            var method = action.MethodInfo;
+
+            // 1. Must be inside a Controller (not ControllerBase)
+            if (!typeof(Controller).IsAssignableFrom(action.ControllerTypeInfo))
+                return false;
+
+            // 2. Must NOT be [HttpPost], [HttpPut], [HttpDelete]
+            if (method.GetCustomAttributes(typeof(HttpPostAttribute), false).Any()) return false;
+            if (method.GetCustomAttributes(typeof(HttpPutAttribute), false).Any()) return false;
+            if (method.GetCustomAttributes(typeof(HttpDeleteAttribute), false).Any()) return false;
+
+            // 3. Must NOT be API-like
+            if (method.GetCustomAttributes(typeof(ProducesAttribute), false).Any()) return false;
+            if (method.GetCustomAttributes(typeof(ProducesResponseTypeAttribute), false).Any()) return false;
+
+            // 4. Must NOT be NonAction
+            if (method.GetCustomAttributes(typeof(NonActionAttribute), false).Any()) return false;
+
+            // 5. Must NOT return JSON, File, Redirect, or PartialView explicitly
+            var rt = method.ReturnType;
+
+            if (typeof(JsonResult).IsAssignableFrom(rt)) return false;
+            if (typeof(FileResult).IsAssignableFrom(rt)) return false;
+            if (typeof(RedirectResult).IsAssignableFrom(rt)) return false;
+            if (typeof(RedirectToActionResult).IsAssignableFrom(rt)) return false;
+            if (typeof(PartialViewResult).IsAssignableFrom(rt)) return false;
+
+            // If all checks passed → it is a real View()
+            return true;
+        }
 
         private async Task CallLogoutApi(int userId)
         {
