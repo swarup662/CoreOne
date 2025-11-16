@@ -2,6 +2,7 @@
 using CoreOne.UI.Controllers;
 using CoreOne.UI.Helper;
 using CoreOne.UI.Middleware;
+using CoreOne.UI.Middleware.Filter;
 using CoreOne.UI.Service;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
@@ -9,7 +10,11 @@ using Microsoft.Extensions.Options;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews(options =>
+{
+    options.Filters.Add<AuthorizationFilter>();   // 👈 GLOBAL AUTH FILTER
+});
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSingleton<SettingsService>();
@@ -105,7 +110,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseMiddleware<UiErrorLoggingMiddleware>();
-app.UseMiddleware<AuthorizationMiddleware>(); // Your token expiry middleware
 app.UseAuthorization();
 
 app.MapStaticAssets();
